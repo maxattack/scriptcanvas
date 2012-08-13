@@ -13,7 +13,7 @@ namespace EntityComponentSystem {
 	typedef uint32_t EntityHandle;
 	typedef uint32_t ComponentHandle;
 	typedef uint32_t Type;		// component handle's most significant byte
-	typedef uint32_t ID;			// component handle sans system specifier
+	typedef uint32_t ID;		// component handle sans system specifier
 
 	/*
 	Systems are "Batch Operators" which do things like graphics,
