@@ -12,7 +12,7 @@ namespace EntityComponentSystem {
 	
 	typedef uint32_t EntityHandle;
 	typedef uint32_t ComponentHandle;
-	typedef uint32_t SystemType;		// component handle's most significant byte
+	typedef uint32_t Type;		// component handle's most significant byte
 	typedef uint32_t ID;			// component handle sans system specifier
 
 	/*
@@ -30,7 +30,7 @@ namespace EntityComponentSystem {
 		virtual void DestroyComponent(ID i) = 0;
 	};
 
-	SystemType RegisterSystem(ISystem *s);
+	Type RegisterSystem(ISystem *s);
 
 	/*
 	All the basic interface for creating logic entities, attaching components,
@@ -44,12 +44,12 @@ namespace EntityComponentSystem {
 	
 	EntityHandle CreateEntity();
 
-	ComponentHandle AddComponent(EntityHandle e, SystemType type);
+	ComponentHandle AddComponent(EntityHandle e, Type type);
 
-	SystemType GetType(ComponentHandle c);
+	Type GetType(ComponentHandle c);
 	ID GetID(ComponentHandle c);
 
-	ComponentHandle GetComponent(EntityHandle e, SystemType t);
+	ComponentHandle GetComponent(EntityHandle e, Type t);
 
 	class ComponentIterator {
 	private:

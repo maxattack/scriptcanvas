@@ -15,7 +15,7 @@ struct EntityComponentRecord {
 static std::vector<ISystem*> gSystems;
 static std::vector<EntityComponentRecord> gDatabase;
 
-SystemType RegisterSystem(ISystem *s) {
+Type RegisterSystem(ISystem *s) {
 	gSystems.push_back(s);
 	return gSystems.size() - 1;
 }
@@ -26,7 +26,7 @@ EntityHandle CreateEntity() {
 	return ++mNext;
 }
 
-ComponentHandle AddComponent(EntityHandle e, SystemType type) {
+ComponentHandle AddComponent(EntityHandle e, Type type) {
 	unsigned result = gSystems[type]->AddComponent();
 	if (result) {
 		result |= (type<<24);
@@ -38,7 +38,7 @@ ComponentHandle AddComponent(EntityHandle e, SystemType type) {
 	return result;
 }
 
-SystemType GetType(ComponentHandle c) { 
+Type GetType(ComponentHandle c) { 
 	return c >> 24; 
 }
 
@@ -47,7 +47,7 @@ ID GetID(ComponentHandle c) {
 }
 
 
-ComponentHandle GetComponent(EntityHandle e, SystemType t) {
+ComponentHandle GetComponent(EntityHandle e, Type t) {
 	for(auto p=gDatabase.begin(); p!=gDatabase.end(); ++p) {
 		if (p->e == e and GetType(p->c) == t) {
 			return p->c;
