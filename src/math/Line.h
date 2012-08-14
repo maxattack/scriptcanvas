@@ -16,16 +16,16 @@
 
 #pragma once
 
-#include "Vec2.h"
+#include "Vec.h"
 
 struct Line {
-  Vec2 p0;
-  Vec2 p1;
+  Vec p0;
+  Vec p1;
   
-  Vec2 ValueAt(float u) const { return p0 + u * (p1 - p0); }
-  Vec2 DerivAt(float u) const { return p1 - p0; }
-  Vec2 Delta() const { return p1 - p0; }
-  void Offset(Vec2 d) { p0+=d; p1+=d; }
+  Vec ValueAt(float u) const { return p0 + u * (p1 - p0); }
+  Vec DerivAt(float u) const { return p1 - p0; }
+  Vec Delta() const { return p1 - p0; }
+  void Offset(Vec d) { p0+=d; p1+=d; }
 };
 
 bool Intersection(const Line& U, const Line& V, float& u);

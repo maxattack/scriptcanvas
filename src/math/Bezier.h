@@ -15,15 +15,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
-#include "Vec2.h"
+#include "Vec.h"
 
 struct CubicBezier {
-	Vec2 p0;
-	Vec2 p1;
-	Vec2 p2;
-	Vec2 p3;
+	Vec p0;
+	Vec p1;
+	Vec p2;
+	Vec p3;
   
-	Vec2 ValueAt(float u) const {
+	Vec ValueAt(float u) const {
 		return 
       ((1.0f-u) * (1.0f-u) * (1.0f-u)) * p0 +
       (3.0f * (1.0f-u) * (1.0f-u) * u) * p1 +
@@ -31,7 +31,7 @@ struct CubicBezier {
       (u * u * u) * p3;
 	}
   
-	Vec2 DerivAt(float u)const {
+	Vec DerivAt(float u)const {
 		return 3.0f * (
       (-(1.0f-u) * (1.0f-u)) * p0 +
       (1.0f - 4.0f * u + 3.0f * u * u) * p1 +
@@ -43,15 +43,15 @@ struct CubicBezier {
 };
 
 struct QuadraticBezier {
-  Vec2 p0;
-  Vec2 p1;
-  Vec2 p2;
+  Vec p0;
+  Vec p1;
+  Vec p2;
   
-    Vec2 ValueAt(float u) const {
+    Vec ValueAt(float u) const {
         return ((1.0f-u)*(1.0f-u))*p0 + (2.0f*(1.0f-u)*u)*p1 + (u*u)*p2;
     }
     
-    Vec2 DerivAt(float u)const {
+    Vec DerivAt(float u)const {
         return (2.0f*(1.0f-u))*(p1-p0) + (2.0f*u)*(p2-p1);
     }
 };

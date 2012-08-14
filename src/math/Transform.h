@@ -16,27 +16,27 @@
 
 #pragma once
 
-#include "Vec2.h"
+#include "Vec.h"
 
 struct Transform {
 
-  Vec2 q;
-  Vec2 t;
+  Vec q;
+  Vec t;
 
-  Vec2 TransformPoint(Vec2 p) const { return q*p + t; }
-  Vec2 TransformVector(Vec2 v) const { return q*v; }
-  Vec2 InvTransformPoint(Vec2 p) const { return (p - t)/q; }
-  Vec2 InvTransformVector(Vec2 v) const { return v/q; }
+  Vec TransformPoint(Vec p) const { return q*p + t; }
+  Vec TransformVector(Vec v) const { return q*v; }
+  Vec InvTransformPoint(Vec p) const { return (p - t)/q; }
+  Vec InvTransformVector(Vec v) const { return v/q; }
 
   Transform() {}
-  Transform(Vec2 aq, Vec2 at) : q(aq), t(at) {}
+  Transform(Vec aq, Vec at) : q(aq), t(at) {}
 
-  inline static Transform Identity() { return Transform(vec2(1,0), vec2(0,0)); }
+  inline static Transform Identity() { return Transform(vec(1,0), vec(0,0)); }
 
-  bool IsIdentity() const { return t.Norm() < 0.001f && (q-vec2(1,0)).Norm() < 0.001f; }
+  bool IsIdentity() const { return t.Norm() < 0.001f && (q-vec(1,0)).Norm() < 0.001f; }
   
   Transform Inverse() const { 
-    Vec2 qInv = vec2(1,0)/q;
+    Vec qInv = vec(1,0)/q;
     return Transform(qInv, -t*qInv);
   }
 
@@ -45,18 +45,18 @@ struct Transform {
   }
 };
 
-inline Transform Translation(Vec2 t) {
-  return Transform(vec2(1,0), t);
+inline Transform Translation(Vec t) {
+  return Transform(vec(1,0), t);
 }
 
 inline Transform Rotation(float radians) {
-  return Transform(Polar(1,radians), vec2(0,0));
+  return Transform(Polar(1,radians), vec(0,0));
 }
 
 inline Transform Scale(float k) {
-  return Transform(vec2(k,0), vec2(0,0));
+  return Transform(vec(k,0), vec(0,0));
 }
 
-inline Transform TRS(Vec2 t, float radians, float scale) {
+inline Transform TRS(Vec t, float radians, float scale) {
   return Transform(Polar(scale, radians), t);
 }
