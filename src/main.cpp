@@ -20,7 +20,7 @@ public:
 
 class QuackSystem : public ISystem, Table<Duck,32> {
 public:
-	ID AddComponent() {
+	ID CreateComponent() {
 		return Add();
 	}
 
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 	auto qtype = RegisterSystem(&q);
 	auto e = CreateEntity();
 	auto c = AddComponent(e, qtype);
-	q.GetDuck(GetID(c)).SetMessage("Quack!");
+	q.GetDuck(c).SetMessage("Quack!");
 	q.BatchQuack();
 	DestroyEntity(e);
 	q.BatchQuack();

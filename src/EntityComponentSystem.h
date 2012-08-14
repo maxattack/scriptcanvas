@@ -4,21 +4,20 @@
 namespace EntityComponentSystem {
 	
 	/*
-	Definitions of the basic numeric ID types.  The only
+	Definitions of the basic numeric ComponentID types.  The only
 	functional requirements is that these handles match 
 	Lua's native word size so they can be passed around
 	inexpensively in scripts.
 	*/
 	
 	typedef uint32_t EntityHandle;
-	typedef uint64_t ComponentHandle;
-	typedef uint32_t Type;		// component handle's most significant word
-	typedef uint32_t ID;		// component handle's least significant word
+	typedef uint32_t ComponentType;
+	typedef uint32_t ComponentID;
 
 	/*
 	Systems are "Batch Operators" which do things like graphics,
 	physics, AI, etc.  The only requirement is that they are able
-	to assign valid database IDs to their components.
+	to assign valid database ComponentIDs to their components.
 	
 	I'm actually not too keen on this interface, but I figure I'll
 	implement it and see how it goes.
@@ -26,11 +25,11 @@ namespace EntityComponentSystem {
 
 	class ISystem {
 	public:
-		virtual ID AddComponent() = 0;
-		virtual void DestroyComponent(ID i) = 0;
+		virtual ComponentID CreateComponent() = 0;
+		virtual void DestroyComponent(ComponentID i) = 0;
 	};
 
-	Type RegisterSystem(ISystem *s);
+	ComponentType RegisterSystem(ISystem *s);
 
 	/*
 	All the basic interface for creating logic entities, attaching components,
@@ -44,12 +43,8 @@ namespace EntityComponentSystem {
 	
 	EntityHandle CreateEntity();
 
-	ComponentHandle AddComponent(EntityHandle e, Type type);
-
-	Type GetType(ComponentHandle c);
-	ID GetID(ComponentHandle c);
-
-	ComponentHandle GetComponent(EntityHandle e, Type t);
+	ComponentID AddComponent(EntityHandle e, ComponentType t);
+	ComponentID GetComponent(EntityHandle e, ComponentType t);
 
 	class ComponentIterator {
 	private:
@@ -57,11 +52,10 @@ namespace EntityComponentSystem {
 		unsigned i;
 	public:
 		ComponentIterator(EntityHandle e);
-		ComponentHandle Next();
+		bool Next(ComponentType* outType, ComponentID* outID);
 	};
 
-	void DestroyComponent(ComponentHandle c);
-
+	void DestroyComponent(ComponentType t, ComponentID id);
 	void DestroyEntity(EntityHandle e);
 
 	/*
@@ -86,7 +80,7 @@ private:
 public:
 	Ogre() {
 		hEntity = CreateEntity();
-		// Precache component IDs, to avoid per-frame lookups
+		// Precache component ComponentIDs, to avoid per-frame lookups
 		hPhys = AddComponent(hEntity, hPhysics);
 		hRend = AddComponent(hEntity, hRendering);
 		hOgre = AddComponent(hEntity, hOgre);

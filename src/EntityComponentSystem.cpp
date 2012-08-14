@@ -9,13 +9,14 @@ namespace EntityComponentSystem {
 
 struct EntityComponentRecord {
 	EntityHandle e;
-	ComponentHandle c;
+	ComponentType t;
+	ComponentID c;
 };
 
 static std::vector<ISystem*> gSystems;
 static std::vector<EntityComponentRecord> gDatabase;
 
-Type RegisterSystem(ISystem *s) {
+ComponentType RegisterSystem(ISystem *s) {
 	gSystems.push_back(s);
 	return gSystems.size();
 }
@@ -26,30 +27,21 @@ EntityHandle CreateEntity() {
 	return ++mNext;
 }
 
-ComponentHandle AddComponent(EntityHandle e, Type type) {
-	uint64_t result = gSystems[type-1]->AddComponent();
+ComponentID AddComponent(EntityHandle e, ComponentType t) {
+	ComponentID result = gSystems[t-1]->CreateComponent();
 	if (result) {
-		result |= (uint64_t(type)<<32);
 		EntityComponentRecord record;
 		record.e = e;
+		record.t = t;
 		record.c = result;
 		gDatabase.push_back(record);
 	}
 	return result;
 }
 
-Type GetType(ComponentHandle c) { 
-	return c >> 32; 
-}
-
-ID GetID(ComponentHandle c) {
-	return c & 0xffffffff;
-}
-
-
-ComponentHandle GetComponent(EntityHandle e, Type t) {
+ComponentID GetComponent(EntityHandle e, ComponentType t) {
 	for(auto p=gDatabase.begin(); p!=gDatabase.end(); ++p) {
-		if (p->e == e and GetType(p->c) == t) {
+		if (p->e == e and p->t == t) {
 			return p->c;
 		}
 	}
@@ -59,20 +51,21 @@ ComponentHandle GetComponent(EntityHandle e, Type t) {
 ComponentIterator::ComponentIterator(EntityHandle e) : e(e), i(0) {
 }
 
-ComponentHandle ComponentIterator::Next() {
+bool ComponentIterator::Next(ComponentType* outType, ComponentID* outID) {
 	while(i++ < gDatabase.size()) {
 		if (gDatabase[i-1].e == e) {
-			return gDatabase[i-1].c;
+			*outType = gDatabase[i-1].t;
+			*outID = gDatabase[i-1].c;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
-
-void DestroyComponent(ComponentHandle c) {
-	gSystems[GetType(c)-1]->DestroyComponent(GetID(c));
+void DestroyComponent(ComponentType t, ComponentID id) {
+	gSystems[t-1]->DestroyComponent(id);
 	for(auto p=gDatabase.begin(); p!=gDatabase.end(); ++p) {
-		if (p->c == c) {
+		if (p->t == t && p->c == id) {
 			gDatabase.erase(p);
 			break;
 		}
@@ -81,9 +74,10 @@ void DestroyComponent(ComponentHandle c) {
 
 void DestroyEntity(EntityHandle e) {
 	ComponentIterator i(e);
-	ComponentHandle c;
-	while((c = i.Next())) {
-		DestroyComponent(c);
+	ComponentType t;
+	ComponentID id;
+	while(i.Next(&t, &id)) {
+		DestroyComponent(t, id);
 	}
 }
 
