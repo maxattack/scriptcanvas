@@ -15,8 +15,15 @@ public:
 	void Quack() { std::cout << msg << std::endl; }
 };
 
-class QuackSystem : public EntityComponentSystem::ISystem, Table<Duck,32> {
+class QuackSystem : public EntityComponentSystem::ISystem, Table<Duck> {
+private:
+	IndexRecord mIndex[32];
+	Duck mDucks[32];
+
 public:
+	QuackSystem() : Table(32, mIndex, mDucks) {
+	}
+
 	ID CreateComponent() {
 		return Add();
 	}

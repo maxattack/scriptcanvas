@@ -1,6 +1,7 @@
 BIN = bubble
 CC = clang
 CFLAGS = -Os -g -fno-common -I/usr/local/include -Wall -Wno-c++11-extensions -Werror 
+CFLAGS += -DDEBUG=1
 CXXFLAGS = -fno-exceptions -fno-rtti
 LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw
 

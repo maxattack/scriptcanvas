@@ -35,17 +35,18 @@ struct IndexRecord {
     uint16_t next;
 };
 
-template<typename Record, unsigned Capacity>
+template<typename Record>
 class Table {
 private:
     uint32_t mCount;
     uint16_t mFreelistEnqueue;
     uint16_t mFreelistDequeue;
-    IndexRecord mIndex[Capacity];
-    Record mRecords[Capacity];
+    int mCapacity;
+    IndexRecord* mIndex;
+    Record* mRecords;
 
 public:
-    Table();
+    Table(int capacity, IndexRecord* indexBuffer, Record* recordBuffer);
 
     inline bool Contains(ID id) const {
         // use the lower-bits to find the record
@@ -61,21 +62,24 @@ public:
     void Remove(ID id);
 };
 
-template<typename Record, unsigned Capacity>
-Table<Record, Capacity>::Table() : 
+template<typename Record>
+Table<Record>::Table(int capacity, IndexRecord* indexBuffer, Record* recordBuffer) : 
     mCount(0), 
-    mFreelistEnqueue(Capacity-1), 
-    mFreelistDequeue(0) {
-    STATIC_ASSERT(Capacity <= MAX_CAPACITY);
+    mFreelistEnqueue(capacity-1), 
+    mFreelistDequeue(0),
+    mCapacity(capacity),
+    mIndex(indexBuffer),
+    mRecords(recordBuffer) {
+    ASSERT(mCapacity <= MAX_CAPACITY);
     // initialize the free queue linked-list
-    for(unsigned i=0; i<Capacity; ++i) {
+    for(unsigned i=0; i<mCapacity; ++i) {
         mIndex[i].id = i;
         mIndex[i].next = i+1;
     }
 }
 
-template<typename Record, unsigned Capacity>
-void Table<Record, Capacity>::Remove(ID id) {
+template<typename Record>
+void Table<Record>::Remove(ID id) {
     // assuming IDs are valid in production
     ASSERT(Contains(id));
     // lookup the index record
@@ -91,9 +95,9 @@ void Table<Record, Capacity>::Remove(ID id) {
     mFreelistEnqueue = id & INDEX_MASK;
 }
 
-template<typename Record, unsigned Capacity>
-ID Table<Record, Capacity>::Add() {
-    ASSERT(mCount < Capacity);
+template<typename Record>
+ID Table<Record>::Add() {
+    ASSERT(mCount < mCapacity);
     // dequeue a new index record - we do this in FIFO order so that
     // we don't "thrash" a record with interleaved add-remove calls
     // and use up the higher-order bits of the id
