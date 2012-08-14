@@ -48,11 +48,13 @@ public:
 
     bool IsActive(ID id) const {
         // use the lower-bits to find the record
-        const PoolIndex *p = mIndex + (id & 0xffff);
+        PoolIndex *p = mIndex + (id & 0xffff);
         return p->id == (id & 0x00ffffff) && p->index != USHRT_MAX;
     }
 
     T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[mIndex[id & 0xffff].index]; }
+    ID TakeOut();
+    void PutBack(ID id);
     
     T* Begin() const { return mBuffer; }
     T* End() const { return mBuffer + mCount; }
@@ -73,10 +75,6 @@ public:
     };
 
     Iterator Enumerate() { return Iterator(this); }
-    
-
-    ID TakeOut();
-    void PutBack(ID id);
 };
 
 template<typename T>

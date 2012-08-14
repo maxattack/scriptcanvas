@@ -43,6 +43,8 @@ public:
 
     bool IsActive(ID id) const;
     T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[id & 0xffff]; }
+    ID TakeOut();
+    void PutBack(ID id);
 
     class Iterator {
     private:
@@ -64,10 +66,6 @@ public:
     };
 
     Iterator Enumerate() { return Iterator(this); }
-
-    ID TakeOut();
-    void PutBack(ID id);
-
 };
 
 template<typename T>
