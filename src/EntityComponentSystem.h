@@ -11,8 +11,8 @@ namespace EntityComponentSystem {
     */
     
     typedef uint32_t EntityID;
-    typedef uint32_t ComponentType;
     typedef uint32_t ComponentID;
+    typedef uint8_t TypeID;
 
     // Should we roll "Type" and "ID" into one word?  E.g. 8-bit type, 24-bit ID.
     // Would require modifying the object pools to ignore the most significant byte.
@@ -32,7 +32,7 @@ namespace EntityComponentSystem {
         virtual void DestroyComponent(ComponentID i) = 0;
     };
 
-    ComponentType RegisterComponentType(ISystem *s);
+    TypeID RegisterComponentType(ISystem *s);
 
     /*
     All the basic interface for creating logic entities, attaching components,
@@ -45,9 +45,10 @@ namespace EntityComponentSystem {
     */
     
     EntityID CreateEntity();
+    TypeID GetType(ComponentID c);
 
-    ComponentID AddComponent(EntityID e, ComponentType t);
-    ComponentID GetComponent(EntityID e, ComponentType t);
+    ComponentID AddComponent(EntityID e, TypeID t);
+    ComponentID GetComponent(EntityID e, TypeID t);
 
     class ComponentIterator {
     private:
@@ -55,10 +56,10 @@ namespace EntityComponentSystem {
         unsigned i;
     public:
         ComponentIterator(EntityID e);
-        bool Next(ComponentType* outType, ComponentID* outID);
+        bool Next(ComponentID* outID);
     };
 
-    void DestroyComponent(ComponentType t, ComponentID id);
+    void DestroyComponent(ComponentID id);
     void DestroyEntity(EntityID e);
 
     /*

@@ -1,4 +1,5 @@
 #include "EntityComponentSystem.h"
+#include "util/Macros.h"
 #include <vector>
 #include <iostream>
 /*
@@ -9,39 +10,43 @@ namespace EntityComponentSystem {
 
 struct EntityComponentRecord {
     EntityID e;
-    ComponentType t;
     ComponentID c;
 };
 
 static std::vector<ISystem*> gSystems;
 static std::vector<EntityComponentRecord> gDatabase;
 
-ComponentType RegisterComponentType(ISystem *s) {
+TypeID RegisterComponentType(ISystem *s) {
     gSystems.push_back(s);
     return gSystems.size();
 }
 
 EntityID CreateEntity() {
     static EntityID mNext = 0;
-    // ASSERT(mNext != 0xffffffff);
+    ASSERT(mNext != 0xffffffff);
     return ++mNext;
 }
 
-ComponentID AddComponent(EntityID e, ComponentType t) {
+TypeID GetType(ComponentID c) {
+    return (0xff000000 & c) >> 24;
+}
+
+ComponentID AddComponent(EntityID e, TypeID t) {
     ComponentID result = gSystems[t-1]->CreateComponent();
     if (result) {
+        ASSERT(GetType(result) == 0);
+        result |= t << 24;
         EntityComponentRecord record;
         record.e = e;
-        record.t = t;
         record.c = result;
         gDatabase.push_back(record);
     }
     return result;
 }
 
-ComponentID GetComponent(EntityID e, ComponentType t) {
+ComponentID GetComponent(EntityID e, TypeID t) {
     for(auto p=gDatabase.begin(); p!=gDatabase.end(); ++p) {
-        if (p->e == e and p->t == t) {
+        if (p->e == e and GetType(p->c) == t) {
             return p->c;
         }
     }
@@ -51,10 +56,9 @@ ComponentID GetComponent(EntityID e, ComponentType t) {
 ComponentIterator::ComponentIterator(EntityID e) : e(e), i(0) {
 }
 
-bool ComponentIterator::Next(ComponentType* outType, ComponentID* outID) {
+bool ComponentIterator::Next(ComponentID* outID) {
     while(i++ < gDatabase.size()) {
         if (gDatabase[i-1].e == e) {
-            *outType = gDatabase[i-1].t;
             *outID = gDatabase[i-1].c;
             return true;
         }
@@ -62,10 +66,10 @@ bool ComponentIterator::Next(ComponentType* outType, ComponentID* outID) {
     return false;
 }
 
-void DestroyComponent(ComponentType t, ComponentID id) {
-    gSystems[t-1]->DestroyComponent(id);
+void DestroyComponent(ComponentID id) {
+    gSystems[GetType(id)-1]->DestroyComponent(id);
     for(auto p=gDatabase.begin(); p!=gDatabase.end(); ++p) {
-        if (p->t == t && p->c == id) {
+        if (p->c == id) {
             gDatabase.erase(p);
             break;
         }
@@ -74,10 +78,9 @@ void DestroyComponent(ComponentType t, ComponentID id) {
 
 void DestroyEntity(EntityID e) {
     ComponentIterator i(e);
-    ComponentType t;
     ComponentID id;
-    while(i.Next(&t, &id)) {
-        DestroyComponent(t, id);
+    while(i.Next(&id)) {
+        DestroyComponent(id);
     }
 }
 

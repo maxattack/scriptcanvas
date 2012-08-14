@@ -24,8 +24,6 @@ to the comments.
 
 typedef uint32_t ID; // record handle
 
-#define INDEX_MASK 0xffff
-#define NEW_ID_ADD 0x10000
 #define MAX_CAPACITY (64*1024)
 
 struct PoolIndex {
@@ -49,11 +47,11 @@ public:
 
     bool IsActive(ID id) const {
         // use the lower-bits to find the record
-        const PoolIndex *p = mIndex + (id & INDEX_MASK);
-        return p->id == id && p->index != USHRT_MAX;
+        const PoolIndex *p = mIndex + (id & 0xffff);
+        return p->id == (id & 0x00ffffff) && p->index != USHRT_MAX;
     }
 
-    T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[mIndex[id & INDEX_MASK].index]; }
+    T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[mIndex[id & 0xffff].index]; }
     T* Begin() const { return mBuffer; }
     T* End() const { return mBuffer + mCount; }
     ID TakeOut();
@@ -85,7 +83,8 @@ ID CompactPool<T>::TakeOut() {
     PoolIndex &in = mIndex[mFreelistDequeue];
     mFreelistDequeue = in.next;
     // increment the higher-order bits of the id
-    in.id += NEW_ID_ADD;
+    auto i = (((in.id & 0x00ff0000) >> 16) % 255) + 1;
+    in.id = (0xffff & in.id) | (i << 16);
     // push a new record into the buffer
     in.index = mCount++;
     // write the id to the record
@@ -97,14 +96,14 @@ void CompactPool<T>::PutBack(ID id) {
     // assuming IDs are valid in production
     ASSERT(IsActive(id));
     // lookup the index record
-    PoolIndex &in = mIndex[id & INDEX_MASK];
+    PoolIndex &in = mIndex[id & 0xffff];
     // move the last record into this slot
     T& record = mBuffer[in.index];
     record = mBuffer[--mCount];
     // update the index from the moved record
-    mIndex[record.id & INDEX_MASK].index = in.index;
+    mIndex[record.id & 0xffff].index = in.index;
     // free up this index record and enqueue
     in.index = USHRT_MAX;
-    mIndex[mFreelistEnqueue].next = id & INDEX_MASK;
-    mFreelistEnqueue = id & INDEX_MASK;
+    mIndex[mFreelistEnqueue].next = id & 0xffff;
+    mFreelistEnqueue = id & 0xffff;
 }

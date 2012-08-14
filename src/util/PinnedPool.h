@@ -25,8 +25,6 @@ cause slot-ambiguity issues :P
 #endif
 
 typedef uint32_t ID;
-#define INDEX_MASK 0xffff
-#define NEW_ID_ADD 0x10000
 #define MAX_CAPACITY (64*1024)
 
 // TODO propery test
@@ -44,7 +42,7 @@ public:
     PinnedPool(int capacity, uint32_t* mask, T* buffer);
 
     bool IsActive(ID id) const;
-    T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[id & INDEX_MASK]; }
+    T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[id & 0xffff]; }
 
     class Iterator {
     private:
@@ -87,7 +85,7 @@ PinnedPool<T>::PinnedPool(int capacity, uint32_t* mask, T* buffer) :
 
 template<typename T>
 bool PinnedPool<T>::IsActive(ID id) const {
-    id &= INDEX_MASK;
+    id &= 0xffff;
     return mMask[id >> 5] & (0x80000000 >> (id%32));
 }
 
@@ -101,13 +99,13 @@ ID PinnedPool<T>::TakeOut() {
     mMask[i] |= (0x80000000 >> localIndex);
     mWorkingMaskIndex = mMask[i] == 0xffffffff ? i+1 : i;
     mCount++;
-    return localIndex + (i << 5) + NEW_ID_ADD;
+    return localIndex + (i << 5) + 0x10000; // no way to count like in CompactPool :*(
 }
 
 template<typename T>
 void PinnedPool<T>::PutBack(ID id) {
     ASSERT(IsActive(id));
-    id &= INDEX_MASK;
+    id &= 0xffff;
     int maskIndex = id >> 5;
     mMask[maskIndex] ^= (0x80000000 >> (id%32));
     if (maskIndex < mWorkingMaskIndex) { mWorkingMaskIndex = maskIndex; }
