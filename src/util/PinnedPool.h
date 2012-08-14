@@ -16,7 +16,6 @@ cause slot-ambiguity issues :P
 
 #include <limits.h>
 #include <stdint.h>
-#include <cstdlib>
 #include "Macros.h"
 
 #if (__GNUC__ && !__clang__)|| __has_builtin(__builtin_clz)

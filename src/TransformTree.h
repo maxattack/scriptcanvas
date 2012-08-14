@@ -1,8 +1,6 @@
 #pragma once
 #include <limits.h>
 #include <stdint.h>
-#include <cstdlib>
-#include <cstdio>
 #include "math/Transform.h"
 
 #define T_INDEX_MASK 0xffff

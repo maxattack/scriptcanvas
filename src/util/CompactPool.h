@@ -20,7 +20,6 @@ to the comments.
 
 #include <limits.h>
 #include <stdint.h>
-#include <cstdlib>
 #include "Macros.h"
 
 typedef uint32_t ID; // record handle
