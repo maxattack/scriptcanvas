@@ -17,6 +17,7 @@ static std::vector<ISystem*> gSystems;
 static std::vector<EntityComponentRecord> gDatabase;
 
 TypeID RegisterComponentType(ISystem *s) {
+    ASSERT(gSystems.size() < 254);
     gSystems.push_back(s);
     return gSystems.size();
 }
