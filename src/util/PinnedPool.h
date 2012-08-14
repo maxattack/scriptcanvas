@@ -36,7 +36,7 @@ class PinnedPool {
 private:
     int mCount;
     int mCapacity;
-	int mWorkingMaskIndex;
+    int mWorkingMaskIndex;
     uint32_t* mMask;
     T* mBuffer;
 
@@ -76,7 +76,7 @@ template<typename T>
 PinnedPool<T>::PinnedPool(int capacity, uint32_t* mask, T* buffer) :
     mCount(0),
     mCapacity(capacity),
-	mWorkingMaskIndex(0),
+    mWorkingMaskIndex(0),
     mMask(mask),
     mBuffer(buffer) {
     ASSERT(mCapacity < MAX_CAPACITY);
@@ -99,7 +99,7 @@ ID PinnedPool<T>::TakeOut() {
     int localIndex = 0;
     while ((0x80000000 >> localIndex) & mMask[i]) { localIndex++; }
     mMask[i] |= (0x80000000 >> localIndex);
-	mWorkingMaskIndex = mMask[i] == 0xffffffff ? i+1 : i;
+    mWorkingMaskIndex = mMask[i] == 0xffffffff ? i+1 : i;
     mCount++;
     return localIndex + (i << 5) + NEW_ID_ADD;
 }
@@ -108,9 +108,9 @@ template<typename T>
 void PinnedPool<T>::PutBack(ID id) {
     ASSERT(IsActive(id));
     id &= INDEX_MASK;
-	int maskIndex = id >> 5;
+    int maskIndex = id >> 5;
     mMask[maskIndex] ^= (0x80000000 >> (id%32));
-	if (maskIndex < mWorkingMaskIndex) { mWorkingMaskIndex = maskIndex; }
+    if (maskIndex < mWorkingMaskIndex) { mWorkingMaskIndex = maskIndex; }
     mCount--;
 }
 
