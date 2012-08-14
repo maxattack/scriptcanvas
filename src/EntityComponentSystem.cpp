@@ -39,11 +39,11 @@ ComponentHandle AddComponent(EntityHandle e, Type type) {
 }
 
 Type GetType(ComponentHandle c) { 
-	return c >> 24; 
+	return c >> 32; 
 }
 
 ID GetID(ComponentHandle c) {
-	return c & 0x00ffffff;
+	return c & 0xffffffff;
 }
 
 
