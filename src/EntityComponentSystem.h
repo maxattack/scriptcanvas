@@ -14,6 +14,9 @@ namespace EntityComponentSystem {
 	typedef uint32_t ComponentType;
 	typedef uint32_t ComponentID;
 
+	// Should we roll "Type" and "ID" into one word?  E.g. 8-bit type, 24-bit ID.
+	// Would require modifying the object pools to ignore the most significant byte.
+
 	/*
 	Systems are "Batch Operators" which do things like graphics,
 	physics, AI, etc.  The only requirement is that they are able
@@ -81,9 +84,9 @@ public:
 	Ogre() {
 		hEntity = CreateEntity();
 		// Precache component ComponentIDs, to avoid per-frame lookups
-		hPhys = AddComponent(hEntity, hPhysics);
-		hRend = AddComponent(hEntity, hRendering);
-		hOgre = AddComponent(hEntity, hOgre);
+		hPhys = AddComponent(hEntity, kPhysics);
+		hRend = AddComponent(hEntity, kRendering);
+		hOgre = AddComponent(hEntity, kOgre);
 	}
 	
 	PhysComponent& Phys() { return PhysicsSystem::GetComponent(hPhys); }

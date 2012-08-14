@@ -2,14 +2,14 @@
 
 /*
 CompactPools are represent compact linear arrays of records,
-endower with an index array which provides cheap (3 op)
+endowed with an index array which provides cheap (3 op)
 lookup of records using 32-bit handles.
 
 CompactPools are very cache friendly, and simple to synchronize
 over multiple threads, making them ideal for creating fast,
 cache-friendly homogenous batch processes.
 
-Furthermore, tables and table IDs are trivial to serialize
+Furthermore, pools and table IDs are trivial to serialize
 and block-allocate without worrying about pointer-fixup.
 
 Often, you may need to copy this source and modify it to meet
@@ -48,13 +48,13 @@ private:
 public:
     CompactPool(int capacity, PoolIndex* indexBuffer, T* recordBuffer);
 
-    bool Contains(ID id) const {
+    bool IsActive(ID id) const {
         // use the lower-bits to find the record
         const PoolIndex *p = mIndex + (id & INDEX_MASK);
         return p->id == id && p->index != USHRT_MAX;
     }
 
-    T& operator[](ID id) { ASSERT(Contains(id)); return mBuffer[mIndex[id & INDEX_MASK].index]; }
+    T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[mIndex[id & INDEX_MASK].index]; }
     T* Begin() const { return mBuffer; }
     T* End() const { return mBuffer + mCount; }
     ID TakeOut();
@@ -96,7 +96,7 @@ ID CompactPool<T>::TakeOut() {
 template<typename T>
 void CompactPool<T>::PutBack(ID id) {
     // assuming IDs are valid in production
-    ASSERT(Contains(id));
+    ASSERT(IsActive(id));
     // lookup the index record
     PoolIndex &in = mIndex[id & INDEX_MASK];
     // move the last record into this slot
