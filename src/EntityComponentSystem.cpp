@@ -38,14 +38,6 @@ ComponentHandle AddComponent(EntityHandle e, Type type) {
 	return result;
 }
 
-struct Component {
-	ComponentHandle handle;
-	struct {
-		uint32_t type;
-		uint32_t id;
-	} part;
-};
-
 Type GetType(ComponentHandle c) { 
 	return c >> 32; 
 }
