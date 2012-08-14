@@ -1,11 +1,11 @@
 #pragma once
 
 /*
-Tables are represent compact linear arrays of records,
+CompactPools are represent compact linear arrays of records,
 endower with an index array which provides cheap (3 op)
 lookup of records using 32-bit handles.
 
-Tables are very cache friendly, and simple to synchronize
+CompactPools are very cache friendly, and simple to synchronize
 over multiple threads, making them ideal for creating fast,
 cache-friendly homogenous batch processes.
 
@@ -29,47 +29,47 @@ typedef uint32_t ID; // record handle
 #define NEW_ID_ADD 0x10000
 #define MAX_CAPACITY (64*1024)
 
-struct IndexRecord {
+struct PoolIndex {
     ID id;
     uint16_t index;
     uint16_t next;
 };
 
-template<typename Record>
-class Table {
+template<typename T>
+class CompactPool {
 private:
     uint32_t mCount;
     uint16_t mFreelistEnqueue;
     uint16_t mFreelistDequeue;
     int mCapacity;
-    IndexRecord* mIndex;
-    Record* mRecords;
+    PoolIndex* mIndex;
+    T* mBuffer;
 
 public:
-    Table(int capacity, IndexRecord* indexBuffer, Record* recordBuffer);
+    CompactPool(int capacity, PoolIndex* indexBuffer, T* recordBuffer);
 
     inline bool Contains(ID id) const {
         // use the lower-bits to find the record
-        const IndexRecord *p = mIndex + (id & INDEX_MASK);
+        const PoolIndex *p = mIndex + (id & INDEX_MASK);
         return p->id == id && p->index != USHRT_MAX;
     }
 
-    inline Record& operator[](ID id) { ASSERT(Contains(id)); return mRecords[mIndex[id & INDEX_MASK].index]; }
-    inline Record* Begin() const { return (Record*)mRecords; }
-    inline Record* End() const { return (Record*)mRecords + mCount; }
+    inline T& operator[](ID id) { ASSERT(Contains(id)); return mBuffer[mIndex[id & INDEX_MASK].index]; }
+    inline T* Begin() const { return (T*)mBuffer; }
+    inline T* End() const { return (T*)mBuffer + mCount; }
 
     ID Add();
     void Remove(ID id);
 };
 
-template<typename Record>
-Table<Record>::Table(int capacity, IndexRecord* indexBuffer, Record* recordBuffer) : 
+template<typename T>
+CompactPool<T>::CompactPool(int capacity, PoolIndex* indexBuffer, T* recordBuffer) : 
     mCount(0), 
     mFreelistEnqueue(capacity-1), 
     mFreelistDequeue(0),
     mCapacity(capacity),
     mIndex(indexBuffer),
-    mRecords(recordBuffer) {
+    mBuffer(recordBuffer) {
     ASSERT(mCapacity <= MAX_CAPACITY);
     // initialize the free queue linked-list
     for(unsigned i=0; i<mCapacity; ++i) {
@@ -78,15 +78,15 @@ Table<Record>::Table(int capacity, IndexRecord* indexBuffer, Record* recordBuffe
     }
 }
 
-template<typename Record>
-void Table<Record>::Remove(ID id) {
+template<typename T>
+void CompactPool<T>::Remove(ID id) {
     // assuming IDs are valid in production
     ASSERT(Contains(id));
     // lookup the index record
-    IndexRecord &in = mIndex[id & INDEX_MASK];
+    PoolIndex &in = mIndex[id & INDEX_MASK];
     // move the last record into this slot
-    Record& record = mRecords[in.index];
-    record = mRecords[--mCount];
+    T& record = mBuffer[in.index];
+    record = mBuffer[--mCount];
     // update the index from the moved record
     mIndex[record.id & INDEX_MASK].index = in.index;
     // free up this index record and enqueue
@@ -95,19 +95,19 @@ void Table<Record>::Remove(ID id) {
     mFreelistEnqueue = id & INDEX_MASK;
 }
 
-template<typename Record>
-ID Table<Record>::Add() {
+template<typename T>
+ID CompactPool<T>::Add() {
     ASSERT(mCount < mCapacity);
     // dequeue a new index record - we do this in FIFO order so that
     // we don't "thrash" a record with interleaved add-remove calls
     // and use up the higher-order bits of the id
-    IndexRecord &in = mIndex[mFreelistDequeue];
+    PoolIndex &in = mIndex[mFreelistDequeue];
     mFreelistDequeue = in.next;
     // increment the higher-order bits of the id
     in.id += NEW_ID_ADD;
     // push a new record into the buffer
     in.index = mCount++;
     // write the id to the record
-    return mRecords[in.index].id = in.id;
+    return mBuffer[in.index].id = in.id;
 }
 

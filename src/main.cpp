@@ -1,5 +1,5 @@
 #include "EntityComponentSystem.h"
-#include "util/Table.h"
+#include "util/CompactPool.h"
 #include <vector>
 #include <iostream>
 
@@ -15,29 +15,30 @@ public:
 	void Quack() { std::cout << msg << std::endl; }
 };
 
-class QuackSystem : public EntityComponentSystem::ISystem, Table<Duck> {
+class QuackSystem : public EntityComponentSystem::ISystem  {
 private:
-	IndexRecord mIndex[32];
+	CompactPool<Duck> mPool;
+	PoolIndex mIndex[32];
 	Duck mDucks[32];
 
 public:
-	QuackSystem() : Table(32, mIndex, mDucks) {
+	QuackSystem() : mPool(32, mIndex, mDucks) {
 	}
 
 	ID CreateComponent() {
-		return Add();
+		return mPool.Add();
 	}
 
 	void DestroyComponent(ID c) {
-		Remove(c);
+		mPool.Remove(c);
 	}
 	
 	Duck& GetDuck(ID c) {
-		return (*this)[c];
+		return mPool[c];
 	}
 	
 	void BatchQuack() {
-		for(auto p=Begin(); p!=End(); ++p) {
+		for(auto p=mPool.Begin(); p!=mPool.End(); ++p) {
 			p->Quack();
 		}
 	}
