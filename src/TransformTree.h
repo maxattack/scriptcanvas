@@ -15,13 +15,13 @@ typedef uint32_t TID;
 
 class TransformTree {
 private:
-	struct IndexSlot {
-    	TID id;
-    	uint16_t index;
-    	uint16_t next;
-	};
+    struct IndexSlot {
+        TID id;
+        uint16_t index;
+        uint16_t next;
+    };
 
-	uint32_t mBottomLevel;
+    uint32_t mBottomLevel;
     uint16_t mFreelistEnqueue;
     uint16_t mFreelistDequeue;
     uint16_t mCounts[T_MAX_DEPTH];
@@ -33,28 +33,28 @@ private:
     Transform mWorld[T_CAPACITY];
 
 public:
-	TransformTree();
+    TransformTree();
 
-	inline bool Contains(TID id) const {
+    inline bool Contains(TID id) const {
         const IndexSlot& slot = mIndex[id & T_INDEX_MASK];
         return slot.id == id && slot.index != USHRT_MAX;
-	}
+    }
 
-	inline uint32_t Count() const { return mCounts[mBottomLevel]; }
-	inline Transform& operator[](TID id) { return mLocal[mIndex[id & T_INDEX_MASK].index]; }
-	inline Transform GetWorld(TID id) const {  return mWorld[mIndex[id & T_INDEX_MASK].index]; }
+    inline uint32_t Count() const { return mCounts[mBottomLevel]; }
+    inline Transform& operator[](TID id) { return mLocal[mIndex[id & T_INDEX_MASK].index]; }
+    inline Transform GetWorld(TID id) const {  return mWorld[mIndex[id & T_INDEX_MASK].index]; }
 
-	unsigned LevelOf(TID id) const;
+    unsigned LevelOf(TID id) const;
 
-	TID AddRoot();
-	TID AddChild(TID parent);
-	void RemoveTree(TID id);
-	void Remove(TID id);
-	void Update();
+    TID AddRoot();
+    TID AddChild(TID parent);
+    void RemoveTree(TID id);
+    void Remove(TID id);
+    void Update();
 
 private:
 
-	IndexSlot& AllocateSlot(unsigned index);
-	void MoveData(unsigned src, unsigned dst);
+    IndexSlot& AllocateSlot(unsigned index);
+    void MoveData(unsigned src, unsigned dst);
 };
 

@@ -35,34 +35,34 @@ typedef uint32_t ID;
 template<typename T>
 class PinnedPool {
 private:
-	int mCount;
-	int mCapacity;
-	uint32_t* mMask;
-	T* mBuffer;
+    int mCount;
+    int mCapacity;
+    uint32_t* mMask;
+    T* mBuffer;
 
 public:
-	PinnedPool(int capacity, uint32_t* mask, T* buffer);
+    PinnedPool(int capacity, uint32_t* mask, T* buffer);
 
     bool IsActive(ID id) const;
     T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[id & INDEX_MASK]; }
 
     class Iterator {
     private:
-    	friend class PinnedPool<T>;
-    	PinnedPool<T> * mPool;
-    	int mMaskIndex;
-    	int mCurrentMask;
-    	int mCount;
-    	ID mCurrent;
+        friend class PinnedPool<T>;
+        PinnedPool<T> * mPool;
+        int mMaskIndex;
+        int mCurrentMask;
+        int mCount;
+        ID mCurrent;
 
-    	Iterator(PinnedPool<T> *p);
+        Iterator(PinnedPool<T> *p);
 
     public:
-    	bool Next();
-    	ID Current() { ASSERT(mCount>0); return mCurrent; }
-		operator T*();
-		T& operator*();
-		T* operator->();
+        bool Next();
+        ID Current() { ASSERT(mCount>0); return mCurrent; }
+        operator T*();
+        T& operator*();
+        T* operator->();
     };
 
     Iterator Enumerate() { return Iterator(this); }
@@ -74,79 +74,79 @@ public:
 
 template<typename T>
 PinnedPool<T>::PinnedPool(int capacity, uint32_t* mask, T* buffer) :
-	mCount(0),
-	mCapacity(capacity),
-	mMask(mask),
-	mBuffer(buffer) {
-	ASSERT(mCapacity < MAX_CAPACITY);
-	for(int i=0; i<(mCapacity+31)>>5; ++i) {
-		mMask[i] = 0;
-	}
+    mCount(0),
+    mCapacity(capacity),
+    mMask(mask),
+    mBuffer(buffer) {
+    ASSERT(mCapacity < MAX_CAPACITY);
+    for(int i=0; i<(mCapacity+31)>>5; ++i) {
+        mMask[i] = 0;
+    }
 }
 
 template<typename T>
 bool PinnedPool<T>::IsActive(ID id) const {
-	id &= INDEX_MASK;
-	return mMask[id >> 5] & (0x80000000 >> (id%32));
+    id &= INDEX_MASK;
+    return mMask[id >> 5] & (0x80000000 >> (id%32));
 }
 
 template<typename T>
 ID PinnedPool<T>::TakeOut() {
-	ASSERT(mCount < mCapacity);
-	int i=0;
-	while(mMask[i] == 0xffffffff) { ++i; }
-	int localIndex = 0;
-	while ((0x80000000 >> localIndex) & mMask[i]) { localIndex++; }
-	mMask[i] |= (0x80000000 >> localIndex);
-	mCount++;
-	return localIndex + (i << 5) + NEW_ID_ADD;
+    ASSERT(mCount < mCapacity);
+    int i=0;
+    while(mMask[i] == 0xffffffff) { ++i; }
+    int localIndex = 0;
+    while ((0x80000000 >> localIndex) & mMask[i]) { localIndex++; }
+    mMask[i] |= (0x80000000 >> localIndex);
+    mCount++;
+    return localIndex + (i << 5) + NEW_ID_ADD;
 }
 
 template<typename T>
 void PinnedPool<T>::PutBack(ID id) {
-	ASSERT(IsActive(id));
-	id &= INDEX_MASK;
-	mMask[id >> 5] ^= (0x80000000 >> (id%32));
-	mCount--;
+    ASSERT(IsActive(id));
+    id &= INDEX_MASK;
+    mMask[id >> 5] ^= (0x80000000 >> (id%32));
+    mCount--;
 }
 
 template<typename T>
 PinnedPool<T>::Iterator::Iterator(PinnedPool<T> *p) : 
-	mPool(p), 
-	mMaskIndex(0), 
-	mCurrentMask(mPool->mMask[0]),
-	mCount(0),
-	mCurrent(0) {
+    mPool(p), 
+    mMaskIndex(0), 
+    mCurrentMask(mPool->mMask[0]),
+    mCount(0),
+    mCurrent(0) {
 }
 
 template<typename T>
 bool PinnedPool<T>::Iterator::Next() {
-	if (mCount >= mPool->mCount) {
-		return false;
-	}
-	while(!mCurrentMask) {
-		mMaskIndex++;
-		mCurrentMask = mPool->mMask[mMaskIndex];
-	}
-	int localIndex = CLZ(mCurrentMask);
-	mCurrentMask ^= 0x80000000 >> localIndex;
-	mCurrent = (mMaskIndex << 5) + localIndex;
-	mCount++;
-	return true;
+    if (mCount >= mPool->mCount) {
+        return false;
+    }
+    while(!mCurrentMask) {
+        mMaskIndex++;
+        mCurrentMask = mPool->mMask[mMaskIndex];
+    }
+    int localIndex = CLZ(mCurrentMask);
+    mCurrentMask ^= 0x80000000 >> localIndex;
+    mCurrent = (mMaskIndex << 5) + localIndex;
+    mCount++;
+    return true;
 }
 
 template<typename T>
 PinnedPool<T>::Iterator::operator T*() {
-	return mPool->mBuffer + Current();
+    return mPool->mBuffer + Current();
 }
 
 template<typename T>
 T& PinnedPool<T>::Iterator::operator*() {
-	return mPool->mBuffer[Current()];
+    return mPool->mBuffer[Current()];
 }
 
 template<typename T>
 T* PinnedPool<T>::Iterator::operator->() {
-	return mPool->mBuffer + Current();
+    return mPool->mBuffer + Current();
 }
 
