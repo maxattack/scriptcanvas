@@ -33,9 +33,7 @@ ComponentID AddComponent(EntityID e, TypeID t) {
     if (result) {
         ASSERT(GetType(result) == 0);
         result |= t << 24;
-        EntityComponentRecord record;
-        record.e = e;
-        record.c = result;
+        EntityComponentRecord record = { e, result };
         gDatabase.push_back(record);
     }
     return result;
