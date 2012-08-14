@@ -33,8 +33,7 @@ public:
     Duck& GetDuck(ID c) { return mPool[c]; }
     
     void BatchQuack() {
-        for(auto p=mPool.Begin(); p!=mPool.End(); ++p) {
-        // for(auto p=mPool.Enumerate(); p.Next();) {
+        for(auto p=mPool.Enumerate(); p.Next();) {
             p->Quack();
         }
     }
@@ -48,6 +47,11 @@ int main(int argc, char* argv[]) {
     auto e = CreateEntity();
     auto c = AddComponent(e, qtype);
     q.GetDuck(c).SetMessage("Quack!");
+
+    auto e0 = CreateEntity();
+    auto c0 = AddComponent(e0, qtype);
+    q.GetDuck(c0).SetMessage("(>'')>");
+
     q.BatchQuack();
     DestroyEntity(e);
     q.BatchQuack();
