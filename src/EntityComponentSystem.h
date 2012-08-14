@@ -77,17 +77,20 @@ Example C++ Class:
 class Ogre {
 private:
     EntityID hEntity;
-    ComponentHandle hPhys;
-    ComponentHandle hRend;
-    ComponentHandle hOgre;
+    ComponentID hPhys;
+    ComponentID hRend;
+    ComponentID hOgre;
     
 public:
     Ogre() {
         hEntity = CreateEntity();
-        // Precache component ComponentIDs, to avoid per-frame lookups
         hPhys = AddComponent(hEntity, kPhysics);
         hRend = AddComponent(hEntity, kRendering);
         hOgre = AddComponent(hEntity, kOgre);
+    }
+
+    ~Ogre() {
+        DestroyEntity(hEntity);
     }
     
     PhysComponent& Phys() { return PhysicsSystem::GetComponent(hPhys); }
