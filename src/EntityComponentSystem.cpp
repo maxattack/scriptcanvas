@@ -49,7 +49,7 @@ ComponentID GetComponent(EntityID e, TypeID t) {
 }
 
 TypeID GetType(ComponentID c) {
-    return (0xff000000 & c) >> 24;
+    return c >> 24;
 }
 
 
