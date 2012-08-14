@@ -8,7 +8,7 @@ A mind-numbingly stupid implementation just to get the wheels turning.
 namespace EntityComponentSystem {
 
 struct EntityComponentRecord {
-	EntityHandle e;
+	EntityID e;
 	ComponentType t;
 	ComponentID c;
 };
@@ -16,18 +16,18 @@ struct EntityComponentRecord {
 static std::vector<ISystem*> gSystems;
 static std::vector<EntityComponentRecord> gDatabase;
 
-ComponentType RegisterSystem(ISystem *s) {
+ComponentType RegisterComponentType(ISystem *s) {
 	gSystems.push_back(s);
 	return gSystems.size();
 }
 
-EntityHandle CreateEntity() {
-	static EntityHandle mNext = 0;
+EntityID CreateEntity() {
+	static EntityID mNext = 0;
 	// ASSERT(mNext != 0xffffffff);
 	return ++mNext;
 }
 
-ComponentID AddComponent(EntityHandle e, ComponentType t) {
+ComponentID AddComponent(EntityID e, ComponentType t) {
 	ComponentID result = gSystems[t-1]->CreateComponent();
 	if (result) {
 		EntityComponentRecord record;
@@ -39,7 +39,7 @@ ComponentID AddComponent(EntityHandle e, ComponentType t) {
 	return result;
 }
 
-ComponentID GetComponent(EntityHandle e, ComponentType t) {
+ComponentID GetComponent(EntityID e, ComponentType t) {
 	for(auto p=gDatabase.begin(); p!=gDatabase.end(); ++p) {
 		if (p->e == e and p->t == t) {
 			return p->c;
@@ -48,7 +48,7 @@ ComponentID GetComponent(EntityHandle e, ComponentType t) {
 	return 0;
 }
 
-ComponentIterator::ComponentIterator(EntityHandle e) : e(e), i(0) {
+ComponentIterator::ComponentIterator(EntityID e) : e(e), i(0) {
 }
 
 bool ComponentIterator::Next(ComponentType* outType, ComponentID* outID) {
@@ -72,7 +72,7 @@ void DestroyComponent(ComponentType t, ComponentID id) {
 	}
 }
 
-void DestroyEntity(EntityHandle e) {
+void DestroyEntity(EntityID e) {
 	ComponentIterator i(e);
 	ComponentType t;
 	ComponentID id;

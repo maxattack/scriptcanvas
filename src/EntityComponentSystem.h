@@ -10,7 +10,7 @@ namespace EntityComponentSystem {
 	inexpensively in scripts.
 	*/
 	
-	typedef uint32_t EntityHandle;
+	typedef uint32_t EntityID;
 	typedef uint32_t ComponentType;
 	typedef uint32_t ComponentID;
 
@@ -29,7 +29,7 @@ namespace EntityComponentSystem {
 		virtual void DestroyComponent(ComponentID i) = 0;
 	};
 
-	ComponentType RegisterSystem(ISystem *s);
+	ComponentType RegisterComponentType(ISystem *s);
 
 	/*
 	All the basic interface for creating logic entities, attaching components,
@@ -41,22 +41,22 @@ namespace EntityComponentSystem {
 	E.g.: someEntity:GetComponent(Physics)
 	*/
 	
-	EntityHandle CreateEntity();
+	EntityID CreateEntity();
 
-	ComponentID AddComponent(EntityHandle e, ComponentType t);
-	ComponentID GetComponent(EntityHandle e, ComponentType t);
+	ComponentID AddComponent(EntityID e, ComponentType t);
+	ComponentID GetComponent(EntityID e, ComponentType t);
 
 	class ComponentIterator {
 	private:
-		EntityHandle e;
+		EntityID e;
 		unsigned i;
 	public:
-		ComponentIterator(EntityHandle e);
+		ComponentIterator(EntityID e);
 		bool Next(ComponentType* outType, ComponentID* outID);
 	};
 
 	void DestroyComponent(ComponentType t, ComponentID id);
-	void DestroyEntity(EntityHandle e);
+	void DestroyEntity(EntityID e);
 
 	/*
 	EntityIterators?
@@ -72,7 +72,7 @@ Example C++ Class:
 
 class Ogre {
 private:
-	EntityHandle hEntity;
+	EntityID hEntity;
 	ComponentHandle hPhys;
 	ComponentHandle hRend;
 	ComponentHandle hOgre;

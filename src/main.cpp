@@ -3,8 +3,6 @@
 #include <vector>
 #include <iostream>
 
-using namespace EntityComponentSystem;
-
 class Duck {
 public:
 	ID id;
@@ -13,12 +11,11 @@ private:
 	const char* msg;
 	
 public:
-	Duck() : msg(0) {}
 	void SetMessage(const char* aMsg) { msg = aMsg; }
 	void Quack() { std::cout << msg << std::endl; }
 };
 
-class QuackSystem : public ISystem, Table<Duck,32> {
+class QuackSystem : public EntityComponentSystem::ISystem, Table<Duck,32> {
 public:
 	ID CreateComponent() {
 		return Add();
@@ -41,8 +38,9 @@ public:
 };
 
 int main(int argc, char* argv[]) {
+	using namespace EntityComponentSystem;
 	QuackSystem q;
-	auto qtype = RegisterSystem(&q);
+	auto qtype = RegisterComponentType(&q);
 	auto e = CreateEntity();
 	auto c = AddComponent(e, qtype);
 	q.GetDuck(c).SetMessage("Quack!");
