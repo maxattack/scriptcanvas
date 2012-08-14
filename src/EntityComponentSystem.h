@@ -12,7 +12,7 @@ namespace EntityComponentSystem {
     
     typedef uint32_t EntityID;
     typedef uint32_t ComponentID;
-    typedef uint8_t TypeID;
+    typedef uint32_t TypeID;
 
     // Should we roll "Type" and "ID" into one word?  E.g. 8-bit type, 24-bit ID.
     // Would require modifying the object pools to ignore the most significant byte.
