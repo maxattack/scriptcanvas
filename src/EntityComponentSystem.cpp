@@ -1,6 +1,6 @@
 #include "EntityComponentSystem.h"
 #include <vector>
-
+#include <iostream>
 /*
 A mind-numbingly stupid implementation just to get the wheels turning.
 */
@@ -17,7 +17,7 @@ static std::vector<EntityComponentRecord> gDatabase;
 
 Type RegisterSystem(ISystem *s) {
 	gSystems.push_back(s);
-	return gSystems.size() - 1;
+	return gSystems.size();
 }
 
 EntityHandle CreateEntity() {
@@ -27,9 +27,9 @@ EntityHandle CreateEntity() {
 }
 
 ComponentHandle AddComponent(EntityHandle e, Type type) {
-	unsigned result = gSystems[type]->AddComponent();
+	uint64_t result = gSystems[type-1]->AddComponent();
 	if (result) {
-		result |= (type<<24);
+		result |= (uint64_t(type)<<32);
 		EntityComponentRecord record;
 		record.e = e;
 		record.c = result;
@@ -37,6 +37,14 @@ ComponentHandle AddComponent(EntityHandle e, Type type) {
 	}
 	return result;
 }
+
+struct Component {
+	ComponentHandle handle;
+	struct {
+		uint32_t type;
+		uint32_t id;
+	} part;
+};
 
 Type GetType(ComponentHandle c) { 
 	return c >> 32; 
@@ -70,7 +78,7 @@ ComponentHandle ComponentIterator::Next() {
 
 
 void DestroyComponent(ComponentHandle c) {
-	gSystems[GetType(c)]->DestroyComponent(GetID(c));
+	gSystems[GetType(c)-1]->DestroyComponent(GetID(c));
 	for(auto p=gDatabase.begin(); p!=gDatabase.end(); ++p) {
 		if (p->c == c) {
 			gDatabase.erase(p);
