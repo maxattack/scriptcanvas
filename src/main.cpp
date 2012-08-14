@@ -33,7 +33,7 @@ public:
 int main(int argc, char* argv[]) {
     using namespace EntityComponentSystem;
     QuackSystem q;
-    auto qtype = RegisterComponentType(&q);
+    auto qtype = RegisterSystem(&q);
     auto e = CreateEntity();
     auto c = AddComponent(e, qtype);
     q.GetDuck(c).SetMessage("Quack!");

@@ -16,7 +16,7 @@ struct EntityComponentRecord {
 static std::vector<ISystem*> gSystems;
 static std::vector<EntityComponentRecord> gDatabase;
 
-TypeID RegisterComponentType(ISystem *s) {
+TypeID RegisterSystem(ISystem *s) {
     ASSERT(gSystems.size() < 254);
     gSystems.push_back(s);
     return gSystems.size();
@@ -26,10 +26,6 @@ EntityID CreateEntity() {
     static EntityID mNext = 0;
     ASSERT(mNext != 0xffffffff);
     return ++mNext;
-}
-
-TypeID GetType(ComponentID c) {
-    return (0xff000000 & c) >> 24;
 }
 
 ComponentID AddComponent(EntityID e, TypeID t) {
@@ -53,6 +49,11 @@ ComponentID GetComponent(EntityID e, TypeID t) {
     }
     return 0;
 }
+
+TypeID GetType(ComponentID c) {
+    return (0xff000000 & c) >> 24;
+}
+
 
 ComponentIterator::ComponentIterator(EntityID e) : e(e), i(0) {
 }

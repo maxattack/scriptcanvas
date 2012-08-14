@@ -32,7 +32,7 @@ namespace EntityComponentSystem {
         virtual void DestroyComponent(ComponentID i) = 0;
     };
 
-    TypeID RegisterComponentType(ISystem *s);
+    TypeID RegisterSystem(ISystem *s);
 
     /*
     All the basic interface for creating logic entities, attaching components,
@@ -45,10 +45,10 @@ namespace EntityComponentSystem {
     */
     
     EntityID CreateEntity();
-    TypeID GetType(ComponentID c);
 
     ComponentID AddComponent(EntityID e, TypeID t);
     ComponentID GetComponent(EntityID e, TypeID t);
+    TypeID GetType(ComponentID c);
 
     class ComponentIterator {
     private:
