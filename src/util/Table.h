@@ -54,8 +54,8 @@ public:
     }
 
     inline Record& operator[](ID id) { ASSERT(Contains(id)); return mRecords[mIndex[id & INDEX_MASK].index]; }
-    inline Record* Begin() const { return mRecords; }
-    inline Record* End() const { return mRecords + mCount; }
+    inline Record* Begin() const { return (Record*)mRecords; }
+    inline Record* End() const { return (Record*)mRecords + mCount; }
 
     ID Add();
     void Remove(ID id);

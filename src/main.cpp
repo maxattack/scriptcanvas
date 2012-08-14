@@ -1,10 +1,14 @@
 #include "EntityComponentSystem.h"
+#include "util/Table.h"
 #include <vector>
 #include <iostream>
 
 using namespace EntityComponentSystem;
 
 class Duck {
+public:
+	ID id;
+
 private:
 	const char* msg;
 	
@@ -14,26 +18,22 @@ public:
 	void Quack() { std::cout << msg << std::endl; }
 };
 
-class QuackSystem : public ISystem {
-private:
-	std::vector<Duck> mDucks;
+class QuackSystem : public ISystem, Table<Duck,32> {
 public:
 	ID AddComponent() {
-		Duck result;
-		mDucks.push_back(result);
-		return mDucks.size()-1;
+		return Add();
 	}
 
 	void DestroyComponent(ID c) {
-		// Just leak :P
+		Remove(c);
 	}
 	
 	Duck& GetDuck(ID c) {
-		return mDucks[c];
+		return (*this)[c];
 	}
 	
 	void BatchQuack() {
-		for(auto p=mDucks.begin(); p!=mDucks.end(); ++p) {
+		for(auto p=Begin(); p!=End(); ++p) {
 			p->Quack();
 		}
 	}
@@ -46,5 +46,7 @@ int main(int argc, char* argv[]) {
 	auto e = CreateEntity();
 	auto c = AddComponent(e, qtype);
 	q.GetDuck(GetID(c)).SetMessage("Quack!");
+	q.BatchQuack();
+	DestroyEntity(e);
 	q.BatchQuack();
 }
