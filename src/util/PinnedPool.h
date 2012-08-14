@@ -24,7 +24,7 @@ cause slot-ambiguity issues :P
 #define CLZ(x) _BitScanReverse(x)
 #endif
 
-typedef uint32_t ID;
+typedef uint32_t ID; // For compatibility w/ ComponentIDs, handles are just 24-bit
 #define MAX_CAPACITY (64*1024)
 
 // TODO propery test

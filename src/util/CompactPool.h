@@ -3,7 +3,8 @@
 /*
 CompactPools are represent compact linear arrays of records,
 endowed with an index array which provides cheap (3 op)
-lookup of records using 32-bit handles.
+lookup of records using 24-bit handles (could be 32, but we 
+reserved the high-order bit for Component TypeIDs).
 
 CompactPools are very cache friendly, and simple to synchronize
 over multiple threads, making them ideal for creating fast,
@@ -22,7 +23,7 @@ to the comments.
 #include <stdint.h>
 #include "Macros.h"
 
-typedef uint32_t ID; // record handle
+typedef uint32_t ID; // For compatibility w/ ComponentIDs, handles are just 24-bit
 
 #define MAX_CAPACITY (64*1024)
 
@@ -55,7 +56,7 @@ public:
     
     T* Begin() const { return mBuffer; }
     T* End() const { return mBuffer + mCount; }
-    
+
     class Iterator {
     private:
         friend class CompactPool<T>;
