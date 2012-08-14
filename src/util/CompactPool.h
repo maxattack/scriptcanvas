@@ -48,18 +48,17 @@ private:
 public:
     CompactPool(int capacity, PoolIndex* indexBuffer, T* recordBuffer);
 
-    inline bool Contains(ID id) const {
+    bool Contains(ID id) const {
         // use the lower-bits to find the record
         const PoolIndex *p = mIndex + (id & INDEX_MASK);
         return p->id == id && p->index != USHRT_MAX;
     }
 
-    inline T& operator[](ID id) { ASSERT(Contains(id)); return mBuffer[mIndex[id & INDEX_MASK].index]; }
-    inline T* Begin() const { return (T*)mBuffer; }
-    inline T* End() const { return (T*)mBuffer + mCount; }
-
-    ID Add();
-    void Remove(ID id);
+    T& operator[](ID id) { ASSERT(Contains(id)); return mBuffer[mIndex[id & INDEX_MASK].index]; }
+    T* Begin() const { return mBuffer; }
+    T* End() const { return mBuffer + mCount; }
+    ID TakeOut();
+    void PutBack(ID id);
 };
 
 template<typename T>
@@ -79,24 +78,7 @@ CompactPool<T>::CompactPool(int capacity, PoolIndex* indexBuffer, T* recordBuffe
 }
 
 template<typename T>
-void CompactPool<T>::Remove(ID id) {
-    // assuming IDs are valid in production
-    ASSERT(Contains(id));
-    // lookup the index record
-    PoolIndex &in = mIndex[id & INDEX_MASK];
-    // move the last record into this slot
-    T& record = mBuffer[in.index];
-    record = mBuffer[--mCount];
-    // update the index from the moved record
-    mIndex[record.id & INDEX_MASK].index = in.index;
-    // free up this index record and enqueue
-    in.index = USHRT_MAX;
-    mIndex[mFreelistEnqueue].next = id & INDEX_MASK;
-    mFreelistEnqueue = id & INDEX_MASK;
-}
-
-template<typename T>
-ID CompactPool<T>::Add() {
+ID CompactPool<T>::TakeOut() {
     ASSERT(mCount < mCapacity);
     // dequeue a new index record - we do this in FIFO order so that
     // we don't "thrash" a record with interleaved add-remove calls
@@ -111,3 +93,19 @@ ID CompactPool<T>::Add() {
     return mBuffer[in.index].id = in.id;
 }
 
+template<typename T>
+void CompactPool<T>::PutBack(ID id) {
+    // assuming IDs are valid in production
+    ASSERT(Contains(id));
+    // lookup the index record
+    PoolIndex &in = mIndex[id & INDEX_MASK];
+    // move the last record into this slot
+    T& record = mBuffer[in.index];
+    record = mBuffer[--mCount];
+    // update the index from the moved record
+    mIndex[record.id & INDEX_MASK].index = in.index;
+    // free up this index record and enqueue
+    in.index = USHRT_MAX;
+    mIndex[mFreelistEnqueue].next = id & INDEX_MASK;
+    mFreelistEnqueue = id & INDEX_MASK;
+}
