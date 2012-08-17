@@ -52,6 +52,10 @@ void DestroyEntity(EntityID e);
 
 /*
 	Iterators
+	
+	Kind of annoying that I have to expose some internal implementation
+	details here.  On the other hand... is there any other way to implement
+	this efficiently?
 */
 
 class EntityIterator {
