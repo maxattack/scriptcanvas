@@ -22,6 +22,7 @@ to the comments.
 #include <limits.h>
 #include <stdint.h>
 #include "Macros.h"
+#include "Alloc.h"
 
 typedef uint32_t ID; // For compatibility w/ ComponentIDs, handles are just 24-bit
 
@@ -41,10 +42,11 @@ private:
     uint16_t mFreelistDequeue;
     int mCapacity;
     PoolIndex* mIndex;
+	uint16_t* mBackBuffer;
     T* mBuffer;
 
 public:
-    CompactPool(int capacity, PoolIndex* indexBuffer, T* recordBuffer);
+    CompactPool(int capacity, PoolIndex* indexBuffer, uint16_t* backBuffer, T* recordBuffer);
 
     bool IsActive(ID id) const {
         // use the lower-bits to find the record
@@ -52,10 +54,13 @@ public:
         return p->id == (id & 0x00ffffff) && p->index != USHRT_MAX;
     }
 
+	
     T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[mIndex[id & 0xffff].index]; }
     ID TakeOut();
     void PutBack(ID id);
     
+	int Count() { return mCount; }
+	ID GetID(T* record) { return mIndex[mBackBuffer[record-mBuffer]].id; }
     T* Begin() const { return mBuffer; }
     T* End() const { return mBuffer + mCount; }
 
@@ -77,13 +82,24 @@ public:
     Iterator Enumerate() { return Iterator(this); }
 };
 
+template<typename T, int Capacity>
+class StaticCompactPool : public CompactPool<T> {
+private:
+	PoolIndex mIndexBuffer[Capacity];
+	uint16_t mBackBuffer[Capacity];
+	T mRecordBuffer[Capacity];
+public:
+	StaticCompactPool() : CompactPool<T>(Capacity, mIndexBuffer, mBackBuffer, mRecordBuffer) {}
+};
+
 template<typename T>
-CompactPool<T>::CompactPool(int capacity, PoolIndex* indexBuffer, T* recordBuffer) : 
+CompactPool<T>::CompactPool(int capacity, PoolIndex* indexBuffer, uint16_t* backBuffer, T* recordBuffer) : 
     mCount(0), 
     mFreelistEnqueue(capacity-1), 
     mFreelistDequeue(0),
     mCapacity(capacity),
     mIndex(indexBuffer),
+	mBackBuffer(backBuffer),
     mBuffer(recordBuffer) {
     ASSERT(mCapacity <= MAX_CAPACITY);
     // initialize the free queue linked-list
@@ -107,7 +123,9 @@ ID CompactPool<T>::TakeOut() {
     // push a new record into the buffer
     in.index = mCount++;
     // write the id to the record
-    return mBuffer[in.index].id = in.id;
+    //return mBuffer[in.index].id = in.id;
+	mBackBuffer[in.index] = 0xffff & in.id;
+	return in.id;
 }
 
 template<typename T>
@@ -120,7 +138,9 @@ void CompactPool<T>::PutBack(ID id) {
     T& record = mBuffer[in.index];
     record = mBuffer[--mCount];
     // update the index from the moved record
-    mIndex[record.id & 0xffff].index = in.index;
+    //mIndex[record.id & 0xffff].index = in.index;
+	mIndex[mBackBuffer[mCount]].index = in.index;
+
     // free up this index record and enqueue
     in.index = USHRT_MAX;
     mIndex[mFreelistEnqueue].next = id & 0xffff;

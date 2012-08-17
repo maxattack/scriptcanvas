@@ -1,4 +1,4 @@
-#include "EntityComponentSystem.h"
+#include "SceneSystem.h"
 #include "util/CompactPool.h"
 #include "util/PinnedPool.h"
 #include <vector>
@@ -10,15 +10,11 @@ struct Duck {
     void Quack() { std::cout << msg << std::endl; }
 };
 
-class QuackSystem : public EntityComponentSystem::ISystem  {
+class QuackSystem : public SceneSystem::IComponentFactory  {
 private:
-    PinnedPool<Duck> mPool;
-    uint32_t mMask[1];
-    Duck mDucks[32];
+    StaticPinnedPool<Duck, 32> mPool;
 
 public:
-    QuackSystem() : mPool(32, mMask, mDucks) {}
-
     ID CreateComponent() { return mPool.TakeOut(); }
     void DestroyComponent(ID c) {  mPool.PutBack(c); }
     
@@ -31,9 +27,9 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    using namespace EntityComponentSystem;
+    using namespace SceneSystem;
     QuackSystem q;
-    auto qtype = RegisterSystem(&q);
+    auto qtype = RegisterComponentType(&q);
     auto e = CreateEntity();
     auto c = AddComponent(e, qtype);
     q.GetDuck(c).SetMessage("Quack!");

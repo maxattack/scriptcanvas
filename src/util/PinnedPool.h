@@ -68,6 +68,15 @@ public:
     Iterator Enumerate() { return Iterator(this); }
 };
 
+template<typename T, int Capacity>
+class StaticPinnedPool : public PinnedPool<T> {
+private:
+	uint32_t mMask[(Capacity+31)>>5];
+	T mBuffer[Capacity];
+public:
+	StaticPinnedPool() : PinnedPool<T>(Capacity, mMask, mBuffer) {}
+};
+
 template<typename T>
 PinnedPool<T>::PinnedPool(int capacity, uint32_t* mask, T* buffer) :
     mCount(0),
