@@ -26,8 +26,8 @@ implement it and see how it goes.
 
 class IComponentFactory {
 public:
-    virtual ComponentID CreateComponent() = 0;
-    virtual void DestroyComponent(ComponentID i) = 0;
+	virtual ComponentID CreateComponent() = 0;
+	virtual void DestroyComponent(ComponentID i) = 0;
 };
 
 TypeID RegisterComponentType(IComponentFactory *s);
@@ -60,7 +60,7 @@ void DestroyEntity(EntityID e);
 
 class EntityIterator {
 private:
-	int i;
+	int32_t i;
 public:
 	EntityIterator();
 	bool Next(EntityID *outID);
@@ -76,11 +76,11 @@ public:
 
 class ComponentIterator {
 private:
-    EntityID e;
-    unsigned i;
+	EntityID e;
+	int32_t i;
 public:
-    ComponentIterator(EntityID e);
-    bool Next(ComponentID* outID);
+	ComponentIterator(EntityID e);
+	bool Next(ComponentID* outID);
 };
 
 }
