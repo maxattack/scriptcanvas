@@ -6,13 +6,17 @@
 
 /*
 A mind-numbingly stupid implementation just to get the wheels turning.
+
+Major Concerns:
+	- Efficient Entity->Component[] Mapping
+	- Efficient Transform DAG-Sorting, Batch Worldspace Calculation
 */
 
 namespace SceneSystem {
 
 struct EntityComponentRecord {
-    EntityID e;
-    ComponentID c;
+	EntityID e;
+	ComponentID c;
 };
 
 // Do not want this to really be object-oriented.
@@ -26,17 +30,17 @@ struct EntityRecord {
 };
 
 static std::vector<IComponentFactory*> gFactories;
-static std::vector<EntityComponentRecord> gDatabase;
+static std::vector<EntityComponentRecord> gComponents;
 static StaticCompactPool<EntityRecord, 256> gEntities;
 
 TypeID RegisterComponentType(IComponentFactory *s) {
-    ASSERT(gFactories.size() < 254);
-    gFactories.push_back(s);
-    return gFactories.size();
+	ASSERT(gFactories.size() < 254);
+	gFactories.push_back(s);
+	return gFactories.size();
 }
 
 EntityID CreateEntity(EntityID parent) {
-    auto result = gEntities.TakeOut();
+	auto result = gEntities.TakeOut();
 	auto& rec = gEntities[result];
 	rec.parent = 0;
 	rec.firstChild = 0;
@@ -91,7 +95,7 @@ void DetachFromParent(EntityID e) {
 }
 
 void ComputeWorldTransforms() {
-	// Nothing doing -- all the transforms are lazy in this crappy impl
+	// nothing doing
 }
 
 Transform& GetLocalTransform(EntityID e) {
@@ -109,37 +113,37 @@ Transform GetWorldTransform(EntityID e) {
 }
 
 TypeID GetType(ComponentID c) {
-    return c >> 24;
+	return c >> 24;
 }
 
 ComponentID GetComponent(EntityID e, TypeID t) {
-    for(auto p=gDatabase.begin(); p!=gDatabase.end(); ++p) {
-        if (p->e == e and GetType(p->c) == t) {
-            return p->c;
-        }
-    }
-    return 0;
+	for(auto p=gComponents.begin(); p!=gComponents.end(); ++p) {
+		if (p->e == e and GetType(p->c) == t) {
+			return p->c;
+		}
+	}
+	return 0;
 }
 
 ComponentID AddComponent(EntityID e, TypeID t) {
-    ComponentID result = gFactories[t-1]->CreateComponent();
-    if (result) {
-        ASSERT(GetType(result) == 0);
-        result |= t << 24;
-        EntityComponentRecord record = { e, result };
-        gDatabase.push_back(record);
-    }
-    return result;
+	ComponentID result = gFactories[t-1]->CreateComponent();
+	if (result) {
+		ASSERT(GetType(result) == 0);
+		result |= t << 24;
+		EntityComponentRecord record = { e, result };
+		gComponents.push_back(record);
+	}
+	return result;
 }
 
 void DestroyComponent(ComponentID id) {
-    gFactories[GetType(id)-1]->DestroyComponent(id);
-    for(auto p=gDatabase.begin(); p!=gDatabase.end(); ++p) {
-        if (p->c == id) {
-            gDatabase.erase(p);
-            break;
-        }
-    }
+	gFactories[GetType(id)-1]->DestroyComponent(id);
+	for(auto p=gComponents.begin(); p!=gComponents.end(); ++p) {
+		if (p->c == id) {
+			gComponents.erase(p);
+			break;
+		}
+	}
 }
 
 void DestroyEntity(EntityID e) {
@@ -147,11 +151,11 @@ void DestroyEntity(EntityID e) {
 	while(gEntities[e].firstChild) {
 		DestroyEntity(gEntities[e].firstChild);
 	}
-    ComponentIterator i(e);
-    ComponentID id;
-    while(i.Next(&id)) {
-        DestroyComponent(id);
-    }
+	ComponentIterator i(e);
+	ComponentID id;
+	while(i.Next(&id)) {
+		DestroyComponent(id);
+	}
 }
 
 
@@ -159,13 +163,13 @@ ComponentIterator::ComponentIterator(EntityID e) : e(e), i(0) {
 }
 
 bool ComponentIterator::Next(ComponentID* outID) {
-    while(i++ < gDatabase.size()) {
-        if (gDatabase[i-1].e == e) {
-            *outID = gDatabase[i-1].c;
-            return true;
-        }
-    }
-    return false;
+	while(i++ < gComponents.size()) {
+		if (gComponents[i-1].e == e) {
+			*outID = gComponents[i-1].c;
+			return true;
+		}
+	}
+	return false;
 }
 
 EntityIterator::EntityIterator() : i(0) {

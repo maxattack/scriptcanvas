@@ -140,7 +140,6 @@ void CompactPool<T>::PutBack(ID id) {
     // update the index from the moved record
     //mIndex[record.id & 0xffff].index = in.index;
 	mIndex[mBackBuffer[mCount]].index = in.index;
-
     // free up this index record and enqueue
     in.index = USHRT_MAX;
     mIndex[mFreelistEnqueue].next = id & 0xffff;

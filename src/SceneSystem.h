@@ -5,10 +5,13 @@
 namespace SceneSystem {
    
 /*
-Definitions of the basic numeric ComponentID types.  The only
-functional requirements is that these handles match 
-Lua's native word size so they can be passed around
-inexpensively in scripts.
+	Definitions of the basic numeric ComponentID types.
+	The only requirement is that these handles match 
+	Lua's native word size so they can be passed around
+	inexpensively in scripts.
+	
+	Right now the TypeID is encoded in the MSB of the 
+	ComponentID, requiring CIDs to only be 24-bit.
 */
 
 typedef uint32_t EntityID;
@@ -16,12 +19,7 @@ typedef uint32_t ComponentID;
 typedef uint32_t TypeID;
 
 /*
-Systems are "Batch Operators" which do things like graphics,
-physics, AI, etc.  The only requirement is that they are able
-to assign valid database ComponentIDs to their components.
-
-I'm actually not too keen on this interface, but I figure I'll
-implement it and see how it goes.
+	Abstract interface for batch-processing Component Factories.
 */
 
 class IComponentFactory {
@@ -30,17 +28,11 @@ public:
 	virtual void DestroyComponent(ComponentID i) = 0;
 };
 
-TypeID RegisterComponentType(IComponentFactory *s);
-
 /*
-All the basic interface for creating logic entities, attaching components,
-querying components, and destroying things.
-
-Typically, scripts will invoke these functions "like methods", so the
-first parameter should be the object's "self" ref.  
-
-E.g.: someEntity:GetComponent(Physics)
+	Core SceneSystem Functions
 */
+
+TypeID RegisterComponentType(IComponentFactory *s);
 
 EntityID CreateEntity(EntityID parent=0);
 EntityID GetParent(EntityID e);
@@ -57,6 +49,10 @@ ComponentID AddComponent(EntityID e, TypeID t);
 
 void DestroyComponent(ComponentID id);
 void DestroyEntity(EntityID e);
+
+/*
+	Iterators
+*/
 
 class EntityIterator {
 private:
@@ -83,13 +79,13 @@ public:
 	bool Next(ComponentID* outID);
 };
 
+/*
+	Entity status?  Uninitialized | Awake | Sleeping | Destroyed?
+	Serialization?
+*/
+
 }
 
-
- /*
- Entity status?  Uninitialized | Awake | Sleeping | Destroyed?
- Serialization?
- */
 
 /*
 Example C++ Class:
