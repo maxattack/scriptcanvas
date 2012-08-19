@@ -1,7 +1,5 @@
 #include "SceneSystem.h"
 #include "util/Macros.h"
-#include <iostream>
-
 
 namespace SceneSystem {
 
