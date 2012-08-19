@@ -1,132 +1,90 @@
 #pragma once
-#include <stdint.h>
+#include "util/Types.h"
 #include "math/Transform.h"
 
+//------------------------------------------------------------------------------
+// SCENE SYSTEM
+//
+// The core interface for composing a scene from a node heirarchy
+// and attaching components to nodes.  Nodes themselves are refered
+// to using plain-old numeric handles.  As with pointers, "0" indicates
+// a "NULL" node, for the purpose of conditional testing.
+//
+// Components themselves are completely managed in separate systems.  
+// The SceneSystem only manages the rapid manipulation of the scene
+// and efficient computation of a worldspace-transform buffer for 
+// the RenderSystem.
+//
+// The SceneSystem itself performs no dynamic memory allocation.  All
+// data records are preallocated in self-defragmenting pools, and should
+// be considered cache-friendly and concurrency-friendly.
+//------------------------------------------------------------------------------
+
 namespace SceneSystem {
-   
-/*
-	Definitions of the basic numeric ComponentID types.
-	The only requirement is that these handles match 
-	Lua's native word size so they can be passed around
-	inexpensively in scripts.
-	
-	Right now the TypeID is encoded in the MSB of the 
-	ComponentID, requiring CIDs to only be 24-bit.
-*/
 
-typedef uint32_t EntityID;
-typedef uint32_t ComponentID;
-typedef uint32_t TypeID;
+// How many nodes are currently active in the scene?
+int NodeCount();
 
-/*
-	Abstract interface for batch-processing Component Factories.
-*/
+// Create a new node, potentially rooted to another node and
+// retrieve it's handle.
+ID CreateNode(ID parent=0);
 
-class IComponentFactory {
-public:
-	virtual ComponentID CreateComponent() = 0;
-	virtual void DestroyComponent(ComponentID i) = 0;
+// Attach a node as a child of another node
+void AttachNode(ID parent, ID child);
+
+// Detach a node from it's parent
+void DetachNode(ID child);
+
+// Lookup a node's parent
+ID Parent(ID node);
+
+// Iterate over a node's children
+struct ChildIterator {
+	ID current;
+	ChildIterator(ID node);
+	bool Next(ID *outNode);
 };
 
-/*
-	Core SceneSystem Functions
-*/
+// Lookup a node's local-to-parent transform
+Transform& Pose(ID node);
 
-TypeID RegisterComponentType(IComponentFactory *s);
-
-EntityID CreateEntity(EntityID parent=0);
-EntityID GetParent(EntityID e);
-void AttachChild(EntityID e, EntityID child);
-void DetachFromParent(EntityID e);
-void ComputeWorldTransforms();
-
-Transform& GetLocalTransform(EntityID e);
-Transform GetWorldTransform(EntityID e);
-
-TypeID GetType(ComponentID c);
-ComponentID GetComponent(EntityID e, TypeID t);
-ComponentID AddComponent(EntityID e, TypeID t);
-
-void DestroyComponent(ComponentID id);
-void DestroyEntity(EntityID e);
-
-/*
-	Iterators
-	
-	Kind of annoying that I have to expose some internal implementation
-	details here.  On the other hand... is there any other way to implement
-	this efficiently?
-*/
-
-class EntityIterator {
-private:
-	int32_t i;
-public:
-	EntityIterator();
-	bool Next(EntityID *outID);
+// Interface for component systems
+struct IComponentManager {
+	virtual void CreateComponent(ID node) = 0;
+	virtual void DestroyComponent(ID node) = 0;
 };
 
-class EntityChildIterator {
-private:
-	EntityID e;
-public:
-	EntityChildIterator(EntityID parent, bool recursive=false);
-	bool Next(EntityID* outID);	
+// Register a component system with the scene system
+void RegisterComponentManager(ID componentType, IComponentManager* pMgr);
+
+// Add a component to a node.  Each node can have multiple components,
+// but only one component of a given type.
+void AddComponent(ID node, ID componentType);
+
+// Check whether this node has a component of that type
+bool HasComponent(ID node, ID componentType);
+
+// Remove a component from a node.  Components cannot be reparented like
+// nodes, only destroyed
+void RemoveComponent(ID node, ID componentType);
+
+// Iterate over the components attached to a given node
+struct ComponentIterator {
+	uint32_t mask;
+	ComponentIterator(ID node);
+	bool Next(ID *outComponentType);
 };
 
-class ComponentIterator {
-private:
-	EntityID e;
-	int32_t i;
-public:
-	ComponentIterator(EntityID e);
-	bool Next(ComponentID* outID);
-};
+// Recursively destroy a node's children, then the node's
+// components, and then the node itself.
+void DestroyNode(ID node);
 
-/*
-	Entity status?  Uninitialized | Awake | Sleeping | Destroyed?
-	Serialization?
-*/
+//------------------------------------------------------------------------------
+// TODO
+// Worldspace Reparenting
+// Serialization of Node Manager and Component Managers
+// Batch Render Transformation
+// Scripting Interface / Component Retrieval
+//------------------------------------------------------------------------------
 
 }
-
-
-/*
-Example C++ Class:
-
-class Ogre {
-private:
-    EntityID hEntity;
-    ComponentID hPhys;
-    ComponentID hRend;
-    ComponentID hOgre;
-    
-public:
-    Ogre() {
-        hEntity = CreateEntity();
-        hPhys = AddComponent(hEntity, kPhysics);
-        hRend = AddComponent(hEntity, kRendering);
-        hOgre = AddComponent(hEntity, kOgre);
-    }
-
-    ~Ogre() {
-        DestroyEntity(hEntity);
-    }
-    
-    PhysComponent& Phys() { return PhysicsSystem::GetComponent(hPhys); }
-    RendComponent& Gfx() { return RenderSystem::GetComponent(hRend); }
-    OgreComponent& Ogre() { return OgreSystem::GetComponent(hOgre); }
-    
-};
-
-Example Lua Script:
-
-function CreateOgre() 
-    result = CreateEntity()
-    result:AddComponent(Physics)
-    result:AddComponent(Rendering)
-    result:AddComponent(Ogre)
-    return result
-end
-
-*/

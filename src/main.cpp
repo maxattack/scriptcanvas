@@ -1,44 +1,54 @@
 #include "SceneSystem.h"
-#include "util/CompactPool.h"
-#include "util/PinnedPool.h"
-#include <vector>
+#include "util/Macros.h"
 #include <iostream>
+#include <map>
 
-struct Duck {
-    const char* msg;
-    void SetMessage(const char* aMsg) { msg = aMsg; }
-    void Quack() { std::cout << msg << std::endl; }
-};
 
-class QuackSystem : public SceneSystem::IComponentFactory  {
+class PrintSystem : public SceneSystem::IComponentManager {
 private:
-    StaticPinnedPool<Duck, 32> mPool;
+    std::map<ID, const char*> mMessages;
 
 public:
-    ID CreateComponent() { return mPool.TakeOut(); }
-    void DestroyComponent(ID c) {  mPool.PutBack(c); }
-    
-    Duck& GetDuck(ID c) { return mPool[c]; }
-    
-    void BatchQuack() {
-        for(auto p=mPool.Enumerate(); p.Next();) { p->Quack(); }
+    static const int Id = 0;
+
+    void CreateComponent(ID node) {
+        std::cout << "+" << node << std::endl;
+        mMessages[node] = "";
     }
-    
+
+    void DestroyComponent(ID node) {
+        mMessages.erase(node);
+        std::cout << "-" << node << std::endl;
+    }
+
+    void SetMessage(ID node, const char* message) {
+        ASSERT(mMessages.find(node) != mMessages.end());
+        mMessages[node] = message;
+    }
+
+    void PrintMessages() {
+        for(auto i=mMessages.begin(); i!=mMessages.end(); ++i) {
+            std::cout << i->first << ": " << i->second << std::endl;
+        }
+    }
+
 };
 
 int main(int argc, char* argv[]) {
     using namespace SceneSystem;
-    QuackSystem q;
-    auto qtype = RegisterComponentType(&q);
-    auto e = CreateEntity();
-    auto c = AddComponent(e, qtype);
-    q.GetDuck(c).SetMessage("Quack!");
-
-    auto e0 = CreateEntity();
-    auto c0 = AddComponent(e0, qtype);
-    q.GetDuck(c0).SetMessage("(>'')>");
-
-    q.BatchQuack();
-    DestroyEntity(e);
-    q.BatchQuack();
+    ID root = CreateNode();
+    ID child = CreateNode(root);
+    ID otherChild = CreateNode();
+    AttachNode(root, otherChild);
+    std::cout << NodeCount() << std::endl;
+    DetachNode(child);
+    DestroyNode(root);
+    std::cout << NodeCount() << std::endl;
+    PrintSystem ps;
+    RegisterComponentManager(PrintSystem::Id, &ps);
+    AddComponent(child, PrintSystem::Id);
+    ps.SetMessage(child, "quack");
+    ps.PrintMessages();
+    DestroyNode(child);
+    return 0;
 }

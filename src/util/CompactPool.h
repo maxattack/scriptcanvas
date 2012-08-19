@@ -23,8 +23,7 @@ to the comments.
 #include <stdint.h>
 #include "Macros.h"
 #include "Alloc.h"
-
-typedef uint32_t ID; // For compatibility w/ ComponentIDs, handles are just 24-bit
+#include "Types.h"
 
 #define MAX_CAPACITY (64*1024)
 
@@ -51,7 +50,7 @@ public:
     bool IsActive(ID id) const {
         // use the lower-bits to find the record
         PoolIndex *p = mIndex + (id & 0xffff);
-        return p->id == (id & 0x00ffffff) && p->index != USHRT_MAX;
+        return p->id == id && p->index != USHRT_MAX;
     }
 
 	
@@ -118,8 +117,7 @@ ID CompactPool<T>::TakeOut() {
     PoolIndex &in = mIndex[mFreelistDequeue];
     mFreelistDequeue = in.next;
     // increment the higher-order bits of the id
-    auto i = (((in.id & 0x00ff0000) >> 16) % 255) + 1;
-    in.id = (0xffff & in.id) | (i << 16);
+    in.id = (0xffff & in.d) + (0xffff0000 & (in.id + 0x10000));
     // push a new record into the buffer
     in.index = mCount++;
     // write the id to the record
