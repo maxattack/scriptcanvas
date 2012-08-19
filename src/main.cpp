@@ -1,4 +1,4 @@
-#include "RenderSystem.h"
+#include "CircleSystem.h"
 #include "util/Macros.h"
 #include <cstdio>
 #include <cstdlib>
@@ -12,14 +12,11 @@ extern "C" {
 }
 #include "tolua++.h"
 #include "binding.h"
-using namespace SceneSystem;
-using namespace RenderSystem;
 
 #define COMPONENT_CIRCLE 0
 
-static CircleSystem gCircles;
+CircleSystem gCircles;
 
-CircleSystem& GetCircleSystem() { return gCircles; }
 
 int main(int argc, char* argv[]) {
     // Initialize Display

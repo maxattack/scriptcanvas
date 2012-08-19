@@ -1,9 +1,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#include "RenderSystem.h"
-
-namespace RenderSystem {
+#include "CircleSystem.h"
 
 static GLuint LoadShaderProgram(const char* filename);
 
@@ -42,12 +40,12 @@ void CircleSystem::Render() {
     glEnableVertexAttribArray(mAttribUnit);
 
     // iterate through all the circles
-    for(auto *p=mData.Begin(); p!=mData.End(); ++p) {
+    for(auto p=mData.Begin(); p!=mData.End(); ++p) {
         
         // THIS IS WHAT REALLY NEEDS TO CHANGE -- World transforms
         // need to be batch-computed, not redone per-renderable per-frame
         // in an arbitrary order (want data-oriented, not object-oriented).
-        Transform w = SceneSystem::WorldPose(p->node);
+        Transform w = WorldPose(p->node);
         float mat[16] = {
             w.q.x, w.q.y, 0, 0,
             -w.q.y, w.q.x, 0, 0,
@@ -154,6 +152,4 @@ static GLuint LoadShaderProgram(const char* filename) {
         glLinkProgram(prog);
     }
     return prog;
-}
-
 }

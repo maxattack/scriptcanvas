@@ -2,8 +2,6 @@
 #include <GL/glfw.h>
 #include "util/SceneUtil.h"
 
-namespace RenderSystem {
-    
 struct Circle {
 	ID node;
 	float radius;
@@ -17,7 +15,7 @@ struct Circle {
 	}
 };
 
-class CircleSystem : public SceneSystem::IComponentManager {
+class CircleSystem : public IComponentManager {
 private:
 	GLuint mProgram;
 	GLuint mAttribUnit;
@@ -35,7 +33,3 @@ public:
 	void DestroyComponent(ID node);
 	Circle& operator[](ID node);
 };
-    
-    
-    
-}

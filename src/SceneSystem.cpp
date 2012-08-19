@@ -1,8 +1,6 @@
 #include "SceneSystem.h"
 #include "util/Macros.h"
 
-namespace SceneSystem {
-
 //------------------------------------------------------
 // INTERNAL DATA
 //------------------------------------------------------
@@ -256,6 +254,4 @@ void DestroyNode(ID node) {
 	}
 	// release node records to manaager
 	gNodes.Free(node);
-}
-
 }

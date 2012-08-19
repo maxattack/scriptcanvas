@@ -3,15 +3,15 @@
 
 BIN = bubble
 CC = clang
-CFLAGS = -Os -g -fno-common -I/usr/local/include -Wall -Wno-c++11-extensions -Werror 
+CFLAGS = -Os -g -fno-common -I/usr/local/include -Wall -Werror 
 CFLAGS += -DDEBUG=1
-CXXFLAGS = -fno-exceptions -fno-rtti
+CXXFLAGS = -fno-exceptions -fno-rtti -Wno-c++11-extensions 
 LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw -llua
 
 OBJS = \
 	src/main.o \
 	src/binding.o \
-	src/RenderSystem.o \
+	src/CircleSystem.o \
 	src/SceneSystem.o \
 	src/tolua_event.o \
 	src/tolua_is.o \
@@ -23,11 +23,11 @@ OBJS = \
 $(BIN): $(OBJS)
 	$(CC) $(OBJS) -o $(BIN) $(LFLAGS)
 	
-%.o : %.cpp 
+%.o : %.cpp
 	$(CC) $(CFLAGS) $(CXXFLAGS) -c $< -o $@
 
 %.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm $(OBJS) $(BIN)
+	rm -f $(OBJS) $(BIN)

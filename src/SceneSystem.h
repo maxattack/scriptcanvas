@@ -24,8 +24,6 @@
 #define MAX_NODES 				1024
 #define MAX_COMPONENT_TYPES		32
 
-namespace SceneSystem {
-
 // How many nodes are currently active in the scene?
 int NodeCount();
 
@@ -93,5 +91,3 @@ void DestroyNode(ID node);
 // Batch Render Transformation
 // Scripting Interface / Component Retrieval
 //------------------------------------------------------------------------------
-
-}
