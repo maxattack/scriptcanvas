@@ -5,14 +5,21 @@
 #include <ctime>
 #include <cmath>
 
+extern "C" {
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+#include "tolua++.h"
+#include "binding.h"
 using namespace SceneSystem;
 using namespace RenderSystem;
 
 #define COMPONENT_CIRCLE 0
 
-#define M_TAU (2.0 * M_PI)
-
 static CircleSystem gCircles;
+
+CircleSystem& GetCircleSystem() { return gCircles; }
 
 int main(int argc, char* argv[]) {
     // Initialize Display
@@ -35,6 +42,21 @@ int main(int argc, char* argv[]) {
     gCircles.Init();
     RegisterComponentManager(COMPONENT_CIRCLE, &gCircles);
 
+    // Initialize Scripts
+    lua_State* virtualMachine = lua_open();
+    luaL_openlibs(virtualMachine);
+    tolua_bubbles_open(virtualMachine);
+    const char* script_path = argc == 2 ? argv[1] : "src/main.lua";
+    luaL_loadfile(virtualMachine, script_path);
+    lua_call(virtualMachine, 0, 0);    
+
+    lua_getglobal(virtualMachine, "init");
+    if (lua_isfunction(virtualMachine, -1)) {
+        lua_call(virtualMachine, 0, 0);    
+    } else {
+        lua_pop(virtualMachine, 1);
+    }
+
     // "Bootstrap Script"
     ID root = CreateNode();
     AddComponent(root, COMPONENT_CIRCLE);
@@ -52,13 +74,19 @@ int main(int argc, char* argv[]) {
 
     while (glfwGetKey('Q') != GLFW_PRESS) {
 
+        lua_getglobal(virtualMachine, "update");
+        if (lua_isfunction(virtualMachine, -1)) {
+            lua_call(virtualMachine, 0, 0);    
+        } else {
+            lua_pop(virtualMachine, 1);
+        }
         // "Update Script"
-        gCircles[root].radius = 32 + 4.f * sin(2.1f * M_TAU * glfwGetTime());
+        gCircles[root].radius = 32 + 4.f * sin(2.1f * kTau * glfwGetTime());
         int mx, my;
         glfwGetMousePos( &mx, &my );
         Pose(root).t = vec(mx, my);
-        Pose(root).q = Polar(1.f, -0.11f * M_TAU * glfwGetTime());
-        Pose(urth).q = Polar(1.f, M_TAU * glfwGetTime());
+        Pose(root).q = Polar(1.f, -0.11f * kTau * glfwGetTime());
+        Pose(urth).q = Polar(1.f, kTau * glfwGetTime());
 
         // Render Shtuff
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

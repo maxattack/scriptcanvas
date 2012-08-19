@@ -128,8 +128,9 @@ static GLuint LoadShaderProgram(const char* filename) {
         glShaderSource(frag, 2, fsrc, fcnt);
         glCompileShader(vert);
         glCompileShader(frag);
+        delete[] buf;
+
         GLint result;
-        
         glGetShaderiv(vert, GL_COMPILE_STATUS, &result);
         if (result != GL_TRUE) {
             GLchar buf[256];
@@ -148,7 +149,6 @@ static GLuint LoadShaderProgram(const char* filename) {
             return 0;
         }
 
-        delete[] buf;
         glAttachShader(prog, vert);
         glAttachShader(prog, frag);
         glLinkProgram(prog);

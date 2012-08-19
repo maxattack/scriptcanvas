@@ -1,0 +1,25 @@
+
+$#include "Script.h"
+
+typedef unsigned int ID;
+
+struct Node {
+	ID id();
+
+	void attach(Node child);
+	void detach();
+	Node* parent();
+
+	void get_position(float* x=0, float* y=0);
+	void set_position(float x, float y);
+	void set_rotation(float radians);
+
+	void add_component(ID componentType);
+	void remove_component(ID componentType);
+
+	void destroy();
+
+	void init_circle(float radius, float r, float g, float b);
+};
+
+Node* create_node(Node* parent=0);
