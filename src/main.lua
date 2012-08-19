@@ -1,6 +1,5 @@
 function init()
 	root = create_node()
-	--root:set_position(100 + 32 * math.cos(get_time()), 100 + 32 * math.sin(get_time()))
 	root:set_position(100,100)
 	root:add_circle():init(48, 0.33, 0.25, 0.65)
 end
