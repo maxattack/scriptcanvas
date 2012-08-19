@@ -7,6 +7,7 @@ LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw
 
 OBJS = \
 	src/main.o \
+	src/RenderSystem.o \
 	src/SceneSystem.o
 
 

@@ -2,6 +2,6 @@
 
 // Todo: Memory-Tracking in DEBUG
 
-#define ALLOC malloc
+#define MALLOC malloc
 #define FREE free
 

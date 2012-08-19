@@ -62,23 +62,6 @@ public:
 	ID GetID(T* record) { return mIndex[mBackBuffer[record-mBuffer]].id; }
     T* Begin() const { return mBuffer; }
     T* End() const { return mBuffer + mCount; }
-
-    class Iterator {
-    private:
-        friend class CompactPool<T>;
-        CompactPool<T> * mPool;
-        T* mCurrent;
-
-        Iterator(CompactPool<T> *p);
-
-    public:
-        bool Next();
-        operator T*() { return mCurrent; }
-        T& operator*() { return *mCurrent; }
-        T* operator->() { return mCurrent; }
-    };
-
-    Iterator Enumerate() { return Iterator(this); }
 };
 
 template<typename T, int Capacity>
@@ -142,16 +125,4 @@ void CompactPool<T>::PutBack(ID id) {
     in.index = USHRT_MAX;
     mIndex[mFreelistEnqueue].next = id & 0xffff;
     mFreelistEnqueue = id & 0xffff;
-}
-
-template<typename T>
-CompactPool<T>::Iterator::Iterator(CompactPool<T> *p) : 
-    mPool(p),
-    mCurrent(mPool->mBuffer-1) {
-}
-
-template<typename T>
-bool CompactPool<T>::Iterator::Next() {
-    mCurrent++;
-    return mCurrent != mPool->mBuffer + mPool->mCount;
 }

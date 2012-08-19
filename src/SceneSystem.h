@@ -20,6 +20,10 @@
 // be considered cache-friendly and concurrency-friendly.
 //------------------------------------------------------------------------------
 
+// Constants
+#define MAX_NODES 				1024
+#define MAX_COMPONENT_TYPES		32
+
 namespace SceneSystem {
 
 // How many nodes are currently active in the scene?
@@ -47,6 +51,9 @@ struct ChildIterator {
 
 // Lookup a node's local-to-parent transform
 Transform& Pose(ID node);
+
+// For mid-frame one-shots -- the RenderQueue will get this batched.
+Transform WorldPose(ID node);
 
 // Interface for component systems
 struct IComponentManager {

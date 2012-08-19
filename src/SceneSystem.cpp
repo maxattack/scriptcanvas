@@ -7,13 +7,6 @@ namespace SceneSystem {
 // INTERNAL DATA
 //------------------------------------------------------
 
-#ifndef MAX_NODES
-#	define MAX_NODES 				1024
-#else
-	// validate that MAX_NODES < 0xffff?
-#endif
-#define MAX_COMPONENT_TYPES		32
-
 struct NodeSlot {
 	// A lookup slot for accessing data records,
 	// we are reordered to preserve a compact buffer
@@ -203,6 +196,10 @@ bool ChildIterator::Next(ID *outNode) {
 
 Transform& Pose(ID node) {
 	return gNodes.TransformFor(node);
+}
+
+Transform WorldPose(ID node) {
+	return gNodes[node].parent ? Pose(node) * WorldPose(gNodes[node].parent) : Pose(node);
 }
 
 void RegisterComponentManager(ID componentType, IComponentManager* pMgr) {
