@@ -53,7 +53,7 @@ struct NodeManager {
 // GLOBAL VARIABLES
 //------------------------------------------------------
 
-static NodeManager gNodes;
+static NodeManager nodes;
 static IManager* gComponentManagers[MAX_COMPONENT_TYPES];
 
 //------------------------------------------------------
@@ -130,14 +130,14 @@ void NodeManager::Free(ID id) {
 //------------------------------------------------------
 
 int NodeCount() {
-	return gNodes.count;
+	return nodes.count;
 }
 
 ID CreateNode(ID parent) {
-	ID result = gNodes.Alloc();
-	gNodes.TransformFor(result) = Transform::Identity();
-	gNodes.SlotFor(result).componentMask = 0x00000000;
-	NodeData &data = gNodes[result];
+	ID result = nodes.Alloc();
+	nodes.TransformFor(result) = Transform::Identity();
+	nodes.SlotFor(result).componentMask = 0x00000000;
+	NodeData &data = nodes[result];
 	data.parent = 0;
 	data.firstChild = 0;
 	data.nextSibling = 0;
@@ -149,26 +149,26 @@ ID CreateNode(ID parent) {
 }
 
 void AttachNode(ID parent, ID child) {
-	NodeData& childData = gNodes[child];
+	NodeData& childData = nodes[child];
 	if (childData.parent && childData.parent != parent) {
 		DetachNode(child);
 	}
 	childData.parent = parent;
-	NodeData& parentData = gNodes[parent];
+	NodeData& parentData = nodes[parent];
 	if (parentData.firstChild) {
 		childData.nextSibling = parentData.firstChild;
-		gNodes[parentData.firstChild].prevSibling = child;
+		nodes[parentData.firstChild].prevSibling = child;
 	}
 	parentData.firstChild = child;
 }
 
 void DetachNode(ID child) {
-	NodeData& data = gNodes[child];
+	NodeData& data = nodes[child];
 	if (data.parent) {
-		NodeData& parent = gNodes[data.parent];
+		NodeData& parent = nodes[data.parent];
 		if (parent.firstChild == child) parent.firstChild = data.nextSibling;
-		if (data.nextSibling) gNodes[data.nextSibling].prevSibling = data.prevSibling;
-		if (data.prevSibling) gNodes[data.prevSibling].nextSibling = data.nextSibling;
+		if (data.nextSibling) nodes[data.nextSibling].prevSibling = data.prevSibling;
+		if (data.prevSibling) nodes[data.prevSibling].nextSibling = data.nextSibling;
 		data.parent = 0;
 		data.nextSibling = 0;
 		data.prevSibling = 0;
@@ -176,17 +176,17 @@ void DetachNode(ID child) {
 }
 
 ID Parent(ID node) {
-	return gNodes[node].parent;
+	return nodes[node].parent;
 }
 
 ChildIterator::ChildIterator(ID node) {
-	current = gNodes[node].firstChild;
+	current = nodes[node].firstChild;
 }
 
 bool ChildIterator::Next(ID *outNode) {
 	if (current) {
 		*outNode = current;
-		current = gNodes[current].nextSibling;
+		current = nodes[current].nextSibling;
 		return true;
 	} else {
 		return false;
@@ -194,27 +194,46 @@ bool ChildIterator::Next(ID *outNode) {
 }
 
 Transform& Pose(ID node) {
-	return gNodes.TransformFor(node);
+	return nodes.TransformFor(node);
 }
 
 uint16_t GetIndex(ID node) {
-	return gNodes.SlotFor(node).index;
+	return nodes.SlotFor(node).index;
 }
 
 Transform WorldPose(ID node) {
-	return gNodes[node].parent ? Pose(node) * WorldPose(gNodes[node].parent) : Pose(node);
+	return nodes[node].parent ? Pose(node) * WorldPose(nodes[node].parent) : Pose(node);
+}
+
+static void UpdateChildren(RenderBuffer *vbuf, int i) {
+	ID child = nodes.dataBuffer[i].firstChild;
+	do {
+		int idx = GetIndex(child);
+		vbuf->transforms[idx] = nodes.poseBuffer[idx] * vbuf->transforms[i];
+		if (nodes.dataBuffer[idx].firstChild) {
+			UpdateChildren(vbuf, idx);
+		}
+		child = nodes.dataBuffer[idx].nextSibling;
+	} while(child);
 }
 
 void Update(RenderBuffer *vbuf) {
 	// This function could use some love -- reordering transforms
 	// into DAG order if dirty and then computing world transforms
 	// in one memory-friendly batch pass.  This is *not* meant as the
-	// final implementation.
-
-	for(int i=0; i<gNodes.count; ++i) {
-		vbuf->transforms[i] = WorldPose(gNodes.slots[gNodes.backBuffer[i]].id);
+	// final implementation (though it *is* at least better than hopping
+	// around dynamic memory).
+	for(int i=0; i<nodes.count; ++i) {
+		if (!nodes.dataBuffer[i].parent) {
+			vbuf->transforms[i] = nodes.poseBuffer[i];
+			if (nodes.dataBuffer[i].firstChild) {
+				UpdateChildren(vbuf, i);
+			}
+		}
 	}
 }
+
+
 
 void RegisterComponentManager(ID componentType, IManager* pMgr) {
 	ASSERT((componentType) < MAX_COMPONENT_TYPES);
@@ -225,23 +244,23 @@ void RegisterComponentManager(ID componentType, IManager* pMgr) {
 void AddComponent(ID node, ID componentType) {
 	ASSERT(gComponentManagers[componentType]);
 	ASSERT(!HasComponent(node, componentType));
-	gNodes.SlotFor(node).componentMask |= (0x80000000 >> componentType);
+	nodes.SlotFor(node).componentMask |= (0x80000000 >> componentType);
 	gComponentManagers[componentType]->CreateComponent(node);
 }
 
 bool HasComponent(ID node, ID componentType) {
-	return gNodes.SlotFor(node).componentMask & (0x80000000 >> componentType);
+	return nodes.SlotFor(node).componentMask & (0x80000000 >> componentType);
 }
 
 void RemoveComponent(ID node, ID componentType) {
 	ASSERT(gComponentManagers[componentType]);
 	ASSERT(HasComponent(node, componentType));
 	gComponentManagers[componentType]->DestroyComponent(node);
-	gNodes.SlotFor(node).componentMask ^= (0x80000000 >> componentType);
+	nodes.SlotFor(node).componentMask ^= (0x80000000 >> componentType);
 }
 
 ComponentIterator::ComponentIterator(ID node) {
-	mask = gNodes.SlotFor(node).componentMask;
+	mask = nodes.SlotFor(node).componentMask;
 }
 
 bool ComponentIterator::Next(ID *outComponentType) {
@@ -258,7 +277,7 @@ bool ComponentIterator::Next(ID *outComponentType) {
 void DestroyNode(ID node) {
 	DetachNode(node);
 	// tear down children
-	NodeData& data = gNodes[node];
+	NodeData& data = nodes[node];
 	while(data.firstChild) {
 		DestroyNode(data.firstChild);
 	}
@@ -269,7 +288,7 @@ void DestroyNode(ID node) {
 		gComponentManagers[componentType]->DestroyComponent(node);
 	}
 	// release node records to manaager
-	gNodes.Free(node);
+	nodes.Free(node);
 }
 
 }

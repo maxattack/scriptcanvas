@@ -29,6 +29,7 @@ void SubmitToRenderSystem(RenderBuffer* vbuf) {
 
 void RetrieveFromRenderSystem(RenderBuffer** out) {
 	if (!mSceneQueue.read(*out)) {
+		//puts("waiting on renderer...");
 		glfwLockMutex(gRenderMutex);
 		glfwWaitCond(gRenderCondition, gRenderMutex, GLFW_INFINITY);
 		glfwUnlockMutex(gRenderMutex);
@@ -38,6 +39,7 @@ void RetrieveFromRenderSystem(RenderBuffer** out) {
 
 void RetrieveFromSceneSystem(RenderBuffer** out) {
 	if (!mRenderQueue.read(*out)) {
+		//puts("waiting on scene...");
 		glfwLockMutex(gSceneMutex);
 		glfwWaitCond(gSceneCondition, gSceneMutex, GLFW_INFINITY);
 		glfwUnlockMutex(gSceneMutex);
