@@ -2,7 +2,7 @@ import(scene)
 import(circle)
 
 function createPlanet(x, y, radius, r, g, b)
-	result = createNode()
+	local result = createNode()
 	setPosition(result, x, y)
 	addComponent(result, component.circle)
 	setMaterial(result, createMaterial(r, g, b))
