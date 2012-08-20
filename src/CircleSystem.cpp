@@ -89,7 +89,7 @@ Circle& CircleSystem::operator[](ID node) {
 
 static GLuint LoadShaderProgram(const char* filename) {
     GLuint prog, vert, frag;
-    unsigned cnt = 0;
+    GLint cnt = 0;
     GLchar* buf = 0;
     {
         FILE* file = fopen(filename, "r");
@@ -120,8 +120,8 @@ static GLuint LoadShaderProgram(const char* filename) {
         const GLchar sCondFrag[] = "#define FRAGMENT\n";
         const GLchar *vsrc[] = { sCondVert, buf };
         const GLchar *fsrc[] = { sCondFrag, buf };
-        GLint vcnt[] = { strlen(sCondVert), cnt };
-        GLint fcnt[] = { strlen(sCondFrag), cnt };
+        GLint vcnt[] = { static_cast<GLint>(strlen(sCondVert)), cnt };
+        GLint fcnt[] = { static_cast<GLint>(strlen(sCondFrag)), cnt };
         glShaderSource(vert, 2, vsrc, vcnt);
         glShaderSource(frag, 2, fsrc, fcnt);
         glCompileShader(vert);

@@ -13,6 +13,8 @@ extern "C" {
 #include "tolua++.h"
 #include "binding.h"
 
+#include "ProducerConsumerQueue.h"
+
 #define COMPONENT_CIRCLE 0
 
 CircleSystem gCircles;
