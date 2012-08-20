@@ -25,7 +25,7 @@ function update()
 	scene.setPosition(sun, mx, my)
 	scene.setRotation(sun, -0.11*360*t)
 	scene.setRotation(urth, 360*t)
-	x,y = scene.positionOf(planetx)
+	local x,y = scene.positionOf(planetx)
 	scene.setPosition(planetx, 0.1*mx + 0.9*x, 0.1*my + 0.9*y)
 end
 
