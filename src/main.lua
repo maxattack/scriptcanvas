@@ -1,5 +1,6 @@
 import(scene)
 import(circle)
+import(math)
 
 function createPlanet(x, y, radius, r, g, b)
 	local result = createNode()
@@ -23,7 +24,7 @@ function update()
 	local tau = 2 * 3.14156
 	local t = input.seconds()
 	local mx, my = input.mousePosition()
-	setGeometryRadius(geometry(sun), 32 + 4*math.sin(2.1*tau*t))
+	setGeometryRadius(geometry(sun), 32 + 4*sin(2.1*tau*t))
 	setPosition(sun, mx, my)
 	setRotation(sun, -0.11*360*t)
 	setRotation(urth, 360*t)
