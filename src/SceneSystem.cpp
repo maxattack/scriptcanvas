@@ -1,5 +1,7 @@
 #include "RenderSystem.h"
 
+namespace SceneSystem {
+
 //------------------------------------------------------
 // INTERNAL DATA
 //------------------------------------------------------
@@ -203,7 +205,7 @@ Transform WorldPose(ID node) {
 	return gNodes[node].parent ? Pose(node) * WorldPose(gNodes[node].parent) : Pose(node);
 }
 
-void UpdateSceneSystem(RenderBuffer *vbuf) {
+void Update(RenderBuffer *vbuf) {
 	// This function could use some love -- reordering transforms
 	// into DAG order if dirty and then computing world transforms
 	// in one memory-friendly batch pass.  This is *not* meant as the
@@ -268,4 +270,6 @@ void DestroyNode(ID node) {
 	}
 	// release node records to manaager
 	gNodes.Free(node);
+}
+
 }

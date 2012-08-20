@@ -14,11 +14,10 @@ extern "C" {
 #include "RenderSystem.h"
 #include "InputSystem.h"
 
-#define COMPONENT_CIRCLE 0
-
 void game(void* ctxt);
 
 int main(int argc, char* argv[]) {
+    
     // Initialize Display
     glfwInit();
     if (glfwOpenWindow(800, 500,8, 8, 8, 8, 8, 0, GLFW_WINDOW) != GL_TRUE) {
@@ -35,26 +34,28 @@ int main(int argc, char* argv[]) {
     glLoadIdentity();
     glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
     
-    InitializeRenderSystem();
+    // init systems
+    RenderSystem::Initialize();
     InputSystem::Initialize();
     glfwSetMousePosCallback(InputSystem::SetMousePosition);
 
+    // initialize communication channels
     static RenderBuffer buf0;
     static RenderBuffer buf1;
-
-    SubmitToSceneSystem(&buf0);
-    SubmitToSceneSystem(&buf1);
+    RenderSystem::SubmitToSceneSystem(&buf0);
+    RenderSystem::SubmitToSceneSystem(&buf1);
     InputSystem::SetTime(glfwGetTime());
     glfwCreateThread(game, 0);
 
+    // render loop
     while (glfwGetKey('Q') != GLFW_PRESS) {
         RenderBuffer *vbuf;
-        RetrieveFromSceneSystem(&vbuf);
+        RenderSystem::RetrieveFromSceneSystem(&vbuf);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Render(vbuf);
+        RenderSystem::Render(vbuf);
         glfwSwapBuffers();
         InputSystem::SetTime(glfwGetTime());
-        SubmitToSceneSystem(vbuf);
+        RenderSystem::SubmitToSceneSystem(vbuf);
     }
 
     // Teardown
@@ -65,16 +66,18 @@ int main(int argc, char* argv[]) {
 }
 
 void game(void* ctxt) {
+    // It feels weird that this is the only non-hard-coded place...
+    /// I suppose it's just until we have scripted components to mix with.
     static CircleSystem::Manager gCircles;
-    RegisterComponentManager(COMPONENT_CIRCLE, &gCircles);
+    SceneSystem::RegisterComponentManager(0, &gCircles);
 
     // Initialize Scripts
+    // TODO handle errors
     lua_State* virtualMachine = lua_open();
     luaL_openlibs(virtualMachine);
     tolua_bubbles_open(virtualMachine);
     luaL_loadfile(virtualMachine, "src/main.lua");
     lua_call(virtualMachine, 0, 0);    
-
     lua_getglobal(virtualMachine, "init");
     if (lua_isfunction(virtualMachine, -1)) {
         lua_call(virtualMachine, 0, 0);    
@@ -82,21 +85,20 @@ void game(void* ctxt) {
         lua_pop(virtualMachine, 1);
     }
 
-    while(1) {
-        RenderBuffer *vbuf;
-        RetrieveFromRenderSystem(&vbuf);
+    RenderBuffer *vbuf;
 
+    while(1) {
         lua_getglobal(virtualMachine, "update");
         if (lua_isfunction(virtualMachine, -1)) {
             lua_call(virtualMachine, 0, 0);    
         } else {
             lua_pop(virtualMachine, 1);
         }
-
         // Render Shtuff
-        UpdateSceneSystem(vbuf);
+        RenderSystem::RetrieveFromRenderSystem(&vbuf);
+        SceneSystem::Update(vbuf);
         CircleSystem::Update(vbuf);
-        SubmitToRenderSystem(vbuf);
+        RenderSystem::SubmitToRenderSystem(vbuf);
     }
 
 }

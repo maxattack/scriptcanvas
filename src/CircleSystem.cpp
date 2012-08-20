@@ -99,7 +99,7 @@ void Update(RenderBuffer* vbuf) {
             cmd.fields.queue = 0;
             cmd.fields.material = mMaterial.GetIndex(p->material);
             cmd.fields.geometry = mGeometry.GetIndex(p->geometry);
-            cmd.fields.transform = GetIndex(p->node);
+            cmd.fields.transform = SceneSystem::GetIndex(p->node);
             vbuf->circleCommands[idx++] = cmd;
         }
     }

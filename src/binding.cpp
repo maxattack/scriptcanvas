@@ -1,6 +1,6 @@
 /*
 ** Lua binding: bubbles
-** Generated automatically by tolua++-1.0.92 on Mon Aug 20 00:03:18 2012.
+** Generated automatically by tolua++-1.0.92 on Mon Aug 20 00:14:54 2012.
 */
 
 #ifndef __cplusplus
@@ -20,9 +20,9 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
 }
 
-/* function: NodeCount */
-#ifndef TOLUA_DISABLE_tolua_bubbles_nodeCount00
-static int tolua_bubbles_nodeCount00(lua_State* tolua_S)
+/* function: SceneSystem::NodeCount */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_nodeCount00
+static int tolua_bubbles_SceneSystem_nodeCount00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -34,7 +34,7 @@ static int tolua_bubbles_nodeCount00(lua_State* tolua_S)
 #endif
  {
   {
-   int tolua_ret = (int)  NodeCount();
+   int tolua_ret = (int)  SceneSystem::NodeCount();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -47,9 +47,9 @@ static int tolua_bubbles_nodeCount00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: CreateNode */
-#ifndef TOLUA_DISABLE_tolua_bubbles_createNode00
-static int tolua_bubbles_createNode00(lua_State* tolua_S)
+/* function: SceneSystem::CreateNode */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_createNode00
+static int tolua_bubbles_SceneSystem_createNode00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -63,7 +63,7 @@ static int tolua_bubbles_createNode00(lua_State* tolua_S)
  {
   unsigned int parent = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   {
-   unsigned int tolua_ret = ( unsigned int)  CreateNode(parent);
+   unsigned int tolua_ret = ( unsigned int)  SceneSystem::CreateNode(parent);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -76,9 +76,9 @@ static int tolua_bubbles_createNode00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: AttachNode */
-#ifndef TOLUA_DISABLE_tolua_bubbles_attach00
-static int tolua_bubbles_attach00(lua_State* tolua_S)
+/* function: SceneSystem::AttachNode */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_attach00
+static int tolua_bubbles_SceneSystem_attach00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -94,7 +94,7 @@ static int tolua_bubbles_attach00(lua_State* tolua_S)
   unsigned int parent = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   unsigned int child = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
   {
-   AttachNode(parent,child);
+   SceneSystem::AttachNode(parent,child);
   }
  }
  return 0;
@@ -106,9 +106,9 @@ static int tolua_bubbles_attach00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: DetachNode */
-#ifndef TOLUA_DISABLE_tolua_bubbles_detach00
-static int tolua_bubbles_detach00(lua_State* tolua_S)
+/* function: SceneSystem::DetachNode */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_detach00
+static int tolua_bubbles_SceneSystem_detach00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -122,7 +122,7 @@ static int tolua_bubbles_detach00(lua_State* tolua_S)
  {
   unsigned int child = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   {
-   DetachNode(child);
+   SceneSystem::DetachNode(child);
   }
  }
  return 0;
@@ -134,9 +134,9 @@ static int tolua_bubbles_detach00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: Parent */
-#ifndef TOLUA_DISABLE_tolua_bubbles_parentOf00
-static int tolua_bubbles_parentOf00(lua_State* tolua_S)
+/* function: SceneSystem::Parent */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_parentOf00
+static int tolua_bubbles_SceneSystem_parentOf00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -150,7 +150,7 @@ static int tolua_bubbles_parentOf00(lua_State* tolua_S)
  {
   unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   {
-   unsigned int tolua_ret = ( unsigned int)  Parent(node);
+   unsigned int tolua_ret = ( unsigned int)  SceneSystem::Parent(node);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -163,9 +163,9 @@ static int tolua_bubbles_parentOf00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: AddComponent */
-#ifndef TOLUA_DISABLE_tolua_bubbles_addComponent00
-static int tolua_bubbles_addComponent00(lua_State* tolua_S)
+/* function: SceneSystem::AddComponent */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_addComponent00
+static int tolua_bubbles_SceneSystem_addComponent00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -181,7 +181,7 @@ static int tolua_bubbles_addComponent00(lua_State* tolua_S)
   unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   unsigned int componentType = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
   {
-   AddComponent(node,componentType);
+   SceneSystem::AddComponent(node,componentType);
   }
  }
  return 0;
@@ -193,9 +193,9 @@ static int tolua_bubbles_addComponent00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: HasComponent */
-#ifndef TOLUA_DISABLE_tolua_bubbles_hasComponent00
-static int tolua_bubbles_hasComponent00(lua_State* tolua_S)
+/* function: SceneSystem::HasComponent */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_hasComponent00
+static int tolua_bubbles_SceneSystem_hasComponent00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -211,7 +211,7 @@ static int tolua_bubbles_hasComponent00(lua_State* tolua_S)
   unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   unsigned int componentType = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
   {
-   bool tolua_ret = (bool)  HasComponent(node,componentType);
+   bool tolua_ret = (bool)  SceneSystem::HasComponent(node,componentType);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -224,9 +224,9 @@ static int tolua_bubbles_hasComponent00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: RemoveComponent */
-#ifndef TOLUA_DISABLE_tolua_bubbles_removeComponent00
-static int tolua_bubbles_removeComponent00(lua_State* tolua_S)
+/* function: SceneSystem::RemoveComponent */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_removeComponent00
+static int tolua_bubbles_SceneSystem_removeComponent00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -242,7 +242,7 @@ static int tolua_bubbles_removeComponent00(lua_State* tolua_S)
   unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   unsigned int componentType = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
   {
-   RemoveComponent(node,componentType);
+   SceneSystem::RemoveComponent(node,componentType);
   }
  }
  return 0;
@@ -254,9 +254,9 @@ static int tolua_bubbles_removeComponent00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: DestroyNode */
-#ifndef TOLUA_DISABLE_tolua_bubbles_destroyNode00
-static int tolua_bubbles_destroyNode00(lua_State* tolua_S)
+/* function: SceneSystem::DestroyNode */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_destroyNode00
+static int tolua_bubbles_SceneSystem_destroyNode00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -270,7 +270,7 @@ static int tolua_bubbles_destroyNode00(lua_State* tolua_S)
  {
   unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   {
-   DestroyNode(node);
+   SceneSystem::DestroyNode(node);
   }
  }
  return 0;
@@ -282,9 +282,9 @@ static int tolua_bubbles_destroyNode00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: GetPosition */
-#ifndef TOLUA_DISABLE_tolua_bubbles_positionOf00
-static int tolua_bubbles_positionOf00(lua_State* tolua_S)
+/* function: SceneSystem::GetPosition */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_positionOf00
+static int tolua_bubbles_SceneSystem_positionOf00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -302,7 +302,7 @@ static int tolua_bubbles_positionOf00(lua_State* tolua_S)
   float x = ((float)  tolua_tonumber(tolua_S,2,0));
   float y = ((float)  tolua_tonumber(tolua_S,3,0));
   {
-   GetPosition(node,&x,&y);
+   SceneSystem::GetPosition(node,&x,&y);
    tolua_pushnumber(tolua_S,(lua_Number)x);
    tolua_pushnumber(tolua_S,(lua_Number)y);
   }
@@ -316,9 +316,9 @@ static int tolua_bubbles_positionOf00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: SetPosition */
-#ifndef TOLUA_DISABLE_tolua_bubbles_setPosition00
-static int tolua_bubbles_setPosition00(lua_State* tolua_S)
+/* function: SceneSystem::SetPosition */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_setPosition00
+static int tolua_bubbles_SceneSystem_setPosition00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -336,7 +336,7 @@ static int tolua_bubbles_setPosition00(lua_State* tolua_S)
   float x = ((float)  tolua_tonumber(tolua_S,2,0));
   float y = ((float)  tolua_tonumber(tolua_S,3,0));
   {
-   SetPosition(node,x,y);
+   SceneSystem::SetPosition(node,x,y);
   }
  }
  return 0;
@@ -348,9 +348,9 @@ static int tolua_bubbles_setPosition00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: GetRotation */
-#ifndef TOLUA_DISABLE_tolua_bubbles_rotationOf00
-static int tolua_bubbles_rotationOf00(lua_State* tolua_S)
+/* function: SceneSystem::GetRotation */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_rotationOf00
+static int tolua_bubbles_SceneSystem_rotationOf00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -364,7 +364,7 @@ static int tolua_bubbles_rotationOf00(lua_State* tolua_S)
  {
   unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   {
-   float tolua_ret = (float)  GetRotation(node);
+   float tolua_ret = (float)  SceneSystem::GetRotation(node);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -377,9 +377,9 @@ static int tolua_bubbles_rotationOf00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: SetRotation */
-#ifndef TOLUA_DISABLE_tolua_bubbles_setRotation00
-static int tolua_bubbles_setRotation00(lua_State* tolua_S)
+/* function: SceneSystem::SetRotation */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_setRotation00
+static int tolua_bubbles_SceneSystem_setRotation00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -395,7 +395,7 @@ static int tolua_bubbles_setRotation00(lua_State* tolua_S)
   unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   float degrees = ((float)  tolua_tonumber(tolua_S,2,0));
   {
-   SetRotation(node,degrees);
+   SceneSystem::SetRotation(node,degrees);
   }
  }
  return 0;
@@ -773,19 +773,22 @@ TOLUA_API int tolua_bubbles_open (lua_State* tolua_S)
  tolua_reg_types(tolua_S);
  tolua_module(tolua_S,NULL,0);
  tolua_beginmodule(tolua_S,NULL);
-  tolua_function(tolua_S,"nodeCount",tolua_bubbles_nodeCount00);
-  tolua_function(tolua_S,"createNode",tolua_bubbles_createNode00);
-  tolua_function(tolua_S,"attach",tolua_bubbles_attach00);
-  tolua_function(tolua_S,"detach",tolua_bubbles_detach00);
-  tolua_function(tolua_S,"parentOf",tolua_bubbles_parentOf00);
-  tolua_function(tolua_S,"addComponent",tolua_bubbles_addComponent00);
-  tolua_function(tolua_S,"hasComponent",tolua_bubbles_hasComponent00);
-  tolua_function(tolua_S,"removeComponent",tolua_bubbles_removeComponent00);
-  tolua_function(tolua_S,"destroyNode",tolua_bubbles_destroyNode00);
-  tolua_function(tolua_S,"positionOf",tolua_bubbles_positionOf00);
-  tolua_function(tolua_S,"setPosition",tolua_bubbles_setPosition00);
-  tolua_function(tolua_S,"rotationOf",tolua_bubbles_rotationOf00);
-  tolua_function(tolua_S,"setRotation",tolua_bubbles_setRotation00);
+  tolua_module(tolua_S,"SceneSystem",0);
+  tolua_beginmodule(tolua_S,"SceneSystem");
+   tolua_function(tolua_S,"nodeCount",tolua_bubbles_SceneSystem_nodeCount00);
+   tolua_function(tolua_S,"createNode",tolua_bubbles_SceneSystem_createNode00);
+   tolua_function(tolua_S,"attach",tolua_bubbles_SceneSystem_attach00);
+   tolua_function(tolua_S,"detach",tolua_bubbles_SceneSystem_detach00);
+   tolua_function(tolua_S,"parentOf",tolua_bubbles_SceneSystem_parentOf00);
+   tolua_function(tolua_S,"addComponent",tolua_bubbles_SceneSystem_addComponent00);
+   tolua_function(tolua_S,"hasComponent",tolua_bubbles_SceneSystem_hasComponent00);
+   tolua_function(tolua_S,"removeComponent",tolua_bubbles_SceneSystem_removeComponent00);
+   tolua_function(tolua_S,"destroyNode",tolua_bubbles_SceneSystem_destroyNode00);
+   tolua_function(tolua_S,"positionOf",tolua_bubbles_SceneSystem_positionOf00);
+   tolua_function(tolua_S,"setPosition",tolua_bubbles_SceneSystem_setPosition00);
+   tolua_function(tolua_S,"rotationOf",tolua_bubbles_SceneSystem_rotationOf00);
+   tolua_function(tolua_S,"setRotation",tolua_bubbles_SceneSystem_setRotation00);
+  tolua_endmodule(tolua_S);
   tolua_module(tolua_S,"CircleSystem",0);
   tolua_beginmodule(tolua_S,"CircleSystem");
    tolua_function(tolua_S,"createMaterial",tolua_bubbles_CircleSystem_createMaterial00);
@@ -808,12 +811,13 @@ TOLUA_API int tolua_bubbles_open (lua_State* tolua_S)
   { /* begin embedded lua code */
    int top = lua_gettop(tolua_S);
    static const unsigned char B[] = {
-    10, 99,105,114, 99,108,101, 32, 61, 32, 67,105,114, 99,108,
-    101, 83,121,115,116,101,109, 10,105,110,112,117,116, 32, 61,
-     32, 73,110,112,117,116, 83,121,115,116,101,109, 10, 99,111,
-    109,112,111,110,101,110,116, 32, 61, 32,123, 10, 99,105,114,
-     99,108,101, 32, 61, 32, 48, 10,125, 45, 45, 45, 45, 45, 45,
-     45, 45, 45, 45, 45,32
+    10,115, 99,101,110,101, 32, 61, 32, 83, 99,101,110,101, 83,
+    121,115,116,101,109, 10, 99,105,114, 99,108,101, 32, 61, 32,
+     67,105,114, 99,108,101, 83,121,115,116,101,109, 10,105,110,
+    112,117,116, 32, 61, 32, 73,110,112,117,116, 83,121,115,116,
+    101,109, 10, 99,111,109,112,111,110,101,110,116, 32, 61, 32,
+    123, 10, 99,105,114, 99,108,101, 32, 61, 32, 48, 10,125, 45,
+     45, 45, 45, 45, 45, 45,32
    };
    tolua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 1");
    lua_settop(tolua_S, top);

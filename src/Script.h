@@ -3,6 +3,8 @@
 #include "CircleSystem.h"
 #include "InputSystem.h"
 
+namespace SceneSystem {
+
 void GetPosition(ID node, float *x=0, float *y=0) {
 	auto position = Pose(node).t;
 	*x = position.x;
@@ -19,4 +21,6 @@ float GetRotation(ID node) {
 
 void SetRotation(ID node, float degrees) {
 	Pose(node).q = Polar(1.f, degrees * (M_PI/180.0f));
+}
+
 }

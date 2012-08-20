@@ -2,10 +2,6 @@
 #include "SceneSystem.h"
 #include "CircleSystem.h"
 
-enum RenderType {
-	kRenderTypeCirle
-};
-
 struct RenderBuffer {
 	Transform transforms[MAX_NODES];
 	CircleSystem::Geometry circleGeometry[MAX_NODES];
@@ -14,8 +10,13 @@ struct RenderBuffer {
 	int circleCount;
 };
 
-void InitializeRenderSystem();
+namespace RenderSystem {
 
+enum RenderType {
+	kRenderTypeCirle
+};
+
+void Initialize();
 
 // For SCENE THREAD
 void SubmitToRenderSystem(RenderBuffer* vbuf);
@@ -25,3 +26,5 @@ void RetrieveFromRenderSystem(RenderBuffer** out);
 void RetrieveFromSceneSystem(RenderBuffer** out);
 void SubmitToSceneSystem(RenderBuffer* vbuf);
 void Render(RenderBuffer* vbuf);
+
+}

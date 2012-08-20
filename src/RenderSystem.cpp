@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <functional>
 
+namespace RenderSystem {
+
 static folly::ProducerConsumerQueue<RenderBuffer*, 4> mRenderQueue;
 static folly::ProducerConsumerQueue<RenderBuffer*, 4> mSceneQueue;
 static GLFWcond gRenderCondition;
@@ -10,7 +12,7 @@ static GLFWcond gSceneCondition;
 static GLFWmutex gRenderMutex;
 static GLFWmutex gSceneMutex;
 
-void InitializeRenderSystem() {
+void Initialize() {
 	gRenderCondition = glfwCreateCond();
 	gSceneCondition = glfwCreateCond();
 	gRenderMutex = glfwCreateMutex();
@@ -53,4 +55,6 @@ void SubmitToSceneSystem(RenderBuffer* vbuf) {
 
 void Render(RenderBuffer* vbuf) {
 	CircleSystem::Render(vbuf);
+}
+
 }

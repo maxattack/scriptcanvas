@@ -3,22 +3,26 @@ $#include "Script.h"
 
 typedef unsigned int ID;
 
-// SceneSystem Functions
-int NodeCount @ nodeCount();
-ID CreateNode @ createNode(ID parent=0);
-void AttachNode @ attach(ID parent, ID child);
-void DetachNode @ detach(ID child);
-ID Parent @ parentOf(ID node);
-void AddComponent @ addComponent(ID node, ID componentType);
-bool HasComponent @ hasComponent(ID node, ID componentType);
-void RemoveComponent @ removeComponent(ID node, ID componentType);
-void DestroyNode @ destroyNode(ID node);
+namespace SceneSystem {
 
-// SceneSystem Util Functions
-void GetPosition @ positionOf(ID node, float *x=0, float *y=0);
-void SetPosition @ setPosition(ID node, float x, float y);
-float GetRotation @ rotationOf(ID node);
-void SetRotation @ setRotation(ID node, float degrees);
+	// SceneSystem Functions
+	int NodeCount @ nodeCount();
+	ID CreateNode @ createNode(ID parent=0);
+	void AttachNode @ attach(ID parent, ID child);
+	void DetachNode @ detach(ID child);
+	ID Parent @ parentOf(ID node);
+	void AddComponent @ addComponent(ID node, ID componentType);
+	bool HasComponent @ hasComponent(ID node, ID componentType);
+	void RemoveComponent @ removeComponent(ID node, ID componentType);
+	void DestroyNode @ destroyNode(ID node);
+
+	// SceneSystem Util Functions
+	void GetPosition @ positionOf(ID node, float *x=0, float *y=0);
+	void SetPosition @ setPosition(ID node, float x, float y);
+	float GetRotation @ rotationOf(ID node);
+	void SetRotation @ setRotation(ID node, float degrees);
+
+}
 
 namespace CircleSystem {
 	
@@ -43,6 +47,7 @@ namespace InputSystem {
 
 
 $[
+scene = SceneSystem
 circle = CircleSystem
 input = InputSystem
 component = {

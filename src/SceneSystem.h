@@ -2,6 +2,8 @@
 #include "BaseSystem.h"
 #include "math/Transform.h"
 
+namespace SceneSystem {
+
 //------------------------------------------------------------------------------
 // SCENE SYSTEM
 //
@@ -55,9 +57,9 @@ uint16_t GetIndex(ID node);
 // For mid-frame one-shots -- the RenderQueue will get this batched.
 Transform WorldPose(ID node);
 
-void UpdateSceneSystem(RenderBuffer *vbuf);
+void Update(RenderBuffer *vbuf);
 
-// Register a component system with the scene system
+// Register a component system with the scene system (belongs in basesystem?)
 void RegisterComponentManager(ID componentType, IManager* pMgr);
 
 // Add a component to a node.  Each node can have multiple components,
@@ -89,3 +91,6 @@ void DestroyNode(ID node);
 // Batch Render Transformation
 // Scripting Interface / Component Retrieval
 //------------------------------------------------------------------------------
+
+}
+
