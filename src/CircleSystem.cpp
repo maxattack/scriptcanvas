@@ -3,49 +3,110 @@
 #include <cstring>
 #include "RenderSystem.h"
 
+namespace CircleSystem {
+
 static bool mInitialized = false;
 static GLuint mProgram;
 static GLuint mAttribUnit;
 static GLuint mUniformRadius;
 static GLuint mUniformColor;
 static GLuint mVertexBuffer;
-static CompactComponentPool<CircleComponent> mComponents;
-static CompactPool<CircleGeometry, MAX_NODES> mGeometry;
-static CompactPool<CircleMaterial, MAX_NODES> mMaterial;
+static CompactComponentPool<Component> mComponents;
+static CompactPool<Geometry, MAX_NODES> mGeometry;
+static CompactPool<Material, MAX_NODES> mMaterial;
 
 static GLuint LoadShaderProgram(const char* filename);
 
-bool CreateCircleComponent(ID node) {
+bool Manager::CreateComponent(ID node) {
 	mComponents.Alloc(node);
     mComponents[node].node = node;
     return true;
 }
 
-bool DestroyCircleComponent(ID node) {
-	mComponents.Free(node);
+bool Manager::DestroyComponent(ID node) {
+    mComponents.Free(node);
     return true;
 }
 
-void UpdateCircleSystem(RenderBuffer* vbuf) {
+ID CreateMaterial(float r, float g, float b) { 
+    ID result = mMaterial.TakeOut(); 
+    mMaterial[result].r = r;
+    mMaterial[result].g = g;
+    mMaterial[result].b = b;
+    mMaterial[result].a = 1.f;
+    return result;
+}
+
+void SetMaterial(ID node, ID mat) {
+    ASSERT(mMaterial.IsActive(mat));
+    mComponents[node].material = mat;
+}
+
+ID GetMaterial(ID node) {
+    return mComponents[node].material;
+}
+
+void SetMaterialColor(ID mat, float r, float g, float b){
+    mMaterial[mat].r = r;
+    mMaterial[mat].g = g;
+    mMaterial[mat].b = b;
+}
+
+void DestroyMaterial(ID matId) { 
+    mMaterial.PutBack(matId); 
+    for(auto p=mComponents.Begin(); p!=mComponents.End(); ++p) {
+        p->material *= (p->material == matId);
+    }
+}
+
+ID CreateGeometry(float radius) { 
+    ID result = mGeometry.TakeOut(); 
+    mGeometry[result].radius = radius;
+    return result;
+}
+
+void SetGeometry(ID node, ID geom) {
+    ASSERT(mGeometry.IsActive(geom));
+    mComponents[node].geometry = geom;
+}
+
+ID GetGeometry(ID node) {
+    return mComponents[node].geometry;
+}
+
+void SetGeometryRadius(ID geomId, float radius) {
+    mGeometry[geomId].radius = radius;
+}
+
+void DestroyGeometry(ID geomId) { 
+    mGeometry.PutBack(geomId); 
+    for (auto p=mComponents.Begin(); p!=mComponents.End(); ++p) {
+        p->geometry *=  (p->geometry == geomId);
+    }
+}
+
+void Update(RenderBuffer* vbuf) {
     for(int i=0; i<mGeometry.Count(); ++i) {
         vbuf->circleGeometry[i] = mGeometry.Begin()[i];
     }
     for(int i=0; i<mMaterial.Count(); ++i) {
         vbuf->circleMaterials[i] = mMaterial.Begin()[i];
     }
-    for(int i=0; i<mComponents.Count(); ++i) {
-        auto& c = mComponents.Begin()[i];
-        CircleCommand cmd;
-        cmd.fields.queue = 0;
-        cmd.fields.material = mMaterial.GetIndex(c.material);
-        cmd.fields.geometry = mGeometry.GetIndex(c.geometry);
-        cmd.fields.transform = GetIndex(c.node);
-        vbuf->circleCommands[i] = cmd;
+    int idx=0;
+    for(auto p=mComponents.Begin(); p!=mComponents.End(); ++p) {
+        if (p->material && p->geometry) {
+            Command cmd;
+            cmd.fields.queue = 0;
+            cmd.fields.material = mMaterial.GetIndex(p->material);
+            cmd.fields.geometry = mGeometry.GetIndex(p->geometry);
+            cmd.fields.transform = GetIndex(p->node);
+            vbuf->circleCommands[idx++] = cmd;
+        }
     }
-    vbuf->circleCount = mComponents.Count();
+    vbuf->circleCount = idx;
 }
 
-void RenderCircleSystem(RenderBuffer* vbuf) {
+void Render(RenderBuffer* vbuf) {
     if (vbuf->circleCount) {
         if (!mInitialized) {
             mProgram = LoadShaderProgram("src/circle.glsl");
@@ -119,47 +180,6 @@ void RenderCircleSystem(RenderBuffer* vbuf) {
     } else { /* teardown when not in use? */ }
 }
 
-CircleComponent& GetCircleComponent(ID node) {
-	return mComponents[node];
-}
-
-ID CreateCircleMaterial(float r, float g, float b) { 
-    ID result = mMaterial.TakeOut(); 
-    mMaterial[result].r = r;
-    mMaterial[result].g = g;
-    mMaterial[result].b = b;
-    mMaterial[result].a = 1.f;
-    return result;
-}
-
-CircleMaterial& GetCircleMaterial(ID matId) { 
-    return mMaterial[matId]; 
-}
-
-void DestroyCircleMaterial(ID matId) { 
-    mMaterial.PutBack(matId); 
-    for(auto p=mComponents.Begin(); p!=mComponents.End(); ++p) {
-        p->material *= (p->material == matId);
-    }
-}
-
-ID CreateCircleGeometry(float radius) { 
-    ID result = mGeometry.TakeOut(); 
-    mGeometry[result].radius = radius;
-    return result;
-}
-
-CircleGeometry& GetCircleGeometry(ID geomId) { 
-    return mGeometry[geomId]; 
-}
-
-void DestroyCircleGeometry(ID geomId) { 
-    mGeometry.PutBack(geomId); 
-    for (auto p=mComponents.Begin(); p!=mComponents.End(); ++p) {
-        p->geometry *=  (p->geometry == geomId);
-    }
-}
-
 static GLuint LoadShaderProgram(const char* filename) {
     GLuint prog, vert, frag;
     GLint cnt = 0;
@@ -225,4 +245,6 @@ static GLuint LoadShaderProgram(const char* filename) {
         glLinkProgram(prog);
     }
     return prog;
+}
+
 }

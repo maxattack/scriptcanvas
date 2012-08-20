@@ -8,9 +8,9 @@ enum RenderType {
 
 struct RenderBuffer {
 	Transform transforms[MAX_NODES];
-	CircleGeometry circleGeometry[MAX_NODES];
-	CircleMaterial circleMaterials[MAX_NODES];
-	CircleCommand circleCommands[MAX_NODES];
+	CircleSystem::Geometry circleGeometry[MAX_NODES];
+	CircleSystem::Material circleMaterials[MAX_NODES];
+	CircleSystem::Command circleCommands[MAX_NODES];
 	int circleCount;
 };
 

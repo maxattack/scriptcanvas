@@ -52,5 +52,5 @@ void SubmitToSceneSystem(RenderBuffer* vbuf) {
 }
 
 void Render(RenderBuffer* vbuf) {
-	RenderCircleSystem(vbuf);
+	CircleSystem::Render(vbuf);
 }

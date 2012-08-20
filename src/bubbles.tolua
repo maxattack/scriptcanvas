@@ -3,21 +3,50 @@ $#include "Script.h"
 
 typedef unsigned int ID;
 
-struct Node {
-	ID id();
+// SceneSystem Functions
+int NodeCount @ nodeCount();
+ID CreateNode @ createNode(ID parent=0);
+void AttachNode @ attach(ID parent, ID child);
+void DetachNode @ detach(ID child);
+ID Parent @ parentOf(ID node);
+void AddComponent @ addComponent(ID node, ID componentType);
+bool HasComponent @ hasComponent(ID node, ID componentType);
+void RemoveComponent @ removeComponent(ID node, ID componentType);
+void DestroyNode @ destroyNode(ID node);
 
-	void attach(Node child);
-	void detach();
-	Node* parent();
+// SceneSystem Util Functions
+void GetPosition @ positionOf(ID node, float *x=0, float *y=0);
+void SetPosition @ setPosition(ID node, float x, float y);
+float GetRotation @ rotationOf(ID node);
+void SetRotation @ setRotation(ID node, float degrees);
 
-	void get_position(float* x=0, float* y=0);
-	void set_position(float x, float y);
-	void set_rotation(float radians);
+namespace CircleSystem {
+	
+	ID CreateMaterial @ createMaterial(float r=1, float g=1, float b=1);
+	void SetMaterial @ setMaterial(ID node, ID mat);
+	ID GetMaterial @ material(ID node);
+	void SetMaterialColor @ setMaterialColor(ID mat, float r, float g, float b);
+	void DestroyMaterial @ destroyMaterial(ID matId);
+	
+	ID CreateGeometry @ createGeometry(float radius=1);
+	void SetGeometry @ setGeometry(ID node, ID geom);
+	ID GetGeometry @ geometry(ID node);
+	void SetGeometryRadius @ setGeometryRadius(ID geomId, float radius);
+	void DestroyGeometry @ destroyGeometry(ID geomId);
 
-	void add_component(ID componentType);
-	void remove_component(ID componentType);
-
-	void destroy();
 };
 
-Node* create_node(Node* parent=0);
+namespace InputSystem {
+	void GetMousePosition @ mousePosition(int *x=0, int *y=0);
+	double GetTime @ seconds();
+}
+
+
+$[
+circle = CircleSystem
+input = InputSystem
+component = {
+	circle = 0
+}
+
+$]

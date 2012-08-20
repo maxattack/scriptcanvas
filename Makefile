@@ -14,12 +14,12 @@ OBJS = \
 	src/InputSystem.o \
 	src/RenderSystem.o \
 	src/SceneSystem.o \
-	# src/binding.o \
-	# src/tolua_event.o \
-	# src/tolua_is.o \
-	# src/tolua_map.o \
-	# src/tolua_push.o \
-	# src/tolua_to.o \
+	src/binding.o \
+	src/tolua_event.o \
+	src/tolua_is.o \
+	src/tolua_map.o \
+	src/tolua_push.o \
+	src/tolua_to.o \
 
 
 $(BIN): $(OBJS)

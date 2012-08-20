@@ -3,21 +3,23 @@
 #include "util/SceneUtil.h"
 #include "util/CompactPool.h"
 
-struct CircleComponent {
+namespace CircleSystem {
+
+struct Component {
 	ID node;
 	ID geometry;
 	ID material;
 };
 
-struct CircleGeometry {
+struct Geometry {
 	float radius;
 };
 
-struct CircleMaterial {
+struct Material {
 	float r, g, b, a;
 };
 
-union CircleCommand {
+union Command {
 	uint64_t id;
 	struct {
 		uint16_t queue;
@@ -27,24 +29,26 @@ union CircleCommand {
 	} fields;
 };
 
-bool CreateCircleComponent(ID node);
-CircleComponent& GetCircleComponent(ID node);
-bool DestroyCircleComponent(ID node);
+ID CreateMaterial(float r=1, float g=1, float b=1);
+void SetMaterial(ID node, ID mat);
+ID GetMaterial(ID node);
+void SetMaterialColor(ID mat, float r, float g, float b);
+void DestroyMaterial(ID matId);
 
-ID CreateCircleMaterial(float r=1, float g=1, float b=1);
-CircleMaterial& GetCircleMaterial(ID matId);
-void DestroyCircleMaterial(ID matId);
+ID CreateGeometry(float radius=1);
+void SetGeometry(ID node, ID geom);
+ID GetGeometry(ID node);
+void SetGeometryRadius(ID geomId, float radius);
+void DestroyGeometry(ID geomId);
 
-ID CreateCircleGeometry(float radius=1);
-CircleGeometry& GetCircleGeometry(ID geomId);
-void DestroyCircleGeometry(ID geomId);
+void Update(RenderBuffer *vbuf);
+void Render(RenderBuffer *vbuf);
 
-void UpdateCircleSystem(RenderBuffer *vbuf);
-void RenderCircleSystem(RenderBuffer *vbuf);
-
-struct CircleSystem : public IManager {
-	bool CreateComponent(ID node) { return CreateCircleComponent(node); }
-	bool DestroyComponent(ID node) { return DestroyCircleComponent(node); }
-	void Update(RenderBuffer *vbuf) { UpdateCircleSystem(vbuf); }
-	void Render(RenderBuffer *vbuf) { RenderCircleSystem(vbuf); }
+struct Manager : public IManager {
+	bool CreateComponent(ID node);
+	bool DestroyComponent(ID node);
+	void Update(RenderBuffer *vbuf) { CircleSystem::Update(vbuf); }
+	void Render(RenderBuffer *vbuf) { CircleSystem::Render(vbuf); }
 };
+
+}

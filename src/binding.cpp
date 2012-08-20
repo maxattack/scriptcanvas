@@ -1,6 +1,6 @@
 /*
 ** Lua binding: bubbles
-** Generated automatically by tolua++-1.0.92 on Sun Aug 19 12:41:31 2012.
+** Generated automatically by tolua++-1.0.92 on Mon Aug 20 00:03:18 2012.
 */
 
 #ifndef __cplusplus
@@ -18,223 +18,83 @@ TOLUA_API int  tolua_bubbles_open (lua_State* tolua_S);
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
 {
- tolua_usertype(tolua_S,"Circle");
- tolua_usertype(tolua_S,"Node");
 }
 
-/* get function: radius of class  Circle */
-#ifndef TOLUA_DISABLE_tolua_get_Circle_radius
-static int tolua_get_Circle_radius(lua_State* tolua_S)
-{
-  Circle* self = (Circle*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'radius'",NULL);
-#endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->radius);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: radius of class  Circle */
-#ifndef TOLUA_DISABLE_tolua_set_Circle_radius
-static int tolua_set_Circle_radius(lua_State* tolua_S)
-{
-  Circle* self = (Circle*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'radius'",NULL);
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->radius = ((float)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: r of class  Circle */
-#ifndef TOLUA_DISABLE_tolua_get_Circle_r
-static int tolua_get_Circle_r(lua_State* tolua_S)
-{
-  Circle* self = (Circle*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'r'",NULL);
-#endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->r);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: r of class  Circle */
-#ifndef TOLUA_DISABLE_tolua_set_Circle_r
-static int tolua_set_Circle_r(lua_State* tolua_S)
-{
-  Circle* self = (Circle*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'r'",NULL);
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->r = ((float)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: g of class  Circle */
-#ifndef TOLUA_DISABLE_tolua_get_Circle_g
-static int tolua_get_Circle_g(lua_State* tolua_S)
-{
-  Circle* self = (Circle*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'g'",NULL);
-#endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->g);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: g of class  Circle */
-#ifndef TOLUA_DISABLE_tolua_set_Circle_g
-static int tolua_set_Circle_g(lua_State* tolua_S)
-{
-  Circle* self = (Circle*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'g'",NULL);
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->g = ((float)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: b of class  Circle */
-#ifndef TOLUA_DISABLE_tolua_get_Circle_b
-static int tolua_get_Circle_b(lua_State* tolua_S)
-{
-  Circle* self = (Circle*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'b'",NULL);
-#endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->b);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: b of class  Circle */
-#ifndef TOLUA_DISABLE_tolua_set_Circle_b
-static int tolua_set_Circle_b(lua_State* tolua_S)
-{
-  Circle* self = (Circle*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'b'",NULL);
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->b = ((float)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Init of class  Circle */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Circle_init00
-static int tolua_bubbles_Circle_init00(lua_State* tolua_S)
+/* function: NodeCount */
+#ifndef TOLUA_DISABLE_tolua_bubbles_nodeCount00
+static int tolua_bubbles_nodeCount00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Circle",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  Circle* self = (Circle*)  tolua_tousertype(tolua_S,1,0);
-  float aradius = ((float)  tolua_tonumber(tolua_S,2,0));
-  float ar = ((float)  tolua_tonumber(tolua_S,3,0));
-  float ag = ((float)  tolua_tonumber(tolua_S,4,0));
-  float ab = ((float)  tolua_tonumber(tolua_S,5,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Init'", NULL);
-#endif
   {
-   self->Init(aradius,ar,ag,ab);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'init'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: id of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_id00
-static int tolua_bubbles_Node_id00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'id'", NULL);
-#endif
-  {
-   unsigned int tolua_ret = ( unsigned int)  self->id();
+   int tolua_ret = (int)  NodeCount();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'id'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'nodeCount'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: attach of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_attach00
-static int tolua_bubbles_Node_attach00(lua_State* tolua_S)
+/* function: CreateNode */
+#ifndef TOLUA_DISABLE_tolua_bubbles_createNode00
+static int tolua_bubbles_createNode00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Node",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,1,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int parent = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  {
+   unsigned int tolua_ret = ( unsigned int)  CreateNode(parent);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'createNode'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: AttachNode */
+#ifndef TOLUA_DISABLE_tolua_bubbles_attach00
+static int tolua_bubbles_attach00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
-  Node child = *((Node*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'attach'", NULL);
-#endif
+  unsigned int parent = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  unsigned int child = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
   {
-   self->attach(child);
+   AttachNode(parent,child);
   }
  }
  return 0;
@@ -246,26 +106,23 @@ static int tolua_bubbles_Node_attach00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: detach of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_detach00
-static int tolua_bubbles_Node_detach00(lua_State* tolua_S)
+/* function: DetachNode */
+#ifndef TOLUA_DISABLE_tolua_bubbles_detach00
+static int tolua_bubbles_detach00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'detach'", NULL);
-#endif
+  unsigned int child = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   {
-   self->detach();
+   DetachNode(child);
   }
  }
  return 0;
@@ -277,46 +134,162 @@ static int tolua_bubbles_Node_detach00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: parent of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_parent00
-static int tolua_bubbles_Node_parent00(lua_State* tolua_S)
+/* function: Parent */
+#ifndef TOLUA_DISABLE_tolua_bubbles_parentOf00
+static int tolua_bubbles_parentOf00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'parent'", NULL);
-#endif
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   {
-   Node* tolua_ret = (Node*)  self->parent();
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Node");
+   unsigned int tolua_ret = ( unsigned int)  Parent(node);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'parent'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'parentOf'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: get_position of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_get_position00
-static int tolua_bubbles_Node_get_position00(lua_State* tolua_S)
+/* function: AddComponent */
+#ifndef TOLUA_DISABLE_tolua_bubbles_addComponent00
+static int tolua_bubbles_addComponent00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  unsigned int componentType = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
+  {
+   AddComponent(node,componentType);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'addComponent'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: HasComponent */
+#ifndef TOLUA_DISABLE_tolua_bubbles_hasComponent00
+static int tolua_bubbles_hasComponent00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  unsigned int componentType = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
+  {
+   bool tolua_ret = (bool)  HasComponent(node,componentType);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'hasComponent'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: RemoveComponent */
+#ifndef TOLUA_DISABLE_tolua_bubbles_removeComponent00
+static int tolua_bubbles_removeComponent00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  unsigned int componentType = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
+  {
+   RemoveComponent(node,componentType);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'removeComponent'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: DestroyNode */
+#ifndef TOLUA_DISABLE_tolua_bubbles_destroyNode00
+static int tolua_bubbles_destroyNode00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  {
+   DestroyNode(node);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'destroyNode'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: GetPosition */
+#ifndef TOLUA_DISABLE_tolua_bubbles_positionOf00
+static int tolua_bubbles_positionOf00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
@@ -325,14 +298,11 @@ static int tolua_bubbles_Node_get_position00(lua_State* tolua_S)
  else
 #endif
  {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   float x = ((float)  tolua_tonumber(tolua_S,2,0));
   float y = ((float)  tolua_tonumber(tolua_S,3,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'get_position'", NULL);
-#endif
   {
-   self->get_position(&x,&y);
+   GetPosition(node,&x,&y);
    tolua_pushnumber(tolua_S,(lua_Number)x);
    tolua_pushnumber(tolua_S,(lua_Number)y);
   }
@@ -340,20 +310,20 @@ static int tolua_bubbles_Node_get_position00(lua_State* tolua_S)
  return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'get_position'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'positionOf'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: set_position of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_set_position00
-static int tolua_bubbles_Node_set_position00(lua_State* tolua_S)
+/* function: SetPosition */
+#ifndef TOLUA_DISABLE_tolua_bubbles_setPosition00
+static int tolua_bubbles_setPosition00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
@@ -362,33 +332,59 @@ static int tolua_bubbles_Node_set_position00(lua_State* tolua_S)
  else
 #endif
  {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   float x = ((float)  tolua_tonumber(tolua_S,2,0));
   float y = ((float)  tolua_tonumber(tolua_S,3,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'set_position'", NULL);
-#endif
   {
-   self->set_position(x,y);
+   SetPosition(node,x,y);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'set_position'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'setPosition'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: set_rotation of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_set_rotation00
-static int tolua_bubbles_Node_set_rotation00(lua_State* tolua_S)
+/* function: GetRotation */
+#ifndef TOLUA_DISABLE_tolua_bubbles_rotationOf00
+static int tolua_bubbles_rotationOf00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  {
+   float tolua_ret = (float)  GetRotation(node);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'rotationOf'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: SetRotation */
+#ifndef TOLUA_DISABLE_tolua_bubbles_setRotation00
+static int tolua_bubbles_setRotation00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -396,32 +392,62 @@ static int tolua_bubbles_Node_set_rotation00(lua_State* tolua_S)
  else
 #endif
  {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
-  float radians = ((float)  tolua_tonumber(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'set_rotation'", NULL);
-#endif
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  float degrees = ((float)  tolua_tonumber(tolua_S,2,0));
   {
-   self->set_rotation(radians);
+   SetRotation(node,degrees);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'set_rotation'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'setRotation'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: add_component of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_add_component00
-static int tolua_bubbles_Node_add_component00(lua_State* tolua_S)
+/* function: CircleSystem::CreateMaterial */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_createMaterial00
+static int tolua_bubbles_CircleSystem_createMaterial00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,1,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  float r = ((float)  tolua_tonumber(tolua_S,1,1));
+  float g = ((float)  tolua_tonumber(tolua_S,2,1));
+  float b = ((float)  tolua_tonumber(tolua_S,3,1));
+  {
+   unsigned int tolua_ret = ( unsigned int)  CircleSystem::CreateMaterial(r,g,b);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'createMaterial'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: CircleSystem::SetMaterial */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_setMaterial00
+static int tolua_bubbles_CircleSystem_setMaterial00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -429,32 +455,149 @@ static int tolua_bubbles_Node_add_component00(lua_State* tolua_S)
  else
 #endif
  {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
-  unsigned int componentType = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'add_component'", NULL);
-#endif
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  unsigned int mat = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
   {
-   self->add_component(componentType);
+   CircleSystem::SetMaterial(node,mat);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'add_component'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'setMaterial'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: remove_component of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_remove_component00
-static int tolua_bubbles_Node_remove_component00(lua_State* tolua_S)
+/* function: CircleSystem::GetMaterial */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_material00
+static int tolua_bubbles_CircleSystem_material00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  {
+   unsigned int tolua_ret = ( unsigned int)  CircleSystem::GetMaterial(node);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'material'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: CircleSystem::SetMaterialColor */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_setMaterialColor00
+static int tolua_bubbles_CircleSystem_setMaterialColor00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int mat = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  float r = ((float)  tolua_tonumber(tolua_S,2,0));
+  float g = ((float)  tolua_tonumber(tolua_S,3,0));
+  float b = ((float)  tolua_tonumber(tolua_S,4,0));
+  {
+   CircleSystem::SetMaterialColor(mat,r,g,b);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setMaterialColor'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: CircleSystem::DestroyMaterial */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_destroyMaterial00
+static int tolua_bubbles_CircleSystem_destroyMaterial00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int matId = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  {
+   CircleSystem::DestroyMaterial(matId);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'destroyMaterial'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: CircleSystem::CreateGeometry */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_createGeometry00
+static int tolua_bubbles_CircleSystem_createGeometry00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  float radius = ((float)  tolua_tonumber(tolua_S,1,1));
+  {
+   unsigned int tolua_ret = ( unsigned int)  CircleSystem::CreateGeometry(radius);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'createGeometry'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: CircleSystem::SetGeometry */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_setGeometry00
+static int tolua_bubbles_CircleSystem_setGeometry00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -462,151 +605,111 @@ static int tolua_bubbles_Node_remove_component00(lua_State* tolua_S)
  else
 #endif
  {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
-  unsigned int componentType = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'remove_component'", NULL);
-#endif
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  unsigned int geom = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
   {
-   self->remove_component(componentType);
+   CircleSystem::SetGeometry(node,geom);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'remove_component'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'setGeometry'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: destroy of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_destroy00
-static int tolua_bubbles_Node_destroy00(lua_State* tolua_S)
+/* function: CircleSystem::GetGeometry */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_geometry00
+static int tolua_bubbles_CircleSystem_geometry00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'destroy'", NULL);
-#endif
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   {
-   self->destroy();
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'destroy'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: add_circle of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_add_circle00
-static int tolua_bubbles_Node_add_circle00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'add_circle'", NULL);
-#endif
-  {
-   Circle* tolua_ret = (Circle*)  self->add_circle();
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Circle");
+   unsigned int tolua_ret = ( unsigned int)  CircleSystem::GetGeometry(node);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'add_circle'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'geometry'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: get_circle of class  Node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_Node_get_circle00
-static int tolua_bubbles_Node_get_circle00(lua_State* tolua_S)
+/* function: CircleSystem::SetGeometryRadius */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_setGeometryRadius00
+static int tolua_bubbles_CircleSystem_setGeometryRadius00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"Node",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int geomId = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  float radius = ((float)  tolua_tonumber(tolua_S,2,0));
+  {
+   CircleSystem::SetGeometryRadius(geomId,radius);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setGeometryRadius'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: CircleSystem::DestroyGeometry */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_destroyGeometry00
+static int tolua_bubbles_CircleSystem_destroyGeometry00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  Node* self = (Node*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'get_circle'", NULL);
-#endif
+  unsigned int geomId = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   {
-   Circle* tolua_ret = (Circle*)  self->get_circle();
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Circle");
+   CircleSystem::DestroyGeometry(geomId);
   }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'get_circle'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'destroyGeometry'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: create_node */
-#ifndef TOLUA_DISABLE_tolua_bubbles_create_node00
-static int tolua_bubbles_create_node00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Node",1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Node* parent = ((Node*)  tolua_tousertype(tolua_S,1,0));
-  {
-   Node* tolua_ret = (Node*)  create_node(parent);
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Node");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'create_node'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: get_mouse_position */
-#ifndef TOLUA_DISABLE_tolua_bubbles_get_mouse_position00
-static int tolua_bubbles_get_mouse_position00(lua_State* tolua_S)
+/* function: InputSystem::GetMousePosition */
+#ifndef TOLUA_DISABLE_tolua_bubbles_InputSystem_mousePosition00
+static int tolua_bubbles_InputSystem_mousePosition00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -622,7 +725,7 @@ static int tolua_bubbles_get_mouse_position00(lua_State* tolua_S)
   int x = ((int)  tolua_tonumber(tolua_S,1,0));
   int y = ((int)  tolua_tonumber(tolua_S,2,0));
   {
-   get_mouse_position(&x,&y);
+   InputSystem::GetMousePosition(&x,&y);
    tolua_pushnumber(tolua_S,(lua_Number)x);
    tolua_pushnumber(tolua_S,(lua_Number)y);
   }
@@ -630,15 +733,15 @@ static int tolua_bubbles_get_mouse_position00(lua_State* tolua_S)
  return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'get_mouse_position'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'mousePosition'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: glfwGetTime */
-#ifndef TOLUA_DISABLE_tolua_bubbles_get_time00
-static int tolua_bubbles_get_time00(lua_State* tolua_S)
+/* function: InputSystem::GetTime */
+#ifndef TOLUA_DISABLE_tolua_bubbles_InputSystem_seconds00
+static int tolua_bubbles_InputSystem_seconds00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -650,14 +753,14 @@ static int tolua_bubbles_get_time00(lua_State* tolua_S)
 #endif
  {
   {
-   double tolua_ret = (double)  glfwGetTime();
+   double tolua_ret = (double)  InputSystem::GetTime();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'get_time'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'seconds'.",&tolua_err);
  return 0;
 #endif
 }
@@ -670,32 +773,52 @@ TOLUA_API int tolua_bubbles_open (lua_State* tolua_S)
  tolua_reg_types(tolua_S);
  tolua_module(tolua_S,NULL,0);
  tolua_beginmodule(tolua_S,NULL);
-  tolua_cclass(tolua_S,"Circle","Circle","",NULL);
-  tolua_beginmodule(tolua_S,"Circle");
-   tolua_variable(tolua_S,"radius",tolua_get_Circle_radius,tolua_set_Circle_radius);
-   tolua_variable(tolua_S,"r",tolua_get_Circle_r,tolua_set_Circle_r);
-   tolua_variable(tolua_S,"g",tolua_get_Circle_g,tolua_set_Circle_g);
-   tolua_variable(tolua_S,"b",tolua_get_Circle_b,tolua_set_Circle_b);
-   tolua_function(tolua_S,"init",tolua_bubbles_Circle_init00);
+  tolua_function(tolua_S,"nodeCount",tolua_bubbles_nodeCount00);
+  tolua_function(tolua_S,"createNode",tolua_bubbles_createNode00);
+  tolua_function(tolua_S,"attach",tolua_bubbles_attach00);
+  tolua_function(tolua_S,"detach",tolua_bubbles_detach00);
+  tolua_function(tolua_S,"parentOf",tolua_bubbles_parentOf00);
+  tolua_function(tolua_S,"addComponent",tolua_bubbles_addComponent00);
+  tolua_function(tolua_S,"hasComponent",tolua_bubbles_hasComponent00);
+  tolua_function(tolua_S,"removeComponent",tolua_bubbles_removeComponent00);
+  tolua_function(tolua_S,"destroyNode",tolua_bubbles_destroyNode00);
+  tolua_function(tolua_S,"positionOf",tolua_bubbles_positionOf00);
+  tolua_function(tolua_S,"setPosition",tolua_bubbles_setPosition00);
+  tolua_function(tolua_S,"rotationOf",tolua_bubbles_rotationOf00);
+  tolua_function(tolua_S,"setRotation",tolua_bubbles_setRotation00);
+  tolua_module(tolua_S,"CircleSystem",0);
+  tolua_beginmodule(tolua_S,"CircleSystem");
+   tolua_function(tolua_S,"createMaterial",tolua_bubbles_CircleSystem_createMaterial00);
+   tolua_function(tolua_S,"setMaterial",tolua_bubbles_CircleSystem_setMaterial00);
+   tolua_function(tolua_S,"material",tolua_bubbles_CircleSystem_material00);
+   tolua_function(tolua_S,"setMaterialColor",tolua_bubbles_CircleSystem_setMaterialColor00);
+   tolua_function(tolua_S,"destroyMaterial",tolua_bubbles_CircleSystem_destroyMaterial00);
+   tolua_function(tolua_S,"createGeometry",tolua_bubbles_CircleSystem_createGeometry00);
+   tolua_function(tolua_S,"setGeometry",tolua_bubbles_CircleSystem_setGeometry00);
+   tolua_function(tolua_S,"geometry",tolua_bubbles_CircleSystem_geometry00);
+   tolua_function(tolua_S,"setGeometryRadius",tolua_bubbles_CircleSystem_setGeometryRadius00);
+   tolua_function(tolua_S,"destroyGeometry",tolua_bubbles_CircleSystem_destroyGeometry00);
   tolua_endmodule(tolua_S);
-  tolua_cclass(tolua_S,"Node","Node","",NULL);
-  tolua_beginmodule(tolua_S,"Node");
-   tolua_function(tolua_S,"id",tolua_bubbles_Node_id00);
-   tolua_function(tolua_S,"attach",tolua_bubbles_Node_attach00);
-   tolua_function(tolua_S,"detach",tolua_bubbles_Node_detach00);
-   tolua_function(tolua_S,"parent",tolua_bubbles_Node_parent00);
-   tolua_function(tolua_S,"get_position",tolua_bubbles_Node_get_position00);
-   tolua_function(tolua_S,"set_position",tolua_bubbles_Node_set_position00);
-   tolua_function(tolua_S,"set_rotation",tolua_bubbles_Node_set_rotation00);
-   tolua_function(tolua_S,"add_component",tolua_bubbles_Node_add_component00);
-   tolua_function(tolua_S,"remove_component",tolua_bubbles_Node_remove_component00);
-   tolua_function(tolua_S,"destroy",tolua_bubbles_Node_destroy00);
-   tolua_function(tolua_S,"add_circle",tolua_bubbles_Node_add_circle00);
-   tolua_function(tolua_S,"get_circle",tolua_bubbles_Node_get_circle00);
+  tolua_module(tolua_S,"InputSystem",0);
+  tolua_beginmodule(tolua_S,"InputSystem");
+   tolua_function(tolua_S,"mousePosition",tolua_bubbles_InputSystem_mousePosition00);
+   tolua_function(tolua_S,"seconds",tolua_bubbles_InputSystem_seconds00);
   tolua_endmodule(tolua_S);
-  tolua_function(tolua_S,"create_node",tolua_bubbles_create_node00);
-  tolua_function(tolua_S,"get_mouse_position",tolua_bubbles_get_mouse_position00);
-  tolua_function(tolua_S,"get_time",tolua_bubbles_get_time00);
+
+  { /* begin embedded lua code */
+   int top = lua_gettop(tolua_S);
+   static const unsigned char B[] = {
+    10, 99,105,114, 99,108,101, 32, 61, 32, 67,105,114, 99,108,
+    101, 83,121,115,116,101,109, 10,105,110,112,117,116, 32, 61,
+     32, 73,110,112,117,116, 83,121,115,116,101,109, 10, 99,111,
+    109,112,111,110,101,110,116, 32, 61, 32,123, 10, 99,105,114,
+     99,108,101, 32, 61, 32, 48, 10,125, 45, 45, 45, 45, 45, 45,
+     45, 45, 45, 45, 45,32
+   };
+   tolua_dobuffer(tolua_S,(char*)B,sizeof(B),"tolua: embedded Lua code 1");
+   lua_settop(tolua_S, top);
+  } /* end of embedded lua code */
+
  tolua_endmodule(tolua_S);
  return 1;
 }
