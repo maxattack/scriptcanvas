@@ -15,8 +15,8 @@ function init()
 	sun = createPlanet(400, 400, 32, 1, 1, 0.25)
 	urth = createPlanet(128, 0, 24, 0.5, 0.5, 0.8)
 	moon = createPlanet(48, 0, 12, 0.4, 0.4, 0.4)	
-	attach(sun, urth)
-	attach(urth, moon)
+	attachTo(sun, urth)
+	attachTo(urth, moon)
 end
 
 function update()

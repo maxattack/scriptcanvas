@@ -8,7 +8,7 @@ namespace SceneSystem {
 	// SceneSystem Functions
 	int NodeCount @ nodeCount();
 	ID CreateNode @ createNode(ID parent=0);
-	void AttachNode @ attach(ID parent, ID child);
+	void AttachNode @ attachTo(ID parent, ID child);
 	void DetachNode @ detach(ID child);
 	ID Parent @ parentOf(ID node);
 	void AddComponent @ addComponent(ID node, ID componentType);

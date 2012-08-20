@@ -1,6 +1,6 @@
 /*
 ** Lua binding: bubbles
-** Generated automatically by tolua++-1.0.92 on Mon Aug 20 00:25:54 2012.
+** Generated automatically by tolua++-1.0.92 on Mon Aug 20 00:29:18 2012.
 */
 
 #ifndef __cplusplus
@@ -77,8 +77,8 @@ static int tolua_bubbles_SceneSystem_createNode00(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* function: SceneSystem::AttachNode */
-#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_attach00
-static int tolua_bubbles_SceneSystem_attach00(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_attachTo00
+static int tolua_bubbles_SceneSystem_attachTo00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -100,7 +100,7 @@ static int tolua_bubbles_SceneSystem_attach00(lua_State* tolua_S)
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'attach'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'attachTo'.",&tolua_err);
  return 0;
 #endif
 }
@@ -777,7 +777,7 @@ TOLUA_API int tolua_bubbles_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"SceneSystem");
    tolua_function(tolua_S,"nodeCount",tolua_bubbles_SceneSystem_nodeCount00);
    tolua_function(tolua_S,"createNode",tolua_bubbles_SceneSystem_createNode00);
-   tolua_function(tolua_S,"attach",tolua_bubbles_SceneSystem_attach00);
+   tolua_function(tolua_S,"attachTo",tolua_bubbles_SceneSystem_attachTo00);
    tolua_function(tolua_S,"detach",tolua_bubbles_SceneSystem_detach00);
    tolua_function(tolua_S,"parentOf",tolua_bubbles_SceneSystem_parentOf00);
    tolua_function(tolua_S,"addComponent",tolua_bubbles_SceneSystem_addComponent00);

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: bubbles
-** Generated automatically by tolua++-1.0.92 on Mon Aug 20 00:25:54 2012.
+** Generated automatically by tolua++-1.0.92 on Mon Aug 20 00:29:18 2012.
 */
 
 /* Exported function */
