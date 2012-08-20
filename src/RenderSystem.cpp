@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <functional>
 
-static folly::ProducerConsumerQueue<RenderBuffer*, 2> mRenderQueue;
-static folly::ProducerConsumerQueue<RenderBuffer*, 2> mSceneQueue;
+static folly::ProducerConsumerQueue<RenderBuffer*, 3> mRenderQueue;
+static folly::ProducerConsumerQueue<RenderBuffer*, 3> mSceneQueue;
 
 bool SubmitToRenderSystem(RenderBuffer* vbuf) {
 	return mRenderQueue.write(vbuf);

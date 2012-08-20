@@ -17,9 +17,9 @@ union CircleCommand {
 	uint64_t id;
 	struct {
 		uint16_t queue;
-		uint16_t transform;
 		uint16_t material;
 		uint16_t geometry;
+		uint16_t transform;
 	} fields;
 };
 
@@ -28,8 +28,6 @@ struct RenderBuffer {
 	CircleGeometry circleGeometry[MAX_NODES];
 	CircleMaterial circleMaterials[MAX_NODES];
 	CircleCommand circleCommands[MAX_NODES];
-
-
 	int circleCount;
 };
 
