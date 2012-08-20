@@ -1,5 +1,4 @@
-#include "SceneSystem.h"
-#include "util/Macros.h"
+#include "RenderSystem.h"
 
 //------------------------------------------------------
 // INTERNAL DATA
@@ -53,7 +52,7 @@ struct NodeManager {
 //------------------------------------------------------
 
 static NodeManager gNodes;
-static IComponentManager* gComponentManagers[MAX_COMPONENT_TYPES];
+static IManager* gComponentManagers[MAX_COMPONENT_TYPES];
 
 //------------------------------------------------------
 // NODE MANAGER IMPLEMENTATION
@@ -196,11 +195,26 @@ Transform& Pose(ID node) {
 	return gNodes.TransformFor(node);
 }
 
+uint16_t GetIndex(ID node) {
+	return gNodes.SlotFor(node).index;
+}
+
 Transform WorldPose(ID node) {
 	return gNodes[node].parent ? Pose(node) * WorldPose(gNodes[node].parent) : Pose(node);
 }
 
-void RegisterComponentManager(ID componentType, IComponentManager* pMgr) {
+void UpdateSceneSystem(RenderBuffer *vbuf) {
+	// This function could use some love -- reordering transforms
+	// into DAG order if dirty and then computing world transforms
+	// in one memory-friendly batch pass.  This is *not* meant as the
+	// final implementation.
+
+	for(int i=0; i<gNodes.count; ++i) {
+		vbuf->transforms[i] = WorldPose(gNodes.slots[gNodes.backBuffer[i]].id);
+	}
+}
+
+void RegisterComponentManager(ID componentType, IManager* pMgr) {
 	ASSERT((componentType) < MAX_COMPONENT_TYPES);
 	ASSERT(gComponentManagers[componentType] == 0);
 	gComponentManagers[componentType] = pMgr;

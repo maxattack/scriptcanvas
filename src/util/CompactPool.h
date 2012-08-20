@@ -20,87 +20,72 @@ to the comments.
 */
 
 #include <limits.h>
-#include <stdint.h>
 #include "Macros.h"
 #include "Alloc.h"
-#include "Types.h"
+#include "../BaseSystem.h"
 
 #define MAX_CAPACITY (64*1024)
 
-struct PoolIndex {
+struct CompactPoolSlot {
     ID id;
     uint16_t index;
     uint16_t next;
 };
 
-template<typename T>
+template<typename T, int Capacity>
 class CompactPool {
 private:
     uint32_t mCount;
     uint16_t mFreelistEnqueue;
     uint16_t mFreelistDequeue;
-    int mCapacity;
-    PoolIndex* mIndex;
-	uint16_t* mBackBuffer;
-    T* mBuffer;
+    CompactPoolSlot mSlot[Capacity];
+	uint16_t mBackBuffer[Capacity];
+    T mBuffer[Capacity];
 
 public:
-    CompactPool(int capacity, PoolIndex* indexBuffer, uint16_t* backBuffer, T* recordBuffer);
+    CompactPool();
 
     bool IsActive(ID id) const {
         // use the lower-bits to find the record
-        PoolIndex *p = mIndex + (id & 0xffff);
-        return p->id == id && p->index != USHRT_MAX;
+        auto& p = mSlot[id & 0xffff];
+        return p.id == id && p.index != USHRT_MAX;
     }
 
 	
-    T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[mIndex[id & 0xffff].index]; }
+    T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[mSlot[id & 0xffff].index]; }
     ID TakeOut();
     void PutBack(ID id);
     
 	int Count() { return mCount; }
-	ID GetID(T* record) { return mIndex[mBackBuffer[record-mBuffer]].id; }
-    T* Begin() const { return mBuffer; }
-    T* End() const { return mBuffer + mCount; }
+	ID GetID(T* record) { return mSlot[mBackBuffer[record-mBuffer]].id; }
+    uint16_t GetIndex(ID id) { return mSlot[id & 0xffff].index; }
+    T* Begin() { return mBuffer; }
+    T* End() { return mBuffer + mCount; }
 };
 
 template<typename T, int Capacity>
-class StaticCompactPool : public CompactPool<T> {
-private:
-	PoolIndex mIndexBuffer[Capacity];
-	uint16_t mBackBuffer[Capacity];
-	T mRecordBuffer[Capacity];
-public:
-	StaticCompactPool() : CompactPool<T>(Capacity, mIndexBuffer, mBackBuffer, mRecordBuffer) {}
-};
-
-template<typename T>
-CompactPool<T>::CompactPool(int capacity, PoolIndex* indexBuffer, uint16_t* backBuffer, T* recordBuffer) : 
+CompactPool<T, Capacity>::CompactPool() : 
     mCount(0), 
-    mFreelistEnqueue(capacity-1), 
-    mFreelistDequeue(0),
-    mCapacity(capacity),
-    mIndex(indexBuffer),
-	mBackBuffer(backBuffer),
-    mBuffer(recordBuffer) {
-    ASSERT(mCapacity <= MAX_CAPACITY);
+    mFreelistEnqueue(Capacity-1), 
+    mFreelistDequeue(0) {
+    ASSERT(Capacity <= MAX_CAPACITY);
     // initialize the free queue linked-list
-    for(unsigned i=0; i<mCapacity; ++i) {
-        mIndex[i].id = i;
-        mIndex[i].next = i+1;
+    for(unsigned i=0; i<Capacity; ++i) {
+        mSlot[i].id = i;
+        mSlot[i].next = i+1;
     }
 }
 
-template<typename T>
-ID CompactPool<T>::TakeOut() {
-    ASSERT(mCount < mCapacity);
+template<typename T, int Capacity>
+ID CompactPool<T, Capacity>::TakeOut() {
+    ASSERT(mCount < Capacity);
     // dequeue a new index record - we do this in FIFO order so that
     // we don't "thrash" a record with interleaved add-remove calls
     // and use up the higher-order bits of the id
-    PoolIndex &in = mIndex[mFreelistDequeue];
+    CompactPoolSlot &in = mSlot[mFreelistDequeue];
     mFreelistDequeue = in.next;
     // increment the higher-order bits of the id
-    in.id = (0xffff & in.d) + (0xffff0000 & (in.id + 0x10000));
+    in.id = (0xffff & in.id) + (0xffff0000 & (in.id + 0x10000));
     // push a new record into the buffer
     in.index = mCount++;
     // write the id to the record
@@ -109,20 +94,20 @@ ID CompactPool<T>::TakeOut() {
 	return in.id;
 }
 
-template<typename T>
-void CompactPool<T>::PutBack(ID id) {
+template<typename T, int Capacity>
+void CompactPool<T, Capacity>::PutBack(ID id) {
     // assuming IDs are valid in production
     ASSERT(IsActive(id));
     // lookup the index record
-    PoolIndex &in = mIndex[id & 0xffff];
+    CompactPoolSlot &in = mSlot[id & 0xffff];
     // move the last record into this slot
     T& record = mBuffer[in.index];
     record = mBuffer[--mCount];
     // update the index from the moved record
-    //mIndex[record.id & 0xffff].index = in.index;
-	mIndex[mBackBuffer[mCount]].index = in.index;
+    //mSlot[record.id & 0xffff].index = in.index;
+	mSlot[mBackBuffer[mCount]].index = in.index;
     // free up this index record and enqueue
     in.index = USHRT_MAX;
-    mIndex[mFreelistEnqueue].next = id & 0xffff;
+    mSlot[mFreelistEnqueue].next = id & 0xffff;
     mFreelistEnqueue = id & 0xffff;
 }

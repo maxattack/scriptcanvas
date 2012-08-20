@@ -1,26 +1,9 @@
 #pragma once
 #include "SceneSystem.h"
+#include "CircleSystem.h"
 
 enum RenderType {
 	kRenderTypeCirle
-};
-
-struct CircleGeometry {
-	float radius;
-};
-
-struct CircleMaterial {
-	float r, g, b, a;
-};
-
-union CircleCommand {
-	uint64_t id;
-	struct {
-		uint16_t queue;
-		uint16_t material;
-		uint16_t geometry;
-		uint16_t transform;
-	} fields;
 };
 
 struct RenderBuffer {
@@ -31,12 +14,14 @@ struct RenderBuffer {
 	int circleCount;
 };
 
+void InitializeRenderSystem();
+
 
 // For SCENE THREAD
-bool SubmitToRenderSystem(RenderBuffer* vbuf);
-bool RetrieveFromRenderSystem(RenderBuffer** out);
+void SubmitToRenderSystem(RenderBuffer* vbuf);
+void RetrieveFromRenderSystem(RenderBuffer** out);
 
 // For RENDERING THREAD
-bool RetrieveFromSceneSystem(RenderBuffer** out);
-bool SubmitToSceneSystem(RenderBuffer* vbuf);
+void RetrieveFromSceneSystem(RenderBuffer** out);
+void SubmitToSceneSystem(RenderBuffer* vbuf);
 void Render(RenderBuffer* vbuf);

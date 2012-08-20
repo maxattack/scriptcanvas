@@ -18,8 +18,9 @@ public:
 	void Alloc(ID node);
 	void Free(ID node);
 	T& operator[](ID node);
-    T* Begin() const { return (T*)mBuffer; }
-    T* End() const { return (T*)mBuffer + mCount; }
+	int Count() const { return mCount; }
+    T* Begin() { return mBuffer; }
+    T* End() { return mBuffer + mCount; }
 	
 };
 

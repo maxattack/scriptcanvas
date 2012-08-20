@@ -3,14 +3,6 @@ $#include "Script.h"
 
 typedef unsigned int ID;
 
-struct Circle {
-	float radius;
-	float r;
-	float g;
-	float b;
-	void Init @ init (float aradius, float ar, float ag, float ab);
-}
-
 struct Node {
 	ID id();
 
@@ -26,11 +18,6 @@ struct Node {
 	void remove_component(ID componentType);
 
 	void destroy();
-
-	Circle* add_circle();
-	Circle* get_circle();
 };
 
 Node* create_node(Node* parent=0);
-void get_mouse_position(int* x=0, int* y=0);
-double glfwGetTime @ get_time();

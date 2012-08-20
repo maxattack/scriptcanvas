@@ -1,5 +1,5 @@
 #pragma once
-#include "util/Types.h"
+#include "BaseSystem.h"
 #include "math/Transform.h"
 
 //------------------------------------------------------------------------------
@@ -50,17 +50,15 @@ struct ChildIterator {
 // Lookup a node's local-to-parent transform
 Transform& Pose(ID node);
 
+uint16_t GetIndex(ID node);
+
 // For mid-frame one-shots -- the RenderQueue will get this batched.
 Transform WorldPose(ID node);
 
-// Interface for component systems
-struct IComponentManager {
-	virtual void CreateComponent(ID node) = 0;
-	virtual void DestroyComponent(ID node) = 0;
-};
+void UpdateSceneSystem(RenderBuffer *vbuf);
 
 // Register a component system with the scene system
-void RegisterComponentManager(ID componentType, IComponentManager* pMgr);
+void RegisterComponentManager(ID componentType, IManager* pMgr);
 
 // Add a component to a node.  Each node can have multiple components,
 // but only one component of a given type.

@@ -1,90 +1,163 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#include "CircleSystem.h"
+#include "RenderSystem.h"
+
+static bool mInitialized = false;
+static GLuint mProgram;
+static GLuint mAttribUnit;
+static GLuint mUniformRadius;
+static GLuint mUniformColor;
+static GLuint mVertexBuffer;
+static CompactComponentPool<CircleComponent> mComponents;
+static CompactPool<CircleGeometry, MAX_NODES> mGeometry;
+static CompactPool<CircleMaterial, MAX_NODES> mMaterial;
 
 static GLuint LoadShaderProgram(const char* filename);
 
-void CircleSystem::Init() {
-	mProgram = LoadShaderProgram("src/circle.glsl");
-	// lookup shader storage locations
-	glUseProgram(mProgram);
-	mAttribUnit = glGetAttribLocation(mProgram, "unit");
-	mUniformRadius = glGetUniformLocation(mProgram, "radius");
-	mUniformColor = glGetUniformLocation(mProgram, "color");
-	// create circle vertex buffer
-	Vec unit = vec(1,0);
-	Vec rotor = Polar(1.f, kTau / (64-2.f));
-	Vec buffer[64];
-	buffer[0] = vec(0,0);
-	for(int i=1; i<64; ++i) {
-		buffer[i] = unit;
-		unit *= rotor;
-	}
-	glGenBuffers(1, &mVertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vec)*64, buffer, GL_STATIC_DRAW);
+bool CreateCircleComponent(ID node) {
+	mComponents.Alloc(node);
+    mComponents[node].node = node;
+    return true;
 }
 
-void CircleSystem::Render() {
-    // A kinda fake function.  In reality, we will queue render
-    // work from a game thread using a lockless queue.  In that case,
-    // this method will perform those queue, not the actual opengl calls.
+bool DestroyCircleComponent(ID node) {
+	mComponents.Free(node);
+    return true;
+}
 
-    // For now we only render one circle at a time.  We would really wanto
-    // batch up to 32 at a time for better performance, but I'd rather get
-    // the real RenderQueue implemented first before thinking about that kind
-    // of performance.
-    glUseProgram(mProgram);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableVertexAttribArray(mAttribUnit);
-
-    // iterate through all the circles
-    for(auto p=mData.Begin(); p!=mData.End(); ++p) {
-        
-        // THIS IS WHAT REALLY NEEDS TO CHANGE -- World transforms
-        // need to be batch-computed, not redone per-renderable per-frame
-        // in an arbitrary order (want data-oriented, not object-oriented).
-        Transform w = WorldPose(p->node);
-        float mat[16] = {
-            w.q.x, w.q.y, 0, 0,
-            -w.q.y, w.q.x, 0, 0,
-            0, 0, 1, 0,
-            w.t.x, w.t.y, 0, 1
-        };
-        glLoadMatrixf(mat);
-        //
-
-        glUniform1f(mUniformRadius, p->radius);
-        glUniform4f(mUniformColor, p->r, p->g, p->b, 1.f);
-
-        glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-        glVertexAttribPointer(mAttribUnit, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 64);
+void UpdateCircleSystem(RenderBuffer* vbuf) {
+    for(int i=0; i<mGeometry.Count(); ++i) {
+        vbuf->circleGeometry[i] = mGeometry.Begin()[i];
     }
-
-    // clean up opengl state
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableVertexAttribArray(mAttribUnit);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glUseProgram(0);
+    for(int i=0; i<mMaterial.Count(); ++i) {
+        vbuf->circleMaterials[i] = mMaterial.Begin()[i];
+    }
+    for(int i=0; i<mComponents.Count(); ++i) {
+        auto& c = mComponents.Begin()[i];
+        CircleCommand cmd;
+        cmd.fields.queue = 0;
+        cmd.fields.material = mMaterial.GetIndex(c.material);
+        cmd.fields.geometry = mGeometry.GetIndex(c.geometry);
+        cmd.fields.transform = GetIndex(c.node);
+        vbuf->circleCommands[i] = cmd;
+    }
+    vbuf->circleCount = mComponents.Count();
 }
 
-void CircleSystem::Dispose() {
-    // TODO: Cleanup OpenGL Stuff
+void RenderCircleSystem(RenderBuffer* vbuf) {
+    if (vbuf->circleCount) {
+        if (!mInitialized) {
+            mProgram = LoadShaderProgram("src/circle.glsl");
+            // lookup shader storage locations
+            glUseProgram(mProgram);
+            mAttribUnit = glGetAttribLocation(mProgram, "unit");
+            mUniformRadius = glGetUniformLocation(mProgram, "radius");
+            mUniformColor = glGetUniformLocation(mProgram, "color");
+            // create circle vertex buffer
+            Vec unit = vec(1,0);
+            Vec rotor = Polar(1.f, kTau / (64-2.f));
+            Vec buffer[64];
+            buffer[0] = vec(0,0);
+            for(int i=1; i<64; ++i) {
+                buffer[i] = unit;
+                unit *= rotor;
+            }
+            glGenBuffers(1, &mVertexBuffer);
+            glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(Vec)*64, buffer, GL_STATIC_DRAW);
+            mInitialized = true;
+        }
+
+        // TODO: Batch!!
+        // std::sort(
+        //  &vbuf->circleCommands[0].id, 
+        //  &vbuf->circleCommands[vbuf->circleCount].id,
+        //  std::less<uint64_t>()
+        // );
+        // construct circle batches until we overflow some capacity:
+        //  -- 32 total circles
+        //  -- 8 distinct transforms
+        //  -- 8 distinct geometries
+        //  -- 8 distinct materials
+        // int batchCircleCount = 0;
+        // int batchTransformCount = 0;
+        // int batchGeometryCount = 0;
+        // int batchMaterialCount = 0;
+        // for(int i=0; i<vbuf->circleCount; ++i) {
+        // }        
+
+        glUseProgram(mProgram);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableVertexAttribArray(mAttribUnit);
+
+        for(int i=0; i<vbuf->circleCount; ++i) {
+            auto cmd = vbuf->circleCommands[i];
+            Transform w = vbuf->transforms[cmd.fields.transform];
+            float mat[16] = {
+                w.q.x, w.q.y, 0, 0,
+                -w.q.y, w.q.x, 0, 0,
+                0, 0, 1, 0,
+                w.t.x, w.t.y, 0, 1
+            };
+            glLoadMatrixf(mat);
+            glUniform1f(mUniformRadius, vbuf->circleGeometry[cmd.fields.geometry].radius);
+            auto material = vbuf->circleMaterials[cmd.fields.material];
+            glUniform4f(mUniformColor, material.r, material.g, material.b, 1.f);
+
+            glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
+            glVertexAttribPointer(mAttribUnit, 2, GL_FLOAT, GL_FALSE, 0, 0);
+            glDrawArrays(GL_TRIANGLE_FAN, 0, 64);
+        }
+
+        // clean up opengl state
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableVertexAttribArray(mAttribUnit);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glUseProgram(0);
+
+    } else { /* teardown when not in use? */ }
 }
 
-void CircleSystem::CreateComponent(ID node) {
-	mData.Alloc(node);
-    mData[node].node = node;
+CircleComponent& GetCircleComponent(ID node) {
+	return mComponents[node];
 }
 
-void CircleSystem::DestroyComponent(ID node) {
-	mData.Free(node);
+ID CreateCircleMaterial(float r, float g, float b) { 
+    ID result = mMaterial.TakeOut(); 
+    mMaterial[result].r = r;
+    mMaterial[result].g = g;
+    mMaterial[result].b = b;
+    mMaterial[result].a = 1.f;
+    return result;
 }
 
-Circle& CircleSystem::operator[](ID node) {
-	return mData[node];
+CircleMaterial& GetCircleMaterial(ID matId) { 
+    return mMaterial[matId]; 
+}
+
+void DestroyCircleMaterial(ID matId) { 
+    mMaterial.PutBack(matId); 
+    for(auto p=mComponents.Begin(); p!=mComponents.End(); ++p) {
+        p->material *= (p->material == matId);
+    }
+}
+
+ID CreateCircleGeometry(float radius) { 
+    ID result = mGeometry.TakeOut(); 
+    mGeometry[result].radius = radius;
+    return result;
+}
+
+CircleGeometry& GetCircleGeometry(ID geomId) { 
+    return mGeometry[geomId]; 
+}
+
+void DestroyCircleGeometry(ID geomId) { 
+    mGeometry.PutBack(geomId); 
+    for (auto p=mComponents.Begin(); p!=mComponents.End(); ++p) {
+        p->geometry *=  (p->geometry == geomId);
+    }
 }
 
 static GLuint LoadShaderProgram(const char* filename) {

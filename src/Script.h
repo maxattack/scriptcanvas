@@ -15,8 +15,6 @@ inline Node* ToNode(ID node) {
 	return ptr_as_id(node).p;
 }
 
-extern CircleSystem gCircles;
-
 struct Node {
 	ID id() { return ptr_as_id(this).h; }
 	void attach(Node child) { AttachNode(id(), child.id()); }
@@ -36,21 +34,9 @@ struct Node {
 		*y = t.y;
 	}
 	void set_rotation(float radians) { Pose(id()).q = Polar(1.f, radians); }
-
-	Circle* add_circle() {
-		AddComponent(id(), 0);
-		return &gCircles[id()];
-	}
-
-	Circle* get_circle() {
-		return &gCircles[id()];
-	}
 };
 
 inline Node* create_node(Node* parent=0) { 
 	return ToNode( CreateNode(ptr_as_id(parent).h) );
 }
 
-inline void get_mouse_position(int* x=0, int* y=0) {
-	glfwGetMousePos(x,y);	
-}
