@@ -130,24 +130,6 @@ void Render(RenderBuffer* vbuf) {
             mInitialized = true;
         }
 
-        // TODO: Batch!!
-        // std::sort(
-        //  &vbuf->circleCommands[0].id, 
-        //  &vbuf->circleCommands[vbuf->circleCount].id,
-        //  std::less<uint64_t>()
-        // );
-        // construct circle batches until we overflow some capacity:
-        //  -- 32 total circles
-        //  -- 8 distinct transforms
-        //  -- 8 distinct geometries
-        //  -- 8 distinct materials
-        // int batchCircleCount = 0;
-        // int batchTransformCount = 0;
-        // int batchGeometryCount = 0;
-        // int batchMaterialCount = 0;
-        // for(int i=0; i<vbuf->circleCount; ++i) {
-        // }        
-
         glUseProgram(mProgram);
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableVertexAttribArray(mAttribUnit);

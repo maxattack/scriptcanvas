@@ -1,6 +1,6 @@
 /*
 ** Lua binding: bubbles
-** Generated automatically by tolua++-1.0.92 on Mon Aug 20 00:29:18 2012.
+** Generated automatically by tolua++-1.0.92 on Sun Aug 26 00:44:10 2012.
 */
 
 #ifndef __cplusplus
@@ -407,6 +407,32 @@ static int tolua_bubbles_SceneSystem_setRotation00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: SceneSystem::Paint */
+#ifndef TOLUA_DISABLE_tolua_bubbles_SceneSystem_paint00
+static int tolua_bubbles_SceneSystem_paint00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   SceneSystem::Paint();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'paint'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: CircleSystem::CreateMaterial */
 #ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_createMaterial00
 static int tolua_bubbles_CircleSystem_createMaterial00(lua_State* tolua_S)
@@ -788,6 +814,7 @@ TOLUA_API int tolua_bubbles_open (lua_State* tolua_S)
    tolua_function(tolua_S,"setPosition",tolua_bubbles_SceneSystem_setPosition00);
    tolua_function(tolua_S,"rotationOf",tolua_bubbles_SceneSystem_rotationOf00);
    tolua_function(tolua_S,"setRotation",tolua_bubbles_SceneSystem_setRotation00);
+   tolua_function(tolua_S,"paint",tolua_bubbles_SceneSystem_paint00);
   tolua_endmodule(tolua_S);
   tolua_module(tolua_S,"CircleSystem",0);
   tolua_beginmodule(tolua_S,"CircleSystem");

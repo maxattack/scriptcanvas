@@ -65,40 +65,30 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
+namespace SceneSystem {
+
+void Paint() {
+    RenderBuffer *vbuf;
+    RenderSystem::RetrieveFromRenderSystem(&vbuf);
+    SceneSystem::Update(vbuf);
+    CircleSystem::Update(vbuf);
+    RenderSystem::SubmitToRenderSystem(vbuf);
+}
+
+}
+
 void game(void* ctxt) {
     // It feels weird that this is the only non-hard-coded place...
     /// I suppose it's just until we have scripted components to mix with.
     static CircleSystem::Manager gCircles;
     SceneSystem::RegisterComponentManager(0, &gCircles);
 
-    // Initialize Scripts
-    // TODO handle errors
+    // run scripts
     lua_State* virtualMachine = lua_open();
     luaL_openlibs(virtualMachine);
     tolua_bubbles_open(virtualMachine);
     luaL_loadfile(virtualMachine, "src/main.lua");
     lua_call(virtualMachine, 0, 0);    
-    lua_getglobal(virtualMachine, "init");
-    if (lua_isfunction(virtualMachine, -1)) {
-        lua_call(virtualMachine, 0, 0);    
-    } else {
-        lua_pop(virtualMachine, 1);
-    }
 
-    RenderBuffer *vbuf;
-
-    while(1) {
-        lua_getglobal(virtualMachine, "update");
-        if (lua_isfunction(virtualMachine, -1)) {
-            lua_call(virtualMachine, 0, 0);    
-        } else {
-            lua_pop(virtualMachine, 1);
-        }
-        // Render Shtuff
-        RenderSystem::RetrieveFromRenderSystem(&vbuf);
-        SceneSystem::Update(vbuf);
-        CircleSystem::Update(vbuf);
-        RenderSystem::SubmitToRenderSystem(vbuf);
-    }
-
+    // todo: handle errors, termination
 }

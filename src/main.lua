@@ -11,16 +11,14 @@ function createPlanet(x, y, radius, r, g, b)
 	return result
 end
 
-function init()
-	planetx = createPlanet(100, 100, 48, 0.33, 0.25, 0.65)
-	sun = createPlanet(400, 400, 32, 1, 1, 0.25)
-	urth = createPlanet(128, 0, 24, 0.5, 0.5, 0.8)
-	moon = createPlanet(48, 0, 12, 0.4, 0.4, 0.4)	
-	attachTo(sun, urth)
-	attachTo(urth, moon)
-end
+planetx = createPlanet(100, 100, 48, 0.33, 0.25, 0.65)
+sun = createPlanet(400, 400, 32, 1, 1, 0.25)
+urth = createPlanet(128, 0, 24, 0.5, 0.5, 0.8)
+moon = createPlanet(48, 0, 12, 0.4, 0.4, 0.4)	
+attachTo(sun, urth)
+attachTo(urth, moon)
 
-function update()
+repeat
 	local tau = 2 * 3.14156
 	local t = input.seconds()
 	local mx, my = input.mousePosition()
@@ -30,6 +28,7 @@ function update()
 	setRotation(urth, 360*t)
 	local x,y = positionOf(planetx)
 	setPosition(planetx, 0.1*mx + 0.9*x, 0.1*my + 0.9*y)
-end
 
+	paint()
+until false
 

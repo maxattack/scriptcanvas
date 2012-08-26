@@ -5,6 +5,8 @@
 
 namespace SceneSystem {
 
+void Paint();
+
 void GetPosition(ID node, float *x=0, float *y=0) {
 	auto position = Pose(node).t;
 	*x = position.x;

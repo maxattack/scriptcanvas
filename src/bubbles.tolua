@@ -22,6 +22,8 @@ namespace SceneSystem {
 	float GetRotation @ rotationOf(ID node);
 	void SetRotation @ setRotation(ID node, float degrees);
 
+	void Paint @ paint();	
+
 }
 
 namespace CircleSystem {
@@ -44,6 +46,7 @@ namespace InputSystem {
 	void GetMousePosition @ mousePosition(int *x=0, int *y=0);
 	double GetTime @ seconds();
 }
+
 
 
 $[
