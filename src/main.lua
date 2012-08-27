@@ -18,6 +18,8 @@ moon = createPlanet(48, 0, 12, 0.4, 0.4, 0.4)
 attachTo(sun, urth)
 attachTo(urth, moon)
 
+isDone = false
+
 repeat
 	local tau = 2 * 3.14156
 	local t = input.seconds()
@@ -28,7 +30,6 @@ repeat
 	setRotation(urth, 360*t)
 	local x,y = positionOf(planetx)
 	setPosition(planetx, 0.1*mx + 0.9*x, 0.1*my + 0.9*y)
-
 	paint()
-until false
+until isDone
 
