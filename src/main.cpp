@@ -3,11 +3,7 @@
 #include <ctime>
 #include <cmath>
 
-extern "C" {
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-}
+#include <lua.hpp>
 #include "tolua++.h"
 #include "binding.h"
 
@@ -84,11 +80,12 @@ void game(void* ctxt) {
     SceneSystem::RegisterComponentManager(0, &gCircles);
 
     // run scripts
-    lua_State* virtualMachine = lua_open();
+    lua_State* virtualMachine = luaL_newstate();
     luaL_openlibs(virtualMachine);
     tolua_bubbles_open(virtualMachine);
     luaL_loadfile(virtualMachine, "src/main.lua");
     lua_call(virtualMachine, 0, 0);    
+    lua_close(virtualMachine);
 
     // todo: handle errors, termination
 }
