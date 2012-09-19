@@ -11,12 +11,20 @@ function createPlanet(x, y, radius, r, g, b)
 	return result
 end
 
+n1 = createNode()
+n2 = createNode(n1)
+n3 = createNode(n2)
+n4 = createNode()
+attachTo(n4, n1)
+
 local planetx = createPlanet(100, 100, 48, 0.33, 0.25, 0.65)
 local sun = createPlanet(400, 400, 32, 1, 1, 0.25)
 local urth = createPlanet(128, 0, 24, 0.5, 0.5, 0.8)
 local moon = createPlanet(48, 0, 12, 0.4, 0.4, 0.4)	
 attachTo(sun, urth)
 attachTo(urth, moon)
+
+destroyNode(n4)
 
 local isDone = false
 

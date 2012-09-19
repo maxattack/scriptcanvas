@@ -13,6 +13,8 @@ struct NodeSlot {
 	// for thumbprint validation (in case slot is reused)
 	ID id;
 
+	// poses are stored in a separate DAG-sorted buffer
+	// for fast per-frame world-coordinate computation
 	uint16_t poseIndex;
 
 	// freelist linked list
@@ -43,9 +45,12 @@ static uint16_t sNodeFreelistEnqueue;
 static uint16_t sNodeFreelistDequeue;
 static NodeSlot sNodeSlots[MAX_NODES];
 static PoseData sNodePoses[MAX_NODES];
+static IManager* sComponentManagers[MAX_COMPONENT_TYPES];
+
+#if !NO_DAG_SORT
 static int mFirstInvalidDagIndex;
 static int mLastInvalidDagIndex;
-static IManager* sComponentManagers[MAX_COMPONENT_TYPES];
+#endif
 
 //------------------------------------------------------
 // INTERNAL METHODS
@@ -53,7 +58,6 @@ static IManager* sComponentManagers[MAX_COMPONENT_TYPES];
 
 static NodeSlot& Slot(ID id) {
 	ASSERT((id&0xffff)<MAX_NODES);
-	ASSERT(NodeValid(id));
 	return sNodeSlots[id & 0xffff];
 }
 
@@ -67,8 +71,11 @@ static PoseData& Pose(ID id) {
 //------------------------------------------------------
 
 void Initialize() {
+	memset(sComponentManagers, 0, MAX_COMPONENT_TYPES * sizeof(IManager*));
+	#if !NO_DAG_SORT
 	mFirstInvalidDagIndex = -1;
 	mLastInvalidDagIndex = -1;
+	#endif
 	sNodeCount = 0;
 	sNodeFreelistEnqueue = MAX_NODES-1;
 	sNodeFreelistDequeue = 0;
@@ -133,7 +140,8 @@ void AttachNode(ID parent, ID child) {
 	int chIndex = Slot(child).poseIndex;
 	parentData.firstChild = child;
 	Pose(child).parentIndex = pIndex;
-	// DAG is invalid if children are listed before parents
+	#if !NO_DAG_SORT
+	// check if the parent is listed after the child
 	if (chIndex < pIndex) {
 		if (mFirstInvalidDagIndex == -1 || chIndex < mFirstInvalidDagIndex) {
 			mFirstInvalidDagIndex = chIndex;
@@ -142,6 +150,7 @@ void AttachNode(ID parent, ID child) {
 			mLastInvalidDagIndex = pIndex;
 		}
 	}
+	#endif
 }
 
 void DetachNode(ID child) {
@@ -184,14 +193,46 @@ transform& LocalToParent(ID node) {
 	return Pose(node).localToParent;
 }
 
-transform LocalToWorld(ID node) {
-	auto parent = Slot(node).parent;
-	return parent ? LocalToParent(node) * LocalToWorld(parent) : LocalToParent(node);
+static transform ComputeLocalToWorld(const PoseData& pose) {
+	if (pose.parentIndex == USHRT_MAX) {
+		return pose.localToParent;
+	} else {
+		return pose.localToParent * ComputeLocalToWorld(sNodePoses[pose.parentIndex]);
+	}
 }
 
+transform LocalToWorld(ID node) {
+	return ComputeLocalToWorld(Pose(node));
+}
 
+#if NO_DAG_SORT
+
+static void Update(RenderBuffer *vbuf, uint16_t i) {
+	auto& pose = sNodePoses[i];
+	vbuf->transforms[i] = pose.localToParent * vbuf->transforms[pose.parentIndex];
+	for(ID cid=Slot(pose.slotIndex).firstChild; cid; cid=Slot(cid).nextSibling) {
+		Update(vbuf, Slot(cid).poseIndex);
+	}
+}
+
+#endif
 
 void Update(RenderBuffer *vbuf) {
+	
+	#if NO_DAG_SORT
+	// have to walk the heirarchy recursively :P
+	for(int i=0; i<sNodeCount; ++i) {
+		auto& pose = sNodePoses[i];
+		if (pose.parentIndex == USHRT_MAX) {
+			vbuf->transforms[i] = pose.localToParent;
+			for(ID cid=Slot(pose.slotIndex).firstChild; cid; cid=Slot(cid).nextSibling) {
+				Update(vbuf, Slot(cid).poseIndex);
+			}
+			
+		}
+	}
+	#else
+
 	// dag-sort slice?
 	if(mFirstInvalidDagIndex >= 0) {
 		// Basic Parents-Before-Children Algorithm (impl could be better):
@@ -269,9 +310,9 @@ void Update(RenderBuffer *vbuf) {
 			vbuf->transforms[i] = sNodePoses[i].localToParent * vbuf->transforms[sNodePoses[i].parentIndex];
 		}
 	}
+
+	#endif
 }
-
-
 
 void RegisterComponentManager(ID componentType, IManager* pMgr) {
 	ASSERT((componentType) < MAX_COMPONENT_TYPES);
@@ -316,9 +357,9 @@ void DestroyNode(ID node) {
 	ASSERT(NodeValid(node));
 	DetachNode(node);
 	// tear down children
-	auto& data = Slot(node);
-	while(data.firstChild) {
-		DestroyNode(data.firstChild);
+	auto& slot = Slot(node);
+	while(slot.firstChild) {
+		DestroyNode(slot.firstChild);
 	}
 	// tear-down components
 	ComponentIterator listComponents(node);
@@ -327,19 +368,23 @@ void DestroyNode(ID node) {
 		sComponentManagers[componentType]->DestroyComponent(node);
 	}
 
-	// release node record
-	auto& slot = Slot(node);
-
 	// relocate last element into this slot and deallocate the last slot
 	sNodeCount--;
-	if (sNodeCount) {
+	if (sNodeCount && slot.poseIndex != sNodeCount) {
+		// relocated last element into this empty slot
+		auto& relocatingPose = sNodePoses[sNodeCount];
+		auto& relocatingSlot = sNodeSlots[relocatingPose.slotIndex];
+		sNodePoses[slot.poseIndex] = relocatingPose;
+		relocatingSlot.poseIndex = slot.poseIndex;
 
-		// move last element into this place
-		sNodePoses[slot.poseIndex] = sNodePoses[sNodeCount];
-		sNodeSlots[sNodePoses[sNodeCount].slotIndex].poseIndex = slot.poseIndex;
-		
-		// check that DAG is still valid
+		// update parent indices
 		int chIndex = slot.poseIndex;
+		for(ID cid = relocatingSlot.firstChild; cid; cid=Slot(cid).nextSibling) {
+			Pose(cid).parentIndex = chIndex;
+		}
+
+		#if !NO_DAG_SORT
+		// check if the pose was relocated before it's parent
 		if (slot.parent) {
 			int pIndex = Slot(slot.parent).poseIndex;
 			if (chIndex < pIndex) {
@@ -351,9 +396,7 @@ void DestroyNode(ID node) {
 				}				
 			}
 		}
-		for(ID cid = slot.firstChild; cid; cid=Slot(cid).nextSibling) {
-			Pose(cid).parentIndex = chIndex;
-		}
+		#endif
 	}
 
 	// Invalidate the slot and enqueue in the freelist

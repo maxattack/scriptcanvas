@@ -94,7 +94,6 @@ void DestroyNode(ID node);
 // TODO
 // Worldspace Reparenting
 // Serialization of Node Manager and Component Managers
-// Batch Render transformation
 // Scripting Interface / Component Retrieval
 //------------------------------------------------------------------------------
 
