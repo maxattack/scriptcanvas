@@ -1,6 +1,6 @@
 #pragma once
 #include "BaseSystem.h"
-#include "math/Transform.h"
+#include "math/transform.h"
 
 namespace SceneSystem {
 
@@ -26,6 +26,12 @@ namespace SceneSystem {
 #define MAX_NODES 				1024
 #define MAX_COMPONENT_TYPES		32
 
+// Initialize the scene system
+void Initialize();
+
+// Is this ID defined for the current scene?
+bool NodeValid(ID id);
+
 // How many nodes are currently active in the scene?
 int NodeCount();
 
@@ -50,12 +56,12 @@ struct ChildIterator {
 };
 
 // Lookup a node's local-to-parent transform
-Transform& Pose(ID node);
+transform& LocalToParent(ID node);
 
-uint16_t GetIndex(ID node);
+int Index(ID node);
 
 // For mid-frame one-shots -- the RenderQueue will get this batched.
-Transform WorldPose(ID node);
+transform LocalToWorld(ID node);
 
 void Update(RenderBuffer *vbuf);
 
@@ -88,7 +94,7 @@ void DestroyNode(ID node);
 // TODO
 // Worldspace Reparenting
 // Serialization of Node Manager and Component Managers
-// Batch Render Transformation
+// Batch Render transformation
 // Scripting Interface / Component Retrieval
 //------------------------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "math/Vec.h"
+#include "math/float2.h"
 
 namespace InputSystem {
 
@@ -8,7 +8,7 @@ void Initialize();
 void SetMousePosition(int x, int y);
 void SetTime(double t);
 
-Vec MousePosition();
+float2 MousePosition();
 void GetMousePosition(int *x=0, int *y=0);
 double GetTime();
 

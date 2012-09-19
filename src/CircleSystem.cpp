@@ -97,9 +97,9 @@ void Update(RenderBuffer* vbuf) {
         if (p->material && p->geometry) {
             Command cmd;
             cmd.fields.queue = 0;
-            cmd.fields.material = mMaterial.GetIndex(p->material);
-            cmd.fields.geometry = mGeometry.GetIndex(p->geometry);
-            cmd.fields.transform = SceneSystem::GetIndex(p->node);
+            cmd.fields.material = mMaterial.Index(p->material);
+            cmd.fields.geometry = mGeometry.Index(p->geometry);
+            cmd.fields.transform = SceneSystem::Index(p->node);
             vbuf->circleCommands[idx++] = cmd;
         }
     }
@@ -116,17 +116,17 @@ void Render(RenderBuffer* vbuf) {
             mUniformRadius = glGetUniformLocation(mProgram, "radius");
             mUniformColor = glGetUniformLocation(mProgram, "color");
             // create circle vertex buffer
-            Vec unit = vec(1,0);
-            Vec rotor = Polar(1.f, kTau / (64-2.f));
-            Vec buffer[64];
-            buffer[0] = vec(0,0);
+            float2 unit = Float2(1,0);
+            float2 rotor = Polar(1.f, kTau / (64-2.f));
+            float2 buffer[64];
+            buffer[0] = Float2(0,0);
             for(int i=1; i<64; ++i) {
                 buffer[i] = unit;
                 unit *= rotor;
             }
             glGenBuffers(1, &mVertexBuffer);
             glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(Vec)*64, buffer, GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(float2)*64, buffer, GL_STATIC_DRAW);
             mInitialized = true;
         }
 
@@ -136,7 +136,7 @@ void Render(RenderBuffer* vbuf) {
 
         for(int i=0; i<vbuf->circleCount; ++i) {
             auto cmd = vbuf->circleCommands[i];
-            Transform w = vbuf->transforms[cmd.fields.transform];
+            transform w = vbuf->transforms[cmd.fields.transform];
             float mat[16] = {
                 w.q.x, w.q.y, 0, 0,
                 -w.q.y, w.q.x, 0, 0,

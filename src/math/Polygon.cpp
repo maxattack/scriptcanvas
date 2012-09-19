@@ -50,7 +50,7 @@ void Polygon::EnsureCanonicalOrdering() {
 
 void Polygon::ReverseOrdering() {
   int h = vertexCount >> 1;
-  Vec p;
+  float2 p;
   for(int i=0; i<h; ++i) {
     p = vertices[i];
     vertices[i] = vertices[vertexCount-1-i];
@@ -58,8 +58,8 @@ void Polygon::ReverseOrdering() {
   }
 }
 
-Vec Polygon::ComputeAveragePosition() const {
-  Vec result = vec(0,0);
+float2 Polygon::ComputeAveragePosition() const {
+  float2 result = Float2(0,0);
   for(int i=0; i<vertexCount; ++i) {
     result += vertices[i];
   }
@@ -75,13 +75,13 @@ float Polygon::ComputeArea() const {
   return fabs(0.5f * result);
 }
 
-void Polygon::ApplyTransformation(const Transform &t) {
+void Polygon::Applytransformation(const transform &t) {
   for(int i=0; i<vertexCount; ++i) {
     vertices[i] = t.TransformPoint(vertices[i]);
   }
 }
 
-void Polygon::ApplyOffset(Vec u) {
+void Polygon::ApplyOffset(float2 u) {
   for(int i=0; i<vertexCount; ++i) {
     vertices[i] += u;
   }
@@ -89,13 +89,13 @@ void Polygon::ApplyOffset(Vec u) {
 
 void Polygon::ComputeRegularPolygon(int nSides, float radius) {
   vertexCount = nSides;
-  Vec curr;
+  float2 curr;
   if (nSides % 2 == 0) {
     curr = Polar(radius, kTau / (float) nSides);
   } else {
     curr = Polar(radius, kTau / 4.0f);
   }
-  Vec rotor = Polar(1.0f, kTau / (float) nSides );
+  float2 rotor = Polar(1.0f, kTau / (float) nSides );
   for(int i=0; i<nSides; ++i) {
     vertices[i] = curr;
     curr *= rotor;
@@ -105,13 +105,13 @@ void Polygon::ComputeRegularPolygon(int nSides, float radius) {
 void Polygon::ComputeEccentricVertices(float eccentricity) {
   int n = vertexCount >> 1;
   for(int i=0; i<n; ++i) {
-    Vec p0 = vertices[i+i];
-    Vec p1 = vertices[(i+i+2)%vertexCount];
+    float2 p0 = vertices[i+i];
+    float2 p1 = vertices[(i+i+2)%vertexCount];
     vertices[i+i+1] = (0.5f * (p0 + p1)) + eccentricity * ((p1 - p0).Clockwise());
   }
 }
 
-bool Polygon::Append(Vec u) {
+bool Polygon::Append(float2 u) {
   if (vertexCount == MAX_POLYGON_VERTICES) {
     return false;
   }
@@ -120,10 +120,10 @@ bool Polygon::Append(Vec u) {
   return true;
 }
 
-void Polygon::ComputeStrokeNormals(Vec* outNormals, float weight) {
+void Polygon::ComputeStrokeNormals(float2* outNormals, float weight) {
   EnsureCanonicalOrdering();
   float _strokeOffsets[vertexCount<<1];
-  Vec* strokeOffsets = (Vec*) _strokeOffsets;
+  float2* strokeOffsets = (float2*) _strokeOffsets;
   for(int i=0; i<vertexCount; ++i) {
     strokeOffsets[i] = 
       ((0.5f * weight) * (vertices[(i+1)%vertexCount] - vertices[i]))

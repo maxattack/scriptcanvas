@@ -15,6 +15,7 @@ OBJS = \
 	src/RenderSystem.o \
 	src/SceneSystem.o \
 	src/binding.o \
+	src/math/Curves.o \
 	src/tolua_event.o \
 	src/tolua_is.o \
 	src/tolua_map.o \
@@ -30,6 +31,9 @@ $(BIN): $(OBJS)
 
 %.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+run: $(BIN) src/main.lua
+	./bubble main.lua
 
 clean:
 	rm -f $(OBJS) $(BIN)

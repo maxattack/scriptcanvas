@@ -58,7 +58,7 @@ public:
     
 	int Count() { return mCount; }
 	ID GetID(T* record) { return mSlot[mBackBuffer[record-mBuffer]].id; }
-    uint16_t GetIndex(ID id) { return mSlot[id & 0xffff].index; }
+    uint16_t Index(ID id) { return mSlot[id & 0xffff].index; }
     T* Begin() { return mBuffer; }
     T* End() { return mBuffer + mCount; }
 };

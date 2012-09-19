@@ -16,17 +16,14 @@
 
 #pragma once
 
-#include "Vec.h"
+#include "float2.h"
 
-struct Line {
-  Vec p0;
-  Vec p1;
-  
-  Vec ValueAt(float u) const { return p0 + u * (p1 - p0); }
-  Vec DerivAt(float u) const { return p1 - p0; }
-  Vec Delta() const { return p1 - p0; }
-  void Offset(Vec d) { p0+=d; p1+=d; }
-};
+bool LinearIntersection(float2 u0, float2 u1, float2 v0, float2 v1, float& u);
+bool LinearIntersection(float2 u0, float2 u1, float2 v0, float2 v1, float& u, float& v);
 
-bool Intersection(const Line& U, const Line& V, float& u);
-bool Intersection(const Line& U, const Line& V, float& u, float& v);
+float2 QuadraticBezier(float2 p0, float2 p1, float2 p2, float u);
+float2 QuadraticBezierDeriv(float2 p0, float2 p1, float2 p2, float u);
+float2 CubicBezier(float2 p0, float2 p1, float2 p2, float2 p3, float u);
+float2 CubicBezierDeriv(float2 p0, float2 p1, float2 p2, float2 p3, float u);
+float2 CubicHermite(float2 p0, float2 m0, float2 p1, float2 m1, float u);
+float2 CubicHermiteDeriv(float2 p0, float2 m0, float2 p1, float2 m1, float u);

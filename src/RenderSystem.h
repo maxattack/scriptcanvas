@@ -3,7 +3,7 @@
 #include "CircleSystem.h"
 
 struct RenderBuffer {
-	Transform transforms[MAX_NODES];
+	transform transforms[MAX_NODES];
 	CircleSystem::Geometry circleGeometry[MAX_NODES];
 	CircleSystem::Material circleMaterials[MAX_NODES];
 	CircleSystem::Command circleCommands[MAX_NODES];

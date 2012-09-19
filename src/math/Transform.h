@@ -16,47 +16,52 @@
 
 #pragma once
 
-#include "Vec.h"
+#include "float2.h"
 
-struct Transform {
+struct transform;
+inline transform Transform(float2 q=Float2(1,0), float2 t=Float2(0,0));
 
-  Vec q;
-  Vec t;
+struct transform {
 
-  Vec TransformPoint(Vec p) const { return q*p + t; }
-  Vec TransformVector(Vec v) const { return q*v; }
-  Vec InvTransformPoint(Vec p) const { return (p - t)/q; }
-  Vec InvTransformVector(Vec v) const { return v/q; }
+  float2 q;
+  float2 t;
 
-  Transform() {}
-  Transform(Vec aq, Vec at) : q(aq), t(at) {}
+  float2 TransformPoint(float2 p) const { return q*p + t; }
+  float2 TransformVector(float2 v) const { return q*v; }
+  float2 InvTransformPoint(float2 p) const { return (p - t)/q; }
+  float2 InvTransformVector(float2 v) const { return v/q; }
 
-  inline static Transform Identity() { return Transform(vec(1,0), vec(0,0)); }
-
-  bool IsIdentity() const { return t.Norm() < 0.001f && (q-vec(1,0)).Norm() < 0.001f; }
+  bool Identity() const { 
+    return t.Norm() < 0.001f && (q-Float2(1,0)).Norm() < 0.001f; 
+  }
   
-  Transform Inverse() const { 
-    Vec qInv = vec(1,0)/q;
+  transform Inverse() const { 
+    float2 qInv = Float2(1,0)/q;
     return Transform(qInv, -t*qInv);
   }
 
-  Transform operator*(const Transform& u) const { 
+  transform operator*(transform u) const { 
     return Transform(q*u.q, u.q*t + u.t);
   }
 };
 
-inline Transform Translation(Vec t) {
-  return Transform(vec(1,0), t);
+inline transform Transform(float2 q, float2 t) {
+  transform result = { q, t };
+  return result;
 }
 
-inline Transform Rotation(float radians) {
-  return Transform(Polar(1,radians), vec(0,0));
+inline transform Translation(float2 t) {
+  return Transform(Float2(1,0), t);
 }
 
-inline Transform Scale(float k) {
-  return Transform(vec(k,0), vec(0,0));
+inline transform Rotation(float radians) {
+  return Transform(Polar(1,radians), Float2(0,0));
 }
 
-inline Transform TRS(Vec t, float radians, float scale) {
+inline transform Scale(float k) {
+  return Transform(Float2(k,0), Float2(0,0));
+}
+
+inline transform TRS(float2 t, float radians, float scale) {
   return Transform(Polar(scale, radians), t);
 }

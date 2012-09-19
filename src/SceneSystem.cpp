@@ -1,4 +1,7 @@
 #include "RenderSystem.h"
+#include <algorithm>
+#include <cstring>
+
 
 namespace SceneSystem {
 
@@ -8,228 +11,273 @@ namespace SceneSystem {
 
 struct NodeSlot {
 	// A lookup slot for accessing data records,
-	// we are reordered to preserve a compact buffer
-	// in the NodeManager
+	// which are reordered to preserve a compact buffer
 	ID id;
 	uint16_t index;
 	uint16_t next;
-	uint32_t componentMask;
 };
 
-struct NodeData {
-	// Heirarchy information
+struct ComponentData {
+	uint32_t mask;
+};
+
+struct TreeData {
 	ID parent;
 	ID firstChild;
 	ID nextSibling;
 	ID prevSibling;
 };
 
-// Idea -- data which doesn't *need* to be compact
-// can be stored in the slot, and not in the relocated
-// buffers?  Honestly, the only important thing to be
-// in DAG-order is the transforms and the parents, right?
-
-struct NodeManager {
-	uint32_t count;						// number of nodes
-	uint16_t freelistEnqueue;			// unused-slot queue
-	uint16_t freelistDequeue;
-	NodeSlot slots[MAX_NODES];			// lookup slots
-	uint16_t backBuffer[MAX_NODES];		// record->slot back map
-	NodeData dataBuffer[MAX_NODES];		// records
-	Transform poseBuffer[MAX_NODES];
-
-	NodeManager();
-	bool IsValid(ID id);
-	NodeSlot& SlotFor(ID id);
-	NodeData& operator[](ID id);
-	Transform& TransformFor(ID id);
-
-	ID Alloc();
-	void Free(ID id);
+struct PoseData {
+	int parentIndex;
+	transform localToParent;
 };
-
 
 //------------------------------------------------------
 // GLOBAL VARIABLES
 //------------------------------------------------------
 
-static NodeManager nodes;
-static IManager* gComponentManagers[MAX_COMPONENT_TYPES];
+static uint32_t sNodeCount;
+static uint16_t sNodeFreelistEnqueue;
+static uint16_t sNodeFreelistDequeue;
+static NodeSlot sNodeSlots[MAX_NODES];
+static uint16_t sNodeBackBuffer[MAX_NODES];
+static TreeData sNodeTrees[MAX_NODES];
+static ComponentData sNodeComps[MAX_NODES];
+static PoseData sNodePoses[MAX_NODES];
+static int mFirstInvalidDagIndex;
+static int mLastInvalidDagIndex;
+static IManager* sComponentManagers[MAX_COMPONENT_TYPES];
 
 //------------------------------------------------------
-// NODE MANAGER IMPLEMENTATION
+// INTERNAL METHODS
 //------------------------------------------------------
 
-NodeManager::NodeManager() : 
-	count(0),
-	freelistEnqueue(MAX_NODES-1),
-	freelistDequeue(0) 
-{
-	// Initialize free slot queue
-	for (unsigned i=0; i<MAX_NODES; ++i) {
-		slots[i].id = i;
-		slots[i].next = i+1;
-	}
+static NodeSlot& Slot(ID id) {
+	ASSERT((id&0xffff)<MAX_NODES);
+	return sNodeSlots[id & 0xffff];
 }
 
-bool NodeManager::IsValid(ID id) {
-	// Validate that the slot ID matches and is in use
-	NodeSlot& slot = slots[id & 0xffff];
-	return slot.id == id && slot.index != USHRT_MAX;
+static TreeData& Heirarchy(ID id) {
+	ASSERT(NodeValid(id));
+	return sNodeTrees[sNodeSlots[id&0xffff].index];
 }
 
-NodeSlot& NodeManager::SlotFor(ID id) {
-	return slots[id & 0xffff];
+static ComponentData& Component(ID id) {
+	ASSERT(NodeValid(id));
+	return sNodeComps[sNodeSlots[id&0xffff].index];
 }
 
-NodeData& NodeManager::operator[](ID id) {
-	// Lookup the pointer from the slot
-	ASSERT(IsValid(id));
-	return dataBuffer[slots[id&0xffff].index];
-}
-
-Transform& NodeManager::TransformFor(ID id) {
-	// Lookup the pointer from the slot
-	ASSERT(IsValid(id));
-	return poseBuffer[slots[id&0xffff].index];
-}
-
-ID NodeManager::Alloc() {
-	ASSERT(count < MAX_NODES);
-	// Dequeue a slot
-	NodeSlot& slot = slots[freelistDequeue];
-	freelistDequeue = slot.next;
-	// Give the ID a unique thumbprint
-	slot.id = (0xffff & slot.id) + ((((0xffff0000&slot.id)>>16)%0xffff)<<16) + 0x10000;
-	// Allocate a new buffer location
-	slot.index = count++;
-	// Back-map the index to the slot
-	backBuffer[slot.index] = 0xffff & slot.id;
-	return slot.id;
-}
-
-void NodeManager::Free(ID id) {
-	ASSERT(IsValid(id));
-	NodeSlot& slot = slots[id & 0xffff];
-	// Reduce slice size
-	count--;
-	// Copy last element into this place
-	backBuffer[slot.index] = backBuffer[count];
-	dataBuffer[slot.index] = dataBuffer[count];
-	poseBuffer[slot.index] = poseBuffer[count];
-	// Update the slot of the last element
-	slots[backBuffer[count]].index = slot.index;
-	// Invalidate the slot and enqueue in the freelist
-	slot.index = USHRT_MAX;
-	slots[freelistEnqueue].next = id & 0xffff;
-	freelistEnqueue = id & 0xffff;
+static PoseData& Pose(ID id) {
+	ASSERT(NodeValid(id));
+	return sNodePoses[sNodeSlots[id&0xffff].index];
 }
 
 //------------------------------------------------------
 // PUBLIC METHODS
 //------------------------------------------------------
 
+void Initialize() {
+	mFirstInvalidDagIndex = -1;
+	mLastInvalidDagIndex = -1;
+	sNodeCount = 0;
+	sNodeFreelistEnqueue = MAX_NODES-1;
+	sNodeFreelistDequeue = 0;
+	for (unsigned i=0; i<MAX_NODES; ++i) {
+		sNodeSlots[i].id = i;
+		sNodeSlots[i].index = USHRT_MAX;
+		sNodeSlots[i].next = i+1;
+	}
+}
+
+bool NodeValid(ID id) {
+	NodeSlot& slot = sNodeSlots[id & 0xffff];
+	return slot.id == id && slot.index != USHRT_MAX;
+}
+
 int NodeCount() {
-	return nodes.count;
+	return sNodeCount;
 }
 
 ID CreateNode(ID parent) {
-	ID result = nodes.Alloc();
-	nodes.TransformFor(result) = Transform::Identity();
-	nodes.SlotFor(result).componentMask = 0x00000000;
-	NodeData &data = nodes[result];
-	data.parent = 0;
-	data.firstChild = 0;
-	data.nextSibling = 0;
-	data.prevSibling = 0;
+	ASSERT(sNodeCount < MAX_NODES);
+	// Allocate a new node at the end of the buffer
+	// Dequeue a slot
+	auto& slot = sNodeSlots[sNodeFreelistDequeue];
+	sNodeFreelistDequeue = slot.next;
+	// Give the ID a unique thumbprint
+	slot.id = (0xffff & slot.id) + ((((0xffff0000&slot.id)>>16)%0xffff)<<16) + 0x10000;
+	// Allocate a new buffer location
+	slot.index = sNodeCount++;
+	// initialize records
+	sNodeBackBuffer[slot.index] = 0xffff & slot.id;
+	sNodePoses[slot.index] = { -1, Transform() };
+	sNodeComps[slot.index].mask = 0;
+	sNodeTrees[slot.index] = { 0, 0, 0, 0 };
 	if (parent) {
-		AttachNode(parent, result);
+		AttachNode(parent, slot.id);
 	}
-	return result;
+	return slot.id;
 }
 
 void AttachNode(ID parent, ID child) {
-	NodeData& childData = nodes[child];
-	if (childData.parent && childData.parent != parent) {
-		DetachNode(child);
+	ASSERT(parent != child);
+	auto& childData = Heirarchy(child);
+	// check existing parents
+	if (childData.parent) {
+		if (childData.parent == parent) {
+			return;
+		} else {
+			DetachNode(child);
+		}
 	}
+	// update records
 	childData.parent = parent;
-	NodeData& parentData = nodes[parent];
+	auto& parentData = Heirarchy(parent);
 	if (parentData.firstChild) {
 		childData.nextSibling = parentData.firstChild;
-		nodes[parentData.firstChild].prevSibling = child;
+		Heirarchy(parentData.firstChild).prevSibling = child;
 	}
+	int pIndex = Slot(parent).index;
+	int chIndex = Slot(child).index;
 	parentData.firstChild = child;
+	Pose(child).parentIndex = pIndex;
+	// DAG is invalid if children are listed before parents
+	if (chIndex < pIndex) {
+		if (mFirstInvalidDagIndex == -1 || chIndex < mFirstInvalidDagIndex) {
+			mFirstInvalidDagIndex = chIndex;
+		}
+		if (mLastInvalidDagIndex == -1 || pIndex > mLastInvalidDagIndex) {
+			mLastInvalidDagIndex = pIndex;
+		}
+	}
 }
 
 void DetachNode(ID child) {
-	NodeData& data = nodes[child];
+	auto& data = Heirarchy(child);
 	if (data.parent) {
-		NodeData& parent = nodes[data.parent];
+		auto& parent = Heirarchy(data.parent);
 		if (parent.firstChild == child) parent.firstChild = data.nextSibling;
-		if (data.nextSibling) nodes[data.nextSibling].prevSibling = data.prevSibling;
-		if (data.prevSibling) nodes[data.prevSibling].nextSibling = data.nextSibling;
+		if (data.nextSibling) Heirarchy(data.nextSibling).prevSibling = data.prevSibling;
+		if (data.prevSibling) Heirarchy(data.prevSibling).nextSibling = data.nextSibling;
 		data.parent = 0;
 		data.nextSibling = 0;
 		data.prevSibling = 0;
+		Pose(child).parentIndex = -1;
 	}
 }
 
 ID Parent(ID node) {
-	return nodes[node].parent;
+	return Heirarchy(node).parent;
 }
 
 ChildIterator::ChildIterator(ID node) {
-	current = nodes[node].firstChild;
+	current = Heirarchy(node).firstChild;
 }
 
 bool ChildIterator::Next(ID *outNode) {
 	if (current) {
 		*outNode = current;
-		current = nodes[current].nextSibling;
+		current = Heirarchy(current).nextSibling;
 		return true;
 	} else {
 		return false;
 	}
 }
 
-Transform& Pose(ID node) {
-	return nodes.TransformFor(node);
+int Index(ID node) {
+	return Slot(node).index+1;
 }
 
-uint16_t GetIndex(ID node) {
-	return nodes.SlotFor(node).index;
+transform& LocalToParent(ID node) {
+	return Pose(node).localToParent;
 }
 
-Transform WorldPose(ID node) {
-	return nodes[node].parent ? Pose(node) * WorldPose(nodes[node].parent) : Pose(node);
+transform LocalToWorld(ID node) {
+	auto parent = Heirarchy(node).parent;
+	return parent ? LocalToParent(node) * LocalToWorld(parent) : LocalToParent(node);
 }
 
-static void UpdateChildren(RenderBuffer *vbuf, int i) {
-	ID child = nodes.dataBuffer[i].firstChild;
-	do {
-		int idx = GetIndex(child);
-		vbuf->transforms[idx] = nodes.poseBuffer[idx] * vbuf->transforms[i];
-		if (nodes.dataBuffer[idx].firstChild) {
-			UpdateChildren(vbuf, idx);
-		}
-		child = nodes.dataBuffer[idx].nextSibling;
-	} while(child);
-}
+
 
 void Update(RenderBuffer *vbuf) {
-	// This function could use some love -- reordering transforms
-	// into DAG order if dirty and then computing world transforms
-	// in one memory-friendly batch pass.  This is *not* meant as the
-	// final implementation (though it *is* at least better than hopping
-	// around dynamic memory).
-	for(int i=0; i<nodes.count; ++i) {
-		if (!nodes.dataBuffer[i].parent) {
-			vbuf->transforms[i] = nodes.poseBuffer[i];
-			if (nodes.dataBuffer[i].firstChild) {
-				UpdateChildren(vbuf, i);
+	// dag-sort slice?
+	if(mFirstInvalidDagIndex >= 0) {
+		LOG(("DAG FIXING!\n"));
+		// Basic Parents-Before-Children Algorithm (impl could be better):
+		//	- start reading at the first invalid DAG index
+		//	- write all parents that are in the invalid DAG slice first in DAG-order
+		//	- write the current readPos
+		//	- increment read pos passed all entires that have already been written
+		
+		// could stack-alloc just enough for the slice?
+		static int scratchpad[MAX_NODES];
+		static uint8_t scratchpadMarks[MAX_NODES];
+		memset(scratchpadMarks+mFirstInvalidDagIndex, 0, mLastInvalidDagIndex-mFirstInvalidDagIndex+1);
+		int readPos = mFirstInvalidDagIndex;
+		int writePos = readPos;
+
+		do {
+			// parent(s) in the invalid-dag-slice, need to write it first
+			int parentIndex = sNodePoses[readPos].parentIndex;
+			int parentCount = 0;
+			while (parentIndex >= mFirstInvalidDagIndex && !scratchpadMarks[parentIndex]) {
+				scratchpad[writePos] = parentIndex;
+				scratchpadMarks[parentIndex] = 1;
+				writePos++;
+				parentIndex = sNodePoses[parentIndex].parentIndex;
+				parentCount++;
+			}
+			if (parentCount > 1) {
+				// parents are in reverse order >__<
+				int halfCount = parentCount >> 1;
+				for(int i=0; i<halfCount; ++i) {
+					std::swap(scratchpad[writePos-parentCount+i], scratchpad[writePos-1-i]);
+				}
+			}
+			scratchpad[writePos++] = readPos;
+			scratchpadMarks[readPos] = 1;
+			// skip past elements that have already been written
+			while(readPos <= mLastInvalidDagIndex && scratchpadMarks[readPos]) {
+				readPos++;
+			}
+		} while(readPos <= mLastInvalidDagIndex);
+		// move records to reflect scratchpad
+		//	- first update pose parents
+		//	- swap record in first position with correct record
+		//	  modifying scratchpad as we go
+		for(int i=mFirstInvalidDagIndex; i<=mLastInvalidDagIndex; ++i) {
+			if (scratchpad[i] != i) {
+				std::swap(
+					sNodeSlots[sNodeBackBuffer[i]].index, 
+					sNodeSlots[sNodeBackBuffer[scratchpad[i]]].index
+				);
+				std::swap(sNodeBackBuffer[i], sNodeBackBuffer[scratchpad[i]]);
+				std::swap(sNodePoses[i], sNodePoses[scratchpad[i]]);
+				std::swap(sNodeTrees[i], sNodeTrees[scratchpad[i]]);
+				std::swap(sNodeComps[i], sNodeComps[scratchpad[i]]);
+				int j=i+1;
+				while(scratchpad[j] != i && j <= mLastInvalidDagIndex) {
+					++j;
+				}
+				if (j <= mLastInvalidDagIndex) {
+					scratchpad[j] = scratchpad[i];
+				}
 			}
 		}
+		for(int i=mFirstInvalidDagIndex; i<=mLastInvalidDagIndex; ++i) {
+			if (sNodeTrees[i].parent) {
+				sNodePoses[i].parentIndex = Slot(sNodeTrees[i].parent).index;
+			}
+			
+		}
+		mFirstInvalidDagIndex = -1;
+		mLastInvalidDagIndex = -1;
+	}
+	// fast-compute local-to-world buffer
+	vbuf->transforms[0] = Transform();
+	for(int i=0; i<sNodeCount; ++i) {
+		vbuf->transforms[i+1] = sNodePoses[i].localToParent * vbuf->transforms[sNodePoses[i].parentIndex+1];
 	}
 }
 
@@ -237,30 +285,30 @@ void Update(RenderBuffer *vbuf) {
 
 void RegisterComponentManager(ID componentType, IManager* pMgr) {
 	ASSERT((componentType) < MAX_COMPONENT_TYPES);
-	ASSERT(gComponentManagers[componentType] == 0);
-	gComponentManagers[componentType] = pMgr;
+	ASSERT(sComponentManagers[componentType] == 0);
+	sComponentManagers[componentType] = pMgr;
 }
 
 void AddComponent(ID node, ID componentType) {
-	ASSERT(gComponentManagers[componentType]);
+	ASSERT(sComponentManagers[componentType]);
 	ASSERT(!HasComponent(node, componentType));
-	nodes.SlotFor(node).componentMask |= (0x80000000 >> componentType);
-	gComponentManagers[componentType]->CreateComponent(node);
+	Component(node).mask |= (0x80000000 >> componentType);
+	sComponentManagers[componentType]->CreateComponent(node);
 }
 
 bool HasComponent(ID node, ID componentType) {
-	return nodes.SlotFor(node).componentMask & (0x80000000 >> componentType);
+	return Component(node).mask & (0x80000000 >> componentType);
 }
 
 void RemoveComponent(ID node, ID componentType) {
-	ASSERT(gComponentManagers[componentType]);
+	ASSERT(sComponentManagers[componentType]);
 	ASSERT(HasComponent(node, componentType));
-	gComponentManagers[componentType]->DestroyComponent(node);
-	nodes.SlotFor(node).componentMask ^= (0x80000000 >> componentType);
+	sComponentManagers[componentType]->DestroyComponent(node);
+	Component(node).mask ^= (0x80000000 >> componentType);
 }
 
 ComponentIterator::ComponentIterator(ID node) {
-	mask = nodes.SlotFor(node).componentMask;
+	mask = Component(node).mask;
 }
 
 bool ComponentIterator::Next(ID *outComponentType) {
@@ -275,9 +323,10 @@ bool ComponentIterator::Next(ID *outComponentType) {
 }
 
 void DestroyNode(ID node) {
+	ASSERT(NodeValid(node));
 	DetachNode(node);
 	// tear down children
-	NodeData& data = nodes[node];
+	auto& data = Heirarchy(node);
 	while(data.firstChild) {
 		DestroyNode(data.firstChild);
 	}
@@ -285,10 +334,47 @@ void DestroyNode(ID node) {
 	ComponentIterator listComponents(node);
 	ID componentType;
 	while(listComponents.Next(&componentType)) {
-		gComponentManagers[componentType]->DestroyComponent(node);
+		sComponentManagers[componentType]->DestroyComponent(node);
 	}
-	// release node records to manaager
-	nodes.Free(node);
+
+	// release node record
+	auto& slot = Slot(node);
+
+	// relocate last element into this slot and deallocate the last slot
+	sNodeCount--;
+	if (sNodeCount) {
+		// move last element into this place
+		sNodeBackBuffer[slot.index] = sNodeBackBuffer[sNodeCount];
+		sNodeTrees[slot.index] = sNodeTrees[sNodeCount];
+		sNodeComps[slot.index] = sNodeComps[sNodeCount];
+		sNodePoses[slot.index] = sNodePoses[sNodeCount];
+		
+		// Update the slot of the last element
+		sNodeSlots[sNodeBackBuffer[sNodeCount]].index = slot.index;
+		
+		// check that DAG is still valid
+		auto& hdata = sNodeTrees[slot.index];
+		int chIndex = slot.index;
+		if (hdata.parent) {
+			int pIndex = Slot(hdata.parent).index;
+			if (chIndex < pIndex) {
+				if (mFirstInvalidDagIndex == -1 || chIndex < mFirstInvalidDagIndex) {
+					mFirstInvalidDagIndex = chIndex;
+				}
+				if (mLastInvalidDagIndex == -1 || pIndex > mLastInvalidDagIndex) {
+					mLastInvalidDagIndex = pIndex;
+				}				
+			}
+		}
+		for(ID cid = hdata.firstChild; cid; cid=Heirarchy(cid).nextSibling) {
+			Pose(cid).parentIndex = chIndex;
+		}
+	}
+
+	// Invalidate the slot and enqueue in the freelist
+	slot.index = USHRT_MAX;
+	sNodeSlots[sNodeFreelistEnqueue].next = node & 0xffff;
+	sNodeFreelistEnqueue = node & 0xffff;
 }
 
 }

@@ -16,35 +16,35 @@
 
 #pragma once
 #include <cstring>
-#include "Vec.h"
-#include "Transform.h"
+#include "float2.h"
+#include "transform.h"
 
 #define MAX_POLYGON_VERTICES 12
 
 struct Polygon {
   int vertexCount;
-  Vec vertices[MAX_POLYGON_VERTICES];
+  float2 vertices[MAX_POLYGON_VERTICES];
 
   Polygon() : vertexCount(0) {}
-  Polygon(int count, Vec* data) : vertexCount(count) { 
-    memcpy(vertices, data, count*sizeof(Vec)); 
+  Polygon(int count, float2* data) : vertexCount(count) { 
+    memcpy(vertices, data, count*sizeof(float2)); 
   }
 
   bool IsClockwise() const;
   bool IsConvex() const;
   float ComputeArea() const;
-  Vec ComputeAveragePosition() const;
+  float2 ComputeAveragePosition() const;
   
   void EnsureCanonicalOrdering();
   void ReverseOrdering();
 
-  void ApplyTransformation(const Transform &t);
-  void ApplyOffset(Vec u);
+  void Applytransformation(const transform &t);
+  void ApplyOffset(float2 u);
   
   void ComputeRegularPolygon(int nSides, float radius);  
   void ComputeEccentricVertices(float eccentricity);
 
-  bool Append(Vec u);
+  bool Append(float2 u);
 
-  void ComputeStrokeNormals(Vec* outNormals, float weight=1.0f);
+  void ComputeStrokeNormals(float2* outNormals, float weight=1.0f);
 };

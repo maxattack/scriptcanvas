@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Bezier.h"
-#include "Line.h"
+#include "Curves.h"
 #include "Polygon.h"
-#include "Transform.h"
-#include "Vec.h"
+#include "transform.h"
+#include "float2.h"

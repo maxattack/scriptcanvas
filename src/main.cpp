@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
     glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
     
     // init systems
+    SceneSystem::Initialize();
     RenderSystem::Initialize();
     InputSystem::Initialize();
     glfwSetMousePosCallback(InputSystem::SetMousePosition);

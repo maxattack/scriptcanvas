@@ -6,18 +6,18 @@ namespace InputSystem {
 // TODO - Add an atomic "dirty bit" and copy
 
 static GLFWmutex lock;
-static Vec mousePosition;
+static float2 mousePosition;
 static double seconds;
 
 void Initialize() {
 	lock = glfwCreateMutex();
-	mousePosition = vec(0,0);
+	mousePosition = Float2(0,0);
 	seconds = 0;
 }
 
 void SetMousePosition(int x, int y) {
 	glfwLockMutex(lock);
-	mousePosition = vec(x, y);
+	mousePosition = Float2(x, y);
 	glfwUnlockMutex(lock);
 }
 
@@ -27,9 +27,9 @@ void SetTime(double t) {
 	glfwUnlockMutex(lock);
 }
 
-Vec MousePosition() {
+float2 MousePosition() {
 	glfwLockMutex(lock);
-	Vec result = mousePosition;
+	float2 result = mousePosition;
 	glfwUnlockMutex(lock);
 	return result;
 }
