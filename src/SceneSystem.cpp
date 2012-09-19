@@ -203,7 +203,6 @@ transform LocalToWorld(ID node) {
 void Update(RenderBuffer *vbuf) {
 	// dag-sort slice?
 	if(mFirstInvalidDagIndex >= 0) {
-		LOG(("DAG FIXING!\n"));
 		// Basic Parents-Before-Children Algorithm (impl could be better):
 		//	- start reading at the first invalid DAG index
 		//	- write all parents that are in the invalid DAG slice first in DAG-order
