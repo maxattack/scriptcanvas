@@ -63,7 +63,6 @@ void CircleManager::Update(RenderBuffer* vbuf) {
 }
 
 void CircleManager::Render(RenderBuffer* vbuf) {
-    LOG_INT(vbuf->circleCount);
     if (vbuf->circleCount) {
         glUseProgram(mProgram);
         glEnableClientState(GL_VERTEX_ARRAY);
