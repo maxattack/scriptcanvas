@@ -251,7 +251,7 @@ void Update(RenderBuffer *vbuf) {
 			// parent(s) in the invalid-dag-slice, need to write it first
 			int parentIndex = sNodePoses[readPos].parentIndex;
 			int parentCount = 0;
-			while (parentIndex >= mFirstInvalidDagIndex && !scratchpadMarks[parentIndex]) {
+			while (parentIndex != USHRT_MAX && parentIndex >= mFirstInvalidDagIndex && !scratchpadMarks[parentIndex]) {
 				scratchpad[writePos] = parentIndex;
 				scratchpadMarks[parentIndex] = 1;
 				writePos++;
