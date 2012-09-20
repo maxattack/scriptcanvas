@@ -48,9 +48,7 @@ $[
 scene = SceneSystem
 circle = CircleSystem
 input = InputSystem
-component = {
-	circle = 0
-}
+
 function import(ns)
 	for key,value in pairs(ns) do
 		_G[key] = value

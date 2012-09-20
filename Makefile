@@ -63,7 +63,7 @@ OBJS = \
 $(BIN): $(OBJS)
 	$(CC) $(OBJS) -o $(BIN) $(LFLAGS)
 
-tools/tolua++: tolua/* src/lua/* src/tolua_*
+tools/tolua++: tolua/*.c src/lua/*.c src/tolua_*.c
 	$(CC) tolua/*.c src/lua/*.c src/tolua_*.c -o tools/tolua++
 
 src/binding.cpp src/binding.h :  tools/tolua++ src/binding.pkg
