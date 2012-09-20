@@ -1,2 +1,4 @@
 **/*.o
+src/binding.cpp
+src/binding.h
 bubble

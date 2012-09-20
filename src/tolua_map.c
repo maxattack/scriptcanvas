@@ -263,7 +263,7 @@ static int tolua_bnd_setpeer(lua_State* L) {
 		lua_pop(L, 1);
 		lua_pushvalue(L, TOLUA_NOPEER);
 	};
-	lua_setuservalue(L, -2);
+	lua_setfenv(L, -2);
 
 	return 0;
 };
@@ -271,7 +271,7 @@ static int tolua_bnd_setpeer(lua_State* L) {
 static int tolua_bnd_getpeer(lua_State* L) {
 
 	/* stack: userdata */
-	lua_getuservalue(L, -1);
+	lua_getfenv(L, -1);
 	if (lua_rawequal(L, -1, TOLUA_NOPEER)) {
 		lua_pop(L, 1);
 		lua_pushnil(L);
@@ -411,7 +411,7 @@ TOLUA_API void tolua_beginmodule (lua_State* L, const char* name)
 		lua_rawget(L,-2);
 	}
 	else
-	 lua_pushglobaltable(L);
+	 lua_pushvalue(L,LUA_GLOBALSINDEX);
 }
 
 /* End module
@@ -445,7 +445,7 @@ TOLUA_API void tolua_module (lua_State* L, const char* name, int hasvar)
 	else
 	{
 		/* global table */
-		lua_pushglobaltable(L);
+		lua_pushvalue(L,LUA_GLOBALSINDEX);
 	}
 	if (hasvar)
 	{

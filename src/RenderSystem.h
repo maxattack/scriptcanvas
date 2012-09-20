@@ -3,18 +3,15 @@
 #include "CircleSystem.h"
 
 struct RenderBuffer {
-	transform transforms[MAX_NODES];
-	CircleSystem::Geometry circleGeometry[MAX_NODES];
-	CircleSystem::Material circleMaterials[MAX_NODES];
-	CircleSystem::Command circleCommands[MAX_NODES];
+	// counts
 	int circleCount;
+
+	// buffers (one shared, compact buffer?)
+	transform transforms[MAX_NODES];
+	CircleManager::Command circles[MAX_NODES];
 };
 
 namespace RenderSystem {
-
-enum RenderType {
-	kRenderTypeCirle
-};
 
 void Initialize();
 

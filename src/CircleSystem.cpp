@@ -2,141 +2,76 @@
 #include <cstdio>
 #include <cstring>
 #include "RenderSystem.h"
+#include "util/Macros.h"
 
-namespace CircleSystem {
+static GLuint LoadShaderProgram(const char* filename); // make more accessible
 
-static bool mInitialized = false;
-static GLuint mProgram;
-static GLuint mAttribUnit;
-static GLuint mUniformRadius;
-static GLuint mUniformColor;
-static GLuint mVertexBuffer;
-static CompactComponentPool<Component> mComponents;
-static CompactPool<Geometry, MAX_NODES> mGeometry;
-static CompactPool<Material, MAX_NODES> mMaterial;
+void CircleManager::Initialize() {
+    mProgram = LoadShaderProgram("src/circle.glsl");
+    // lookup shader storage locations
+    glUseProgram(mProgram);
+    mAttribUnit = glGetAttribLocation(mProgram, "unit");
+    mUniformRadius = glGetUniformLocation(mProgram, "radius");
+    mUniformColor = glGetUniformLocation(mProgram, "color");
+    // create circle vertex buffer
+    float2 unit = Float2(1,0);
+    float2 rotor = Polar(1.f, kTau / (64-2.f));
+    float2 buffer[64];
+    buffer[0] = Float2(0,0);
+    for(int i=1; i<64; ++i) {
+        buffer[i] = unit;
+        unit *= rotor;
+    }
+    glGenBuffers(1, &mVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float2)*64, buffer, GL_STATIC_DRAW);
+}
 
-static GLuint LoadShaderProgram(const char* filename);
+void CircleManager::Destroy() {
+    // todo: cleanup
+}
 
-bool Manager::CreateComponent(ID node) {
-	mComponents.Alloc(node);
-    mComponents[node].node = node;
+bool CircleManager::CreateComponent(ID node) {
+	mSlots.Alloc(node);
+    auto& circle = mSlots[node].circle;
+    circle.radius = 1.f;
+    circle.fill = RGB(0xffffff);
+    mSlots[node].node = node;
     return true;
 }
 
-bool Manager::DestroyComponent(ID node) {
-    mComponents.Free(node);
+bool CircleManager::DestroyComponent(ID node) {
+    mSlots.Free(node);
     return true;
 }
 
-ID CreateMaterial(float r, float g, float b) { 
-    ID result = mMaterial.TakeOut(); 
-    mMaterial[result].r = r;
-    mMaterial[result].g = g;
-    mMaterial[result].b = b;
-    mMaterial[result].a = 1.f;
-    return result;
+Circle& CircleManager::operator[](ID node) {
+    return mSlots[node].circle;
 }
 
-void SetMaterial(ID node, ID mat) {
-    ASSERT(mMaterial.IsActive(mat));
-    mComponents[node].material = mat;
+Circle CircleManager::operator[](ID node) const {
+    return mSlots[node].circle;
 }
 
-ID GetMaterial(ID node) {
-    return mComponents[node].material;
-}
-
-void SetMaterialColor(ID mat, float r, float g, float b){
-    mMaterial[mat].r = r;
-    mMaterial[mat].g = g;
-    mMaterial[mat].b = b;
-}
-
-void DestroyMaterial(ID matId) { 
-    mMaterial.PutBack(matId); 
-    for(auto p=mComponents.Begin(); p!=mComponents.End(); ++p) {
-        p->material *= (p->material == matId);
-    }
-}
-
-ID CreateGeometry(float radius) { 
-    ID result = mGeometry.TakeOut(); 
-    mGeometry[result].radius = radius;
-    return result;
-}
-
-void SetGeometry(ID node, ID geom) {
-    ASSERT(mGeometry.IsActive(geom));
-    mComponents[node].geometry = geom;
-}
-
-ID GetGeometry(ID node) {
-    return mComponents[node].geometry;
-}
-
-void SetGeometryRadius(ID geomId, float radius) {
-    mGeometry[geomId].radius = radius;
-}
-
-void DestroyGeometry(ID geomId) { 
-    mGeometry.PutBack(geomId); 
-    for (auto p=mComponents.Begin(); p!=mComponents.End(); ++p) {
-        p->geometry *=  (p->geometry == geomId);
-    }
-}
-
-void Update(RenderBuffer* vbuf) {
-    for(int i=0; i<mGeometry.Count(); ++i) {
-        vbuf->circleGeometry[i] = mGeometry.Begin()[i];
-    }
-    for(int i=0; i<mMaterial.Count(); ++i) {
-        vbuf->circleMaterials[i] = mMaterial.Begin()[i];
-    }
+void CircleManager::Update(RenderBuffer* vbuf) {
     int idx=0;
-    for(auto p=mComponents.Begin(); p!=mComponents.End(); ++p) {
-        if (p->material && p->geometry) {
-            Command cmd;
-            cmd.fields.queue = 0;
-            cmd.fields.material = mMaterial.Index(p->material);
-            cmd.fields.geometry = mGeometry.Index(p->geometry);
-            cmd.fields.transform = SceneSystem::Index(p->node);
-            vbuf->circleCommands[idx++] = cmd;
-        }
+    for(auto p=mSlots.Begin(); p!=mSlots.End(); ++p) {
+        // culling?
+        Command cmd = { 0, SceneSystem::Index(p->node), p->circle.fill, p->circle.radius };
+        vbuf->circles[idx++] = cmd;
     }
     vbuf->circleCount = idx;
 }
 
-void Render(RenderBuffer* vbuf) {
+void CircleManager::Render(RenderBuffer* vbuf) {
     if (vbuf->circleCount) {
-        if (!mInitialized) {
-            mProgram = LoadShaderProgram("src/circle.glsl");
-            // lookup shader storage locations
-            glUseProgram(mProgram);
-            mAttribUnit = glGetAttribLocation(mProgram, "unit");
-            mUniformRadius = glGetUniformLocation(mProgram, "radius");
-            mUniformColor = glGetUniformLocation(mProgram, "color");
-            // create circle vertex buffer
-            float2 unit = Float2(1,0);
-            float2 rotor = Polar(1.f, kTau / (64-2.f));
-            float2 buffer[64];
-            buffer[0] = Float2(0,0);
-            for(int i=1; i<64; ++i) {
-                buffer[i] = unit;
-                unit *= rotor;
-            }
-            glGenBuffers(1, &mVertexBuffer);
-            glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(float2)*64, buffer, GL_STATIC_DRAW);
-            mInitialized = true;
-        }
-
         glUseProgram(mProgram);
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableVertexAttribArray(mAttribUnit);
 
         for(int i=0; i<vbuf->circleCount; ++i) {
-            auto cmd = vbuf->circleCommands[i];
-            transform w = vbuf->transforms[cmd.fields.transform];
+            auto cmd = vbuf->circles[i];
+            transform w = vbuf->transforms[cmd.transform];
             float mat[16] = {
                 w.q.x, w.q.y, 0, 0,
                 -w.q.y, w.q.x, 0, 0,
@@ -144,10 +79,10 @@ void Render(RenderBuffer* vbuf) {
                 w.t.x, w.t.y, 0, 1
             };
             glLoadMatrixf(mat);
-            glUniform1f(mUniformRadius, vbuf->circleGeometry[cmd.fields.geometry].radius);
-            auto material = vbuf->circleMaterials[cmd.fields.material];
-            glUniform4f(mUniformColor, material.r, material.g, material.b, 1.f);
-
+            glUniform1f(mUniformRadius, cmd.radius);
+            float r,g,b;
+            cmd.fill.ToFloatRGB(&r, &g, &b);
+            glUniform4f(mUniformColor, r, g, b, 1.f);
             glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
             glVertexAttribPointer(mAttribUnit, 2, GL_FLOAT, GL_FALSE, 0, 0);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 64);
@@ -159,7 +94,7 @@ void Render(RenderBuffer* vbuf) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glUseProgram(0);
 
-    } else { /* teardown when not in use? */ }
+    }
 }
 
 static GLuint LoadShaderProgram(const char* filename) {
@@ -227,6 +162,4 @@ static GLuint LoadShaderProgram(const char* filename) {
         glLinkProgram(prog);
     }
     return prog;
-}
-
 }

@@ -1,5 +1,7 @@
 #include "RenderSystem.h"
 #include "ProducerConsumerQueue.h"
+#include "util/Macros.h"
+#include "Script.h"
 #include <algorithm>
 #include <functional>
 
@@ -56,7 +58,7 @@ void SubmitToSceneSystem(RenderBuffer* vbuf) {
 }
 
 void Render(RenderBuffer* vbuf) {
-	CircleSystem::Render(vbuf);
+	Script::Render(vbuf);
 }
 
 }

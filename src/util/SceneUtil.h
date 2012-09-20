@@ -18,6 +18,7 @@ public:
 	void Alloc(ID node);
 	void Free(ID node);
 	T& operator[](ID node);
+	T operator[](ID node) const;
 	int Count() const { return mCount; }
     T* Begin() { return mBuffer; }
     T* End() { return mBuffer + mCount; }
@@ -43,5 +44,10 @@ void CompactComponentPool<T>::Free(ID node) {
 
 template<typename T>
 T& CompactComponentPool<T>::operator[](ID node) {
+	return mBuffer[mIndex[node & 0xffff]];
+}
+
+template<typename T>
+T CompactComponentPool<T>::operator[](ID node) const {
 	return mBuffer[mIndex[node & 0xffff]];
 }

@@ -2,6 +2,7 @@
 $#include "Script.h"
 
 typedef unsigned int ID;
+typedef unsigned int uint32_t;
 
 namespace SceneSystem {
 
@@ -28,17 +29,12 @@ namespace SceneSystem {
 
 namespace CircleSystem {
 	
-	ID CreateMaterial @ createMaterial(float r=1, float g=1, float b=1);
-	void SetMaterial @ setMaterial(ID node, ID mat);
-	ID GetMaterial @ material(ID node);
-	void SetMaterialColor @ setMaterialColor(ID mat, float r, float g, float b);
-	void DestroyMaterial @ destroyMaterial(ID matId);
-	
-	ID CreateGeometry @ createGeometry(float radius=1);
-	void SetGeometry @ setGeometry(ID node, ID geom);
-	ID GetGeometry @ geometry(ID node);
-	void SetGeometryRadius @ setGeometryRadius(ID geomId, float radius);
-	void DestroyGeometry @ destroyGeometry(ID geomId);
+	void Create @ create(ID node, uint32_t color, float radius);
+	void Destroy @ destroy(ID node);
+	void Fill @ fill(ID node, uint32_t *color=0);
+	void Radius @ radius(ID node, float *radius=0);
+	void SetFill @ setFill(ID node, uint32_t fill);
+	void SetRadius @ setRadius(ID node, float r);
 
 };
 
@@ -46,8 +42,6 @@ namespace InputSystem {
 	void GetMousePosition @ mousePosition(int *x=0, int *y=0);
 	double GetTime @ seconds();
 }
-
-
 
 $[
 scene = SceneSystem

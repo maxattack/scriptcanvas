@@ -58,7 +58,7 @@ struct ChildIterator {
 // Lookup a node's local-to-parent transform
 transform& LocalToParent(ID node);
 
-int Index(ID node);
+uint16_t Index(ID node);
 
 // For mid-frame one-shots -- the RenderQueue will get this batched.
 transform LocalToWorld(ID node);

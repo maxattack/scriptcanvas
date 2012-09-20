@@ -8,6 +8,9 @@ struct RenderBuffer;
 
 // Interface for component systems
 struct IManager {
+	virtual void Initialize();
+	virtual void Destroy();
+
 	// SCENE THREAD
 	virtual bool CreateComponent(ID node) = 0;
 	virtual bool DestroyComponent(ID node) = 0;

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: bubbles
-** Generated automatically by tolua++-1.0.92 on Sun Aug 26 00:44:10 2012.
+** Generated automatically by tolua++-1.0.92 on Thu Sep 20 00:03:38 2012.
 */
 
 #ifndef __cplusplus
@@ -433,101 +433,9 @@ static int tolua_bubbles_SceneSystem_paint00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: CircleSystem::CreateMaterial */
-#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_createMaterial00
-static int tolua_bubbles_CircleSystem_createMaterial00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isnumber(tolua_S,1,1,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  float r = ((float)  tolua_tonumber(tolua_S,1,1));
-  float g = ((float)  tolua_tonumber(tolua_S,2,1));
-  float b = ((float)  tolua_tonumber(tolua_S,3,1));
-  {
-   unsigned int tolua_ret = ( unsigned int)  CircleSystem::CreateMaterial(r,g,b);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'createMaterial'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: CircleSystem::SetMaterial */
-#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_setMaterial00
-static int tolua_bubbles_CircleSystem_setMaterial00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
-  unsigned int mat = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
-  {
-   CircleSystem::SetMaterial(node,mat);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'setMaterial'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: CircleSystem::GetMaterial */
-#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_material00
-static int tolua_bubbles_CircleSystem_material00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
-  {
-   unsigned int tolua_ret = ( unsigned int)  CircleSystem::GetMaterial(node);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'material'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: CircleSystem::SetMaterialColor */
-#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_setMaterialColor00
-static int tolua_bubbles_CircleSystem_setMaterialColor00(lua_State* tolua_S)
+/* function: CircleSystem::Create */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_create00
+static int tolua_bubbles_CircleSystem_create00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -535,120 +443,31 @@ static int tolua_bubbles_CircleSystem_setMaterialColor00(lua_State* tolua_S)
      !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  unsigned int mat = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
-  float r = ((float)  tolua_tonumber(tolua_S,2,0));
-  float g = ((float)  tolua_tonumber(tolua_S,3,0));
-  float b = ((float)  tolua_tonumber(tolua_S,4,0));
-  {
-   CircleSystem::SetMaterialColor(mat,r,g,b);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'setMaterialColor'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: CircleSystem::DestroyMaterial */
-#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_destroyMaterial00
-static int tolua_bubbles_CircleSystem_destroyMaterial00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  unsigned int matId = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
-  {
-   CircleSystem::DestroyMaterial(matId);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'destroyMaterial'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: CircleSystem::CreateGeometry */
-#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_createGeometry00
-static int tolua_bubbles_CircleSystem_createGeometry00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isnumber(tolua_S,1,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  float radius = ((float)  tolua_tonumber(tolua_S,1,1));
-  {
-   unsigned int tolua_ret = ( unsigned int)  CircleSystem::CreateGeometry(radius);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'createGeometry'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: CircleSystem::SetGeometry */
-#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_setGeometry00
-static int tolua_bubbles_CircleSystem_setGeometry00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
-  unsigned int geom = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
+  unsigned int color = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
+  float radius = ((float)  tolua_tonumber(tolua_S,3,0));
   {
-   CircleSystem::SetGeometry(node,geom);
+   CircleSystem::Create(node,color,radius);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'setGeometry'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'create'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: CircleSystem::GetGeometry */
-#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_geometry00
-static int tolua_bubbles_CircleSystem_geometry00(lua_State* tolua_S)
+/* function: CircleSystem::Destroy */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_destroy00
+static int tolua_bubbles_CircleSystem_destroy00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -662,72 +481,135 @@ static int tolua_bubbles_CircleSystem_geometry00(lua_State* tolua_S)
  {
   unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   {
-   unsigned int tolua_ret = ( unsigned int)  CircleSystem::GetGeometry(node);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   CircleSystem::Destroy(node);
   }
  }
- return 1;
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'geometry'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'destroy'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: CircleSystem::SetGeometryRadius */
-#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_setGeometryRadius00
-static int tolua_bubbles_CircleSystem_setGeometryRadius00(lua_State* tolua_S)
+/* function: CircleSystem::Fill */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_fill00
+static int tolua_bubbles_CircleSystem_fill00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
      !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  unsigned int geomId = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  unsigned int color = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
+  {
+   CircleSystem::Fill(node,&color);
+   tolua_pushnumber(tolua_S,(lua_Number)color);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'fill'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: CircleSystem::Radius */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_radius00
+static int tolua_bubbles_CircleSystem_radius00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
   float radius = ((float)  tolua_tonumber(tolua_S,2,0));
   {
-   CircleSystem::SetGeometryRadius(geomId,radius);
+   CircleSystem::Radius(node,&radius);
+   tolua_pushnumber(tolua_S,(lua_Number)radius);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'setGeometryRadius'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'radius'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: CircleSystem::DestroyGeometry */
-#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_destroyGeometry00
-static int tolua_bubbles_CircleSystem_destroyGeometry00(lua_State* tolua_S)
+/* function: CircleSystem::SetFill */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_setFill00
+static int tolua_bubbles_CircleSystem_setFill00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
      !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  unsigned int geomId = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  unsigned int fill = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
   {
-   CircleSystem::DestroyGeometry(geomId);
+   CircleSystem::SetFill(node,fill);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'destroyGeometry'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'setFill'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: CircleSystem::SetRadius */
+#ifndef TOLUA_DISABLE_tolua_bubbles_CircleSystem_setRadius00
+static int tolua_bubbles_CircleSystem_setRadius00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  unsigned int node = (( unsigned int)  tolua_tonumber(tolua_S,1,0));
+  float r = ((float)  tolua_tonumber(tolua_S,2,0));
+  {
+   CircleSystem::SetRadius(node,r);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'setRadius'.",&tolua_err);
  return 0;
 #endif
 }
@@ -818,16 +700,12 @@ TOLUA_API int tolua_bubbles_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_module(tolua_S,"CircleSystem",0);
   tolua_beginmodule(tolua_S,"CircleSystem");
-   tolua_function(tolua_S,"createMaterial",tolua_bubbles_CircleSystem_createMaterial00);
-   tolua_function(tolua_S,"setMaterial",tolua_bubbles_CircleSystem_setMaterial00);
-   tolua_function(tolua_S,"material",tolua_bubbles_CircleSystem_material00);
-   tolua_function(tolua_S,"setMaterialColor",tolua_bubbles_CircleSystem_setMaterialColor00);
-   tolua_function(tolua_S,"destroyMaterial",tolua_bubbles_CircleSystem_destroyMaterial00);
-   tolua_function(tolua_S,"createGeometry",tolua_bubbles_CircleSystem_createGeometry00);
-   tolua_function(tolua_S,"setGeometry",tolua_bubbles_CircleSystem_setGeometry00);
-   tolua_function(tolua_S,"geometry",tolua_bubbles_CircleSystem_geometry00);
-   tolua_function(tolua_S,"setGeometryRadius",tolua_bubbles_CircleSystem_setGeometryRadius00);
-   tolua_function(tolua_S,"destroyGeometry",tolua_bubbles_CircleSystem_destroyGeometry00);
+   tolua_function(tolua_S,"create",tolua_bubbles_CircleSystem_create00);
+   tolua_function(tolua_S,"destroy",tolua_bubbles_CircleSystem_destroy00);
+   tolua_function(tolua_S,"fill",tolua_bubbles_CircleSystem_fill00);
+   tolua_function(tolua_S,"radius",tolua_bubbles_CircleSystem_radius00);
+   tolua_function(tolua_S,"setFill",tolua_bubbles_CircleSystem_setFill00);
+   tolua_function(tolua_S,"setRadius",tolua_bubbles_CircleSystem_setRadius00);
   tolua_endmodule(tolua_S);
   tolua_module(tolua_S,"InputSystem",0);
   tolua_beginmodule(tolua_S,"InputSystem");

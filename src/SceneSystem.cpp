@@ -1,7 +1,7 @@
 #include "RenderSystem.h"
+#include "util/Macros.h"
 #include <algorithm>
 #include <cstring>
-
 
 namespace SceneSystem {
 
@@ -20,7 +20,7 @@ struct NodeSlot {
 	// freelist linked list
 	uint16_t nextFreeSlot;
 
-	// tree data
+	// tree data (just store the slot index?)
 	ID parent;
 	ID firstChild;
 	ID nextSibling;
@@ -185,7 +185,7 @@ bool ChildIterator::Next(ID *outNode) {
 	}
 }
 
-int Index(ID node) {
+uint16_t Index(ID node) {
 	return Slot(node).poseIndex;
 }
 
@@ -302,6 +302,7 @@ void Update(RenderBuffer *vbuf) {
 		mFirstInvalidDagIndex = -1;
 		mLastInvalidDagIndex = -1;
 	}
+
 	// fast-compute local-to-world buffer
 	for(int i=0; i<sNodeCount; ++i) {
 		if (sNodePoses[i].parentIndex == USHRT_MAX) {
@@ -317,6 +318,7 @@ void Update(RenderBuffer *vbuf) {
 void RegisterComponentManager(ID componentType, IManager* pMgr) {
 	ASSERT((componentType) < MAX_COMPONENT_TYPES);
 	ASSERT(sComponentManagers[componentType] == 0);
+	pMgr->Initialize();
 	sComponentManagers[componentType] = pMgr;
 }
 

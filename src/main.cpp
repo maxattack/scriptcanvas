@@ -3,12 +3,16 @@
 #include <ctime>
 #include <cmath>
 
-#include <lua.hpp>
+extern "C" {
+#include "lua/lua.h"
+#include "lua/lualib.h"
+#include "lua/lauxlib.h"
+}
 #include "tolua++.h"
 #include "binding.h"
 
+#include "Script.h"
 #include "RenderSystem.h"
-#include "InputSystem.h"
 
 void game(void* ctxt);
 
@@ -35,6 +39,7 @@ int main(int argc, char* argv[]) {
     RenderSystem::Initialize();
     InputSystem::Initialize();
     glfwSetMousePosCallback(InputSystem::SetMousePosition);
+    Script::Initialize();
 
     // initialize communication channels
     static RenderBuffer buf0;
@@ -68,18 +73,13 @@ void Paint() {
     RenderBuffer *vbuf;
     RenderSystem::RetrieveFromRenderSystem(&vbuf);
     SceneSystem::Update(vbuf);
-    CircleSystem::Update(vbuf);
+    Script::Update(vbuf);
     RenderSystem::SubmitToRenderSystem(vbuf);
 }
 
 }
 
 void game(void* ctxt) {
-    // It feels weird that this is the only non-hard-coded place...
-    /// I suppose it's just until we have scripted components to mix with.
-    static CircleSystem::Manager gCircles;
-    SceneSystem::RegisterComponentManager(0, &gCircles);
-
     // run scripts
     lua_State* virtualMachine = luaL_newstate();
     luaL_openlibs(virtualMachine);
