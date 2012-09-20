@@ -68,6 +68,7 @@ void CircleManager::Render(RenderBuffer* vbuf) {
         glUseProgram(mProgram);
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableVertexAttribArray(mAttribUnit);
+        glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
 
         for(int i=0; i<vbuf->circleCount; ++i) {
             auto cmd = vbuf->circles[i];
@@ -83,7 +84,6 @@ void CircleManager::Render(RenderBuffer* vbuf) {
             float r,g,b;
             cmd.fill.ToFloatRGB(&r, &g, &b);
             glUniform4f(mUniformColor, r, g, b, 1.f);
-            glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
             glVertexAttribPointer(mAttribUnit, 2, GL_FLOAT, GL_FALSE, 0, 0);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 64);
         }
