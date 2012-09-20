@@ -1,2 +1,0 @@
-#!/bin/bash
-tolua++ -o src/binding.cpp -H src/binding.h src/bubbles.tolua
