@@ -12,6 +12,7 @@ LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw $(O
 CFLAGS += -DDEBUG
 CFLAGS += -DLUA_USE_POSIX
 #CFLAGS += -DNO_DAG_SORT
+#CFLAGS += -DTOLUA_RELEASE
 
 OBJS = \
 	src/main.o \
