@@ -66,8 +66,8 @@ $(BIN): $(OBJS)
 tools/tolua++: tolua/* src/lua/* src/tolua_*
 	$(CC) tolua/*.c src/lua/*.c src/tolua_*.c -o tools/tolua++
 
-src/binding.cpp src/binding.h :  tools/tolua++ src/bubbles.pkg
-	tools/tolua++ -o src/binding.cpp -H src/binding.h src/bubbles.pkg
+src/binding.cpp src/binding.h :  tools/tolua++ src/binding.pkg
+	tools/tolua++ -o src/binding.cpp -H src/binding.h src/binding.pkg
 
 %.o : %.cpp src/binding.h
 	$(CXXC) $(CFLAGS) $(CXXFLAGS) -c $< -o $@

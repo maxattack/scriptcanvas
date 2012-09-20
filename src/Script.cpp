@@ -1,8 +1,6 @@
 #include "Script.h"
 
-namespace CircleSystem {
-	CircleManager inst;
-};
+CircleManager CircleSystem::inst;
 
 void ScriptInitialize() {
 	SceneSystem::RegisterComponentManager(COMPONENT_CIRCLE, &CircleSystem::inst);
