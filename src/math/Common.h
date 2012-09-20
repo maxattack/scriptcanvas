@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 inline float Clamp(float u, float lo=0.f, float hi=1.f) {
 	return u<lo?lo:u>hi?hi:u;

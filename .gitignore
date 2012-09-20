@@ -1,4 +1,6 @@
-**/*.o
+src/*.o
+src/lua/*.o
+src/math/*.o
 src/binding.cpp
 src/binding.h
 tools/tolua++
