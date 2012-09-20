@@ -1,6 +1,6 @@
 #pragma once
 #include "SceneSystem.h"
-#include "CircleSystem.h"
+#include "CircleManager.h"
 
 struct RenderBuffer {
 	// counts

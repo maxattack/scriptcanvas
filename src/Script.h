@@ -1,8 +1,8 @@
 #pragma once
 #include "SceneSystem.h"
-#include "CircleSystem.h"
 #include "InputSystem.h"
 #include "RenderSystem.h"
+#include "CircleManager.h"
 
 #define COMPONENT_CIRCLE	0
 

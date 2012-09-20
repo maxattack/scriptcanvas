@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseSystem.h"
+#include "IManager.h"
 #include "math/transform.h"
 
 namespace SceneSystem {

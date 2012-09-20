@@ -1,22 +1,29 @@
 
-# tolua++ -o binding.cpp -H binding.h bubbles.tolua
 
 BIN = bubble
 CC = clang
-OFLAG = -Os
 CXXC = clang++
-CFLAGS = -g -fno-common -I/usr/local/include -Wall -Werror -Wno-unused-variable $(OFLAG)
+CFLAGS = -fno-common -I/usr/local/include -Wall -Werror -Wno-unused-variable $(OFLAG)
 CXXFLAGS = -fno-exceptions -fno-rtti -std=c++11 -stdlib=libc++
 LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw $(OFLAG)
 
-CFLAGS += -DDEBUG
 CFLAGS += -DLUA_USE_POSIX
 #CFLAGS += -DNO_DAG_SORT
-#CFLAGS += -DTOLUA_RELEASE
+
+ifeq ($(PRODUCTION),1)
+CFLAGS += -O4
+LFLAGS += -O4
+CFLAGS += -DTOLUA_RELEASE
+else
+CFLAGS += -DDEBUG
+CFLAGS += -g
+CFLAGS += -Os
+LFLAGS += -Os
+endif
 
 OBJS = \
 	src/main.o \
-	src/CircleSystem.o \
+	src/CircleManager.o \
 	src/InputSystem.o \
 	src/RenderSystem.o \
 	src/SceneSystem.o \
