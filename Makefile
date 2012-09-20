@@ -4,7 +4,7 @@
 BIN = bubble
 CC = clang
 CXXC = clang++
-CFLAGS = -Os -g -fno-common -I/usr/local/include -Wall -Werror -DDEBUG=1 -Wno-unused-variable
+CFLAGS = -O4 -g -fno-common -I/usr/local/include -Wall -Werror -DDEBUG=1 -Wno-unused-variable
 CXXFLAGS = -fno-exceptions -fno-rtti -std=c++11 -stdlib=libc++
 LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw
 
