@@ -1,6 +1,13 @@
 #pragma once
 #include "SceneSystem.h"
-#include "CircleManager.h"
+#include "math/color.h"
+
+struct CircleCommand {
+	uint16_t queue;
+	uint16_t transform;
+	float radius;
+	color fill;
+};
 
 struct RenderBuffer {
 	// counts
@@ -8,12 +15,13 @@ struct RenderBuffer {
 
 	// buffers (one shared, compact buffer?)
 	transform transforms[MAX_NODES];
-	CircleManager::Command circles[MAX_NODES];
+	CircleCommand circles[MAX_NODES];
 };
 
 namespace RenderSystem {
 
 void Initialize();
+void Clear(RenderBuffer *vbuf);
 
 // For SCENE THREAD
 void SubmitToRenderSystem(RenderBuffer* vbuf);

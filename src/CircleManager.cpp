@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include "CircleManager.h"
 #include "RenderSystem.h"
 #include "util/Macros.h"
 
@@ -54,16 +55,15 @@ Circle CircleManager::operator[](ID node) const {
 }
 
 void CircleManager::Update(RenderBuffer* vbuf) {
-    int idx=0;
     for(auto p=mSlots.Begin(); p!=mSlots.End(); ++p) {
-        // culling?
-        Command cmd = { 0, SceneSystem::Index(p->node), p->circle.fill, p->circle.radius };
-        vbuf->circles[idx++] = cmd;
+        // todo: culling?
+        CircleCommand cmd = { 0, SceneSystem::Index(p->node), p->circle.radius, p->circle.fill };
+        vbuf->circles[vbuf->circleCount++] = cmd;
     }
-    vbuf->circleCount = idx;
 }
 
 void CircleManager::Render(RenderBuffer* vbuf) {
+    LOG_INT(vbuf->circleCount);
     if (vbuf->circleCount) {
         glUseProgram(mProgram);
         glEnableClientState(GL_VERTEX_ARRAY);

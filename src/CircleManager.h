@@ -24,14 +24,6 @@ private:
 
 public:
 
-	struct Command {
-		uint16_t queue;
-		uint16_t transform;
-		color fill;
-		float radius;
-	};
-
-
 	void Initialize();
 	void Destroy();
 

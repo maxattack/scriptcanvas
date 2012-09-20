@@ -5,8 +5,6 @@
 #include <algorithm>
 #include <functional>
 
-namespace RenderSystem {
-
 static folly::ProducerConsumerQueue<RenderBuffer*, 4> mRenderQueue;
 static folly::ProducerConsumerQueue<RenderBuffer*, 4> mSceneQueue;
 static GLFWcond gRenderCondition;
@@ -14,14 +12,18 @@ static GLFWcond gSceneCondition;
 static GLFWmutex gRenderMutex;
 static GLFWmutex gSceneMutex;
 
-void Initialize() {
+void RenderSystem::Initialize() {
 	gRenderCondition = glfwCreateCond();
 	gSceneCondition = glfwCreateCond();
 	gRenderMutex = glfwCreateMutex();
 	gSceneMutex = glfwCreateMutex();
 }
 
-void SubmitToRenderSystem(RenderBuffer* vbuf) {
+void RenderSystem::Clear(RenderBuffer *vbuf) {
+	vbuf->circleCount = 0;
+}
+
+void RenderSystem::SubmitToRenderSystem(RenderBuffer* vbuf) {
 	glfwLockMutex(gSceneMutex);
 	auto result = mRenderQueue.write(vbuf);
 	ASSERT(result); // eek?
@@ -29,7 +31,7 @@ void SubmitToRenderSystem(RenderBuffer* vbuf) {
 	glfwSignalCond(gSceneCondition);
 }
 
-void RetrieveFromRenderSystem(RenderBuffer** out) {
+void RenderSystem::RetrieveFromRenderSystem(RenderBuffer** out) {
 	if (!mSceneQueue.read(*out)) {
 		//puts("waiting on renderer...");
 		glfwLockMutex(gRenderMutex);
@@ -39,7 +41,7 @@ void RetrieveFromRenderSystem(RenderBuffer** out) {
 	}
 }
 
-void RetrieveFromSceneSystem(RenderBuffer** out) {
+void RenderSystem::RetrieveFromSceneSystem(RenderBuffer** out) {
 	if (!mRenderQueue.read(*out)) {
 		//puts("waiting on scene...");
 		glfwLockMutex(gSceneMutex);
@@ -49,16 +51,15 @@ void RetrieveFromSceneSystem(RenderBuffer** out) {
 	}
 }
 
-void SubmitToSceneSystem(RenderBuffer* vbuf) {
+void RenderSystem::SubmitToSceneSystem(RenderBuffer* vbuf) {
 	glfwLockMutex(gRenderMutex);
+	Clear(vbuf);
 	auto result = mSceneQueue.write(vbuf);
 	ASSERT(result); // eek?
 	glfwUnlockMutex(gRenderMutex);
 	glfwSignalCond(gRenderCondition);
 }
 
-void Render(RenderBuffer* vbuf) {
-	ScriptRender(vbuf);
-}
-
+void RenderSystem::Render(RenderBuffer* vbuf) {
+	CircleSystem::inst.Render(vbuf);
 }

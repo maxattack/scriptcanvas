@@ -62,5 +62,4 @@ inline void SetRadius(ID node, float r) {
 } // CircleSystem
 
 void ScriptInitialize();
-void ScriptUpdate();
-void ScriptRender(RenderBuffer* vbuf);
+void ScriptPaint();

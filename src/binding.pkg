@@ -4,7 +4,7 @@ $#include "Script.h"
 typedef unsigned int ID;
 typedef unsigned int uint32_t;
 
-void ScriptUpdate @ paint();	
+void ScriptPaint @ paint();	
 
 namespace SceneSystem {
 

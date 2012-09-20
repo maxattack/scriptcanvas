@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <cstring>
 
-namespace SceneSystem {
-
 //------------------------------------------------------
 // INTERNAL DATA
 //------------------------------------------------------
@@ -62,7 +60,7 @@ static NodeSlot& Slot(ID id) {
 }
 
 static PoseData& Pose(ID id) {
-	ASSERT(NodeValid(id));
+	ASSERT(SceneSystem::NodeValid(id));
 	return sNodePoses[sNodeSlots[id&0xffff].poseIndex];
 }
 
@@ -70,7 +68,7 @@ static PoseData& Pose(ID id) {
 // PUBLIC METHODS
 //------------------------------------------------------
 
-void Initialize() {
+void SceneSystem::Initialize() {
 	memset(sComponentManagers, 0, MAX_COMPONENT_TYPES * sizeof(IManager*));
 	#if !NO_DAG_SORT
 	mFirstInvalidDagIndex = -1;
@@ -86,16 +84,16 @@ void Initialize() {
 	}
 }
 
-bool NodeValid(ID id) {
+bool SceneSystem::NodeValid(ID id) {
 	NodeSlot& slot = sNodeSlots[id & 0xffff];
 	return slot.id == id && slot.poseIndex != USHRT_MAX;
 }
 
-int NodeCount() {
+int SceneSystem::NodeCount() {
 	return sNodeCount;
 }
 
-ID CreateNode(ID parent) {
+ID SceneSystem::CreateNode(ID parent) {
 	ASSERT(sNodeCount < MAX_NODES);
 	// Allocate a new node at the end of the buffer
 	// Dequeue a slot
@@ -118,7 +116,7 @@ ID CreateNode(ID parent) {
 	return slot.id;
 }
 
-void AttachNode(ID parent, ID child) {
+void SceneSystem::AttachNode(ID parent, ID child) {
 	ASSERT(parent != child);
 	auto& childData = Slot(child);
 	// check existing parents
@@ -153,7 +151,7 @@ void AttachNode(ID parent, ID child) {
 	#endif
 }
 
-void DetachNode(ID child) {
+void SceneSystem::DetachNode(ID child) {
 	auto& data = Slot(child);
 	if (data.parent) {
 		auto& parent = Slot(data.parent);
@@ -167,15 +165,15 @@ void DetachNode(ID child) {
 	}
 }
 
-ID Parent(ID node) {
+ID SceneSystem::Parent(ID node) {
 	return Slot(node).parent;
 }
 
-ChildIterator::ChildIterator(ID node) {
+SceneSystem::ChildIterator::ChildIterator(ID node) {
 	current = Slot(node).firstChild;
 }
 
-bool ChildIterator::Next(ID *outNode) {
+bool SceneSystem::ChildIterator::Next(ID *outNode) {
 	if (current) {
 		*outNode = current;
 		current = Slot(current).nextSibling;
@@ -185,11 +183,11 @@ bool ChildIterator::Next(ID *outNode) {
 	}
 }
 
-uint16_t Index(ID node) {
+uint16_t SceneSystem::Index(ID node) {
 	return Slot(node).poseIndex;
 }
 
-transform& LocalToParent(ID node) {
+transform& SceneSystem::LocalToParent(ID node) {
 	return Pose(node).localToParent;
 }
 
@@ -201,7 +199,7 @@ static transform ComputeLocalToWorld(const PoseData& pose) {
 	}
 }
 
-transform LocalToWorld(ID node) {
+transform SceneSystem::LocalToWorld(ID node) {
 	return ComputeLocalToWorld(Pose(node));
 }
 
@@ -217,7 +215,7 @@ static void Update(RenderBuffer *vbuf, uint16_t i) {
 
 #endif
 
-void Update(RenderBuffer *vbuf) {
+void SceneSystem::Update(RenderBuffer *vbuf) {
 	
 	#if NO_DAG_SORT
 	// have to walk the heirarchy recursively :P
@@ -315,36 +313,36 @@ void Update(RenderBuffer *vbuf) {
 	#endif
 }
 
-void RegisterComponentManager(ID componentType, IManager* pMgr) {
+void SceneSystem::RegisterComponentManager(ID componentType, IManager* pMgr) {
 	ASSERT((componentType) < MAX_COMPONENT_TYPES);
 	ASSERT(sComponentManagers[componentType] == 0);
 	pMgr->Initialize();
 	sComponentManagers[componentType] = pMgr;
 }
 
-void AddComponent(ID node, ID componentType) {
+void SceneSystem::AddComponent(ID node, ID componentType) {
 	ASSERT(sComponentManagers[componentType]);
 	ASSERT(!HasComponent(node, componentType));
 	Slot(node).componentMask |= (0x80000000 >> componentType);
 	sComponentManagers[componentType]->CreateComponent(node);
 }
 
-bool HasComponent(ID node, ID componentType) {
+bool SceneSystem::HasComponent(ID node, ID componentType) {
 	return Slot(node).componentMask & (0x80000000 >> componentType);
 }
 
-void RemoveComponent(ID node, ID componentType) {
+void SceneSystem::RemoveComponent(ID node, ID componentType) {
 	ASSERT(sComponentManagers[componentType]);
 	ASSERT(HasComponent(node, componentType));
 	sComponentManagers[componentType]->DestroyComponent(node);
 	Slot(node).componentMask ^= (0x80000000 >> componentType);
 }
 
-ComponentIterator::ComponentIterator(ID node) {
+SceneSystem::ComponentIterator::ComponentIterator(ID node) {
 	mask = Slot(node).componentMask;
 }
 
-bool ComponentIterator::Next(ID *outComponentType) {
+bool SceneSystem::ComponentIterator::Next(ID *outComponentType) {
 	if (mask) {
 		*outComponentType = __builtin_clz(mask);
 		mask ^= (0x80000000 >> (*outComponentType));
@@ -355,7 +353,7 @@ bool ComponentIterator::Next(ID *outComponentType) {
 
 }
 
-void DestroyNode(ID node) {
+void SceneSystem::DestroyNode(ID node) {
 	ASSERT(NodeValid(node));
 	DetachNode(node);
 	// tear down children
@@ -405,6 +403,4 @@ void DestroyNode(ID node) {
 	slot.poseIndex = USHRT_MAX;
 	sNodeSlots[sNodeFreelistEnqueue].nextFreeSlot = node & 0xffff;
 	sNodeFreelistEnqueue = node & 0xffff;
-}
-
 }

@@ -6,10 +6,7 @@ typedef uint32_t ID;
 
 struct RenderBuffer;
 
-// Interface for component systems
 struct IManager {
-	virtual void Initialize();
-	virtual void Destroy();
 
 	// SCENE THREAD
 	virtual bool CreateComponent(ID node) = 0;
@@ -17,5 +14,8 @@ struct IManager {
 	virtual void Update(RenderBuffer *vbuf) = 0;
 
 	// RENDER THREAD
+	virtual void Initialize();
 	virtual void Render(RenderBuffer *vbuf) = 0;
+	virtual void Destroy();
+
 };

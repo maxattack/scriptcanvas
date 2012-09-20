@@ -21,8 +21,10 @@
 #ifdef DEBUG
 #   define ASSERT(cond) (assert(cond))
 #   define LOG(_x)   printf _x
+#	define LOG_INT(_expr)	printf("%s:%d " #_expr " = %d\n", __FILE__, __LINE__, (_expr))
 #else
 #   define ASSERT(cond)
 #   define LOG(_x)
+#	define LOG_INT(_expr)
 #endif
 
