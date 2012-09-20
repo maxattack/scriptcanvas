@@ -8,10 +8,10 @@ function createPlanet(x, y, color, radius)
 	return result
 end
 
-local planetx = createPlanet(100, 100, 0xffffff, 48)
+local planetx = createPlanet(100, 100, 0x444488, 48)
 local sun = createPlanet(400, 400, 0xffff00, 32)
-local urth = createPlanet(128, 0, 0x000000, 24)
-local moon = createPlanet(48, 0, 0x000000, 12)	
+local urth = createPlanet(128, 0, 0x8888ff, 24)
+local moon = createPlanet(48, 0, 0x888888, 12)	
 attachTo(sun, urth)
 attachTo(urth, moon)
 

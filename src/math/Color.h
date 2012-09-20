@@ -16,14 +16,14 @@ struct color {
 	void ToFloatRGB(float *outR, float *outG, float *outB) {
 		*outR = r /255.f;
 		*outG = g / 255.f;
-		*outB = g / 255.f;
+		*outB = b / 255.f;
 	}
 
 	void ToFloatARGB(float *outR, float *outG, float *outB, float *outA) {
 		*outA = a / 255.f;
 		*outR = r /255.f;
-		*outG = g/255.f;
-		*outB = g / 255.f;
+		*outG = g /255.f;
+		*outB = b / 255.f;
 	}
 };
 

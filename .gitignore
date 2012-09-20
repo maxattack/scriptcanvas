@@ -1,4 +1,5 @@
 **/*.o
 src/binding.cpp
 src/binding.h
+tools/tolua++
 bubble
