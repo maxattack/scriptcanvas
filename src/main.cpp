@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     RenderSystem::Initialize();
     InputSystem::Initialize();
     glfwSetMousePosCallback(InputSystem::SetMousePosition);
-    Script::Initialize();
+    ScriptInitialize();
 
     // initialize communication channels
     static RenderBuffer buf0;
@@ -67,26 +67,13 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-namespace SceneSystem {
-
-void Paint() {
-    RenderBuffer *vbuf;
-    RenderSystem::RetrieveFromRenderSystem(&vbuf);
-    SceneSystem::Update(vbuf);
-    Script::Update(vbuf);
-    RenderSystem::SubmitToRenderSystem(vbuf);
-}
-
-}
-
 void game(void* ctxt) {
     // run scripts
-    lua_State* virtualMachine = luaL_newstate();
-    luaL_openlibs(virtualMachine);
+    auto virtualMachine = luaL_newstate();    // todo: hook memory allocator
+    luaL_openlibs(virtualMachine);                  // todo: limit libs
     tolua_bubbles_open(virtualMachine);
-    luaL_loadfile(virtualMachine, "src/main.lua");
-    lua_call(virtualMachine, 0, 0);    
+    luaL_loadfile(virtualMachine, "src/main.lua");  // todo: hook physFS
+    lua_call(virtualMachine, 0, 0);                 // todo: handle panic
     lua_close(virtualMachine);
-
-    // todo: handle errors, termination
+    // todo: terminate at script end
 }

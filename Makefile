@@ -3,13 +3,14 @@
 
 BIN = bubble
 CC = clang
+OFLAG = -Os
 CXXC = clang++
-CFLAGS = -O4 -g -fno-common -I/usr/local/include -Wall -Werror -DDEBUG=1 -Wno-unused-variable
+CFLAGS = -g -fno-common -I/usr/local/include -Wall -Werror -Wno-unused-variable $(OFLAG)
 CXXFLAGS = -fno-exceptions -fno-rtti -std=c++11 -stdlib=libc++
-LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw
+LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw $(OFLAG)
 
-CFLAGS += -DLUA_USE_LINUX
-
+CFLAGS += -DDEBUG
+CFLAGS += -DLUA_USE_POSIX
 #CFLAGS += -DNO_DAG_SORT
 
 OBJS = \
@@ -61,19 +62,19 @@ OBJS = \
 $(BIN): $(OBJS)
 	$(CC) $(OBJS) -o $(BIN) $(LFLAGS)
 
-tools/tolua++: tolua/*
-	gcc tolua/*.c src/lua/*.c src/tolua_*.c -o tools/tolua++
+tools/tolua++: tolua/* src/lua/* src/tolua_*
+	$(CC) tolua/*.c src/lua/*.c src/tolua_*.c -o tools/tolua++
 
 src/binding.cpp src/binding.h :  tools/tolua++ src/bubbles.pkg
 	tools/tolua++ -o src/binding.cpp -H src/binding.h src/bubbles.pkg
 
-%.o : %.cpp src/binding.cpp
+%.o : %.cpp src/binding.h
 	$(CXXC) $(CFLAGS) $(CXXFLAGS) -c $< -o $@
 
 %.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-run: $(BIN) src/main.lua
+run: $(BIN)
 	./bubble main.lua
 
 clean:

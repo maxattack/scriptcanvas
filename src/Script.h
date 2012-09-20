@@ -8,8 +8,6 @@
 
 namespace SceneSystem {
 
-void Paint();
-
 inline void GetPosition(ID node, float *x=0, float *y=0) {
 	auto position = LocalToParent(node).t;
 	*x = position.x;
@@ -63,19 +61,6 @@ inline void SetRadius(ID node, float r) {
 
 } // CircleSystem
 
-namespace Script {
-	
-inline void Initialize() {
-	SceneSystem::RegisterComponentManager(COMPONENT_CIRCLE, &CircleSystem::inst);
-}
-
-inline void Update(RenderBuffer* vbuf) {
-	CircleSystem::inst.Update(vbuf);
-}
-
-inline void Render(RenderBuffer* vbuf) {
-	CircleSystem::inst.Render(vbuf);
-}
-	
-} // Script
-
+void ScriptInitialize();
+void ScriptUpdate();
+void ScriptRender(RenderBuffer* vbuf);

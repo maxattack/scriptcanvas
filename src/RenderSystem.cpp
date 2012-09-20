@@ -58,7 +58,7 @@ void SubmitToSceneSystem(RenderBuffer* vbuf) {
 }
 
 void Render(RenderBuffer* vbuf) {
-	Script::Render(vbuf);
+	ScriptRender(vbuf);
 }
 
 }

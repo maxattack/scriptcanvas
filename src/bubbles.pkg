@@ -4,6 +4,8 @@ $#include "Script.h"
 typedef unsigned int ID;
 typedef unsigned int uint32_t;
 
+void ScriptUpdate @ paint();	
+
 namespace SceneSystem {
 
 	// SceneSystem Functions
@@ -22,8 +24,6 @@ namespace SceneSystem {
 	void SetPosition @ setPosition(ID node, float x, float y);
 	float GetRotation @ rotationOf(ID node);
 	void SetRotation @ setRotation(ID node, float degrees);
-
-	void Paint @ paint();	
 
 }
 
@@ -44,6 +44,7 @@ namespace InputSystem {
 }
 
 $[
+
 scene = SceneSystem
 circle = CircleSystem
 input = InputSystem
@@ -55,4 +56,5 @@ function import(ns)
 		_G[key] = value
 	end
 end
+
 $]
