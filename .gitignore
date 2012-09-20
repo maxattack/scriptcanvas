@@ -4,4 +4,5 @@ src/math/*.o
 src/binding.cpp
 src/binding.h
 tools/tolua++
+**dSYM**
 bubble
