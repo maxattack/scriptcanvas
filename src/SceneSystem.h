@@ -22,10 +22,6 @@ namespace SceneSystem {
 // be considered cache-friendly and concurrency-friendly.
 //------------------------------------------------------------------------------
 
-// Constants
-#define MAX_NODES 				1024
-#define MAX_COMPONENT_TYPES		32
-
 // Initialize the scene system
 void Initialize();
 

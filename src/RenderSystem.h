@@ -1,12 +1,11 @@
 #pragma once
 #include "SceneSystem.h"
-#include "math/color.h"
+#include "CircleManager.h"
 
 struct CircleCommand {
 	uint16_t queue;
 	uint16_t transform;
-	float radius;
-	color fill;
+	Circle properties;
 };
 
 struct RenderBuffer {

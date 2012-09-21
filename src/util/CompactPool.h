@@ -22,7 +22,7 @@ to the comments.
 #include <limits.h>
 #include "Macros.h"
 #include "Alloc.h"
-#include "../BaseSystem.h"
+#include "Types.h"
 
 #define MAX_CAPACITY (64*1024)
 
@@ -32,15 +32,15 @@ struct CompactPoolSlot {
     uint16_t next;
 };
 
-template<typename T, int Capacity>
+template<typename T, int N>
 class CompactPool {
 private:
     uint32_t mCount;
     uint16_t mFreelistEnqueue;
     uint16_t mFreelistDequeue;
-    CompactPoolSlot mSlot[Capacity];
-	uint16_t mBackBuffer[Capacity];
-    T mBuffer[Capacity];
+    CompactPoolSlot mSlot[N];
+	uint16_t mBackBuffer[N];
+    T mBuffer[N];
 
 public:
     CompactPool();
@@ -63,22 +63,22 @@ public:
     T* End() { return mBuffer + mCount; }
 };
 
-template<typename T, int Capacity>
-CompactPool<T, Capacity>::CompactPool() : 
+template<typename T, int N>
+CompactPool<T, N>::CompactPool() : 
     mCount(0), 
-    mFreelistEnqueue(Capacity-1), 
+    mFreelistEnqueue(N-1), 
     mFreelistDequeue(0) {
-    ASSERT(Capacity <= MAX_CAPACITY);
+    ASSERT(N <= MAX_CAPACITY);
     // initialize the free queue linked-list
-    for(unsigned i=0; i<Capacity; ++i) {
+    for(unsigned i=0; i<N; ++i) {
         mSlot[i].id = i;
         mSlot[i].next = i+1;
     }
 }
 
-template<typename T, int Capacity>
-ID CompactPool<T, Capacity>::TakeOut() {
-    ASSERT(mCount < Capacity);
+template<typename T, int N>
+ID CompactPool<T, N>::TakeOut() {
+    ASSERT(mCount < N);
     // dequeue a new index record - we do this in FIFO order so that
     // we don't "thrash" a record with interleaved add-remove calls
     // and use up the higher-order bits of the id
@@ -94,8 +94,8 @@ ID CompactPool<T, Capacity>::TakeOut() {
 	return in.id;
 }
 
-template<typename T, int Capacity>
-void CompactPool<T, Capacity>::PutBack(ID id) {
+template<typename T, int N>
+void CompactPool<T, N>::PutBack(ID id) {
     // assuming IDs are valid in production
     ASSERT(IsActive(id));
     // lookup the index record

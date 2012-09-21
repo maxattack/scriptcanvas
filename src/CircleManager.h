@@ -1,6 +1,7 @@
 #pragma once
 #include <GL/glfw.h>
-#include "util/SceneUtil.h"
+#include "SceneSystem.h"
+#include "util/CompactComponentPool.h"
 #include "math/color.h"
 
 struct Circle {

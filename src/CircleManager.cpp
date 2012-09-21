@@ -57,7 +57,7 @@ Circle CircleManager::operator[](ID node) const {
 void CircleManager::Update(RenderBuffer* vbuf) {
     for(auto p=mSlots.Begin(); p!=mSlots.End(); ++p) {
         // todo: culling?
-        CircleCommand cmd = { 0, SceneSystem::Index(p->node), p->circle.radius, p->circle.fill };
+        CircleCommand cmd = { 0, SceneSystem::Index(p->node), p->circle };
         vbuf->circles[vbuf->circleCount++] = cmd;
     }
 }
@@ -79,9 +79,9 @@ void CircleManager::Render(RenderBuffer* vbuf) {
                 w.t.x, w.t.y, 0, 1
             };
             glLoadMatrixf(mat);
-            glUniform1f(mUniformRadius, cmd.radius);
+            glUniform1f(mUniformRadius, cmd.properties.radius);
             float r,g,b;
-            cmd.fill.ToFloatRGB(&r, &g, &b);
+            cmd.properties.fill.ToFloatRGB(&r, &g, &b);
             glUniform4f(mUniformColor, r, g, b, 1.f);
             glVertexAttribPointer(mAttribUnit, 2, GL_FLOAT, GL_FALSE, 0, 0);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 64);

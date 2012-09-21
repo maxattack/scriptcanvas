@@ -1,5 +1,5 @@
 #pragma once
-#include "../SceneSystem.h"
+#include "Types.h"
 
 
 // A utility for making component buffers
@@ -31,6 +31,7 @@ CompactComponentPool<T>::CompactComponentPool() : mCount(0) {
 
 template<typename T>
 void CompactComponentPool<T>::Alloc(ID node) {
+	ASSERT(mCount < MAX_NODES);
 	mIndex[node & 0xffff] = mCount;
 	mCount++;
 }
@@ -38,8 +39,10 @@ void CompactComponentPool<T>::Alloc(ID node) {
 template<typename T>
 void CompactComponentPool<T>::Free(ID node) {
 	mCount--;
-	mBuffer[mIndex[node & 0xffff]] = mBuffer[mCount];
-	mIndex[mCount] = mIndex[node & 0xffff];
+	if (mCount > 0) {
+		mBuffer[mIndex[node & 0xffff]] = mBuffer[mCount];
+		mIndex[mBuffer[mCount].node] = mIndex[node & 0xffff];
+	}
 }
 
 template<typename T>

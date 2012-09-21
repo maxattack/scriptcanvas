@@ -25,6 +25,7 @@ OBJS = \
 	src/main.o \
 	src/CircleManager.o \
 	src/InputSystem.o \
+	src/RegularPolygonManager.o \
 	src/RenderSystem.o \
 	src/SceneSystem.o \
 	src/Script.o \

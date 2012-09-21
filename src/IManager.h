@@ -1,8 +1,5 @@
 #pragma once
-#include <limits.h>
-#include <stdint.h>
-
-typedef uint32_t ID;
+#include "util/Types.h"
 
 struct RenderBuffer;
 
