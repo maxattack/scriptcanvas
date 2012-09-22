@@ -9,6 +9,7 @@ LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw $(O
 
 CFLAGS += -DLUA_USE_POSIX
 #CFLAGS += -DNO_DAG_SORT
+#CFLAGS += -DNO_SIMD
 
 ifeq ($(PRODUCTION),1)
 CFLAGS += -O4
