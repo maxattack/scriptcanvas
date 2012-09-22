@@ -1,23 +1,18 @@
-// ScriptCanvas: An Artful, Interactive Canvas
-// Copyright (C) 2011 max.kaufmann@gmail.com
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 #pragma once
 #include <cmath>
+#include <stdint.h>
 
-#define kTau (M_PI+M_PI)
+inline float Clamp(float u, float lo=0.f, float hi=1.f) {
+  return u<lo?lo:u>hi?hi:u;
+}
+
+inline float Clamp01(uint8_t byte) {
+  return (byte*255.f) / 255.f;
+}
+
+#define kTau            (M_PI+M_PI)
+#define kColinearSlop   (0.0001f)
+
 
 struct float2;
 inline float2 Float2(float x, float y);
@@ -71,3 +66,62 @@ inline float Dot(float2 u, float2 v) { return u.x*v.x + u.y*v.y; }
 inline float Cross(float2 u, float2 v) { return u.x * v.y - v.x* u.y; }
 inline float2 Lerp(float2 u, float2 v, float t) { return u + t * (v - u); }
 
+
+bool LinearIntersection(float2 u0, float2 u1, float2 v0, float2 v1, float& u);
+bool LinearIntersection(float2 u0, float2 u1, float2 v0, float2 v1, float& u, float& v);
+
+float2 QuadraticBezier(float2 p0, float2 p1, float2 p2, float u);
+float2 QuadraticBezierDeriv(float2 p0, float2 p1, float2 p2, float u);
+float2 CubicBezier(float2 p0, float2 p1, float2 p2, float2 p3, float u);
+float2 CubicBezierDeriv(float2 p0, float2 p1, float2 p2, float2 p3, float u);
+float2 CubicHermite(float2 p0, float2 m0, float2 p1, float2 m1, float u);
+float2 CubicHermiteDeriv(float2 p0, float2 m0, float2 p1, float2 m1, float u);
+
+
+struct transform;
+inline transform Transform(float2 q=Float2(1,0), float2 t=Float2(0,0));
+
+struct transform {
+
+  float2 q;
+  float2 t;
+
+  float2 TransformPoint(float2 p) const { return q*p + t; }
+  float2 TransformVector(float2 v) const { return q*v; }
+  float2 InvTransformPoint(float2 p) const { return (p - t)/q; }
+  float2 InvTransformVector(float2 v) const { return v/q; }
+
+  bool Identity() const { 
+    return t.Norm() < 0.001f && (q-Float2(1,0)).Norm() < 0.001f; 
+  }
+  
+  transform Inverse() const { 
+    float2 qInv = Float2(1,0)/q;
+    return Transform(qInv, -t*qInv);
+  }
+
+  transform operator*(transform u) const { 
+    return Transform(q*u.q, u.q*t + u.t);
+  }
+};
+
+inline transform Transform(float2 q, float2 t) {
+  transform result = { q, t };
+  return result;
+}
+
+inline transform Translation(float2 t) {
+  return Transform(Float2(1,0), t);
+}
+
+inline transform Rotation(float radians) {
+  return Transform(Polar(1,radians), Float2(0,0));
+}
+
+inline transform Scale(float k) {
+  return Transform(Float2(k,0), Float2(0,0));
+}
+
+inline transform TRS(float2 t, float radians, float scale) {
+  return Transform(Polar(scale, radians), t);
+}

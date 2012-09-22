@@ -3,7 +3,6 @@
 #include <cstring>
 #include "CircleManager.h"
 #include "RenderSystem.h"
-#include "util/Macros.h"
 
 static GLuint LoadShaderProgram(const char* filename); // make more accessible
 

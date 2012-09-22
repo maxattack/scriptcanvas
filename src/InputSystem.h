@@ -1,5 +1,5 @@
 #pragma once
-#include "math/float2.h"
+#include "Math.h"
 
 namespace InputSystem {
 

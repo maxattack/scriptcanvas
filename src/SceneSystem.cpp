@@ -1,5 +1,4 @@
 #include "RenderSystem.h"
-#include "util/Macros.h"
 #include <algorithm>
 #include <cstring>
 

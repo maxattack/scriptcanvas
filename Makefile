@@ -25,12 +25,11 @@ OBJS = \
 	src/main.o \
 	src/CircleManager.o \
 	src/InputSystem.o \
-	src/RegularPolygonManager.o \
 	src/RenderSystem.o \
 	src/SceneSystem.o \
 	src/Script.o \
 	src/binding.o \
-	src/math/Curves.o \
+	src/Math.o \
 	src/tolua_event.o \
 	src/tolua_is.o \
 	src/tolua_map.o \

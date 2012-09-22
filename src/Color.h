@@ -1,6 +1,5 @@
 #pragma once
-#include "Common.h"
-#include <stdint.h>
+#include "Math.h"
 
 struct color {
 	uint8_t a, r, g, b;

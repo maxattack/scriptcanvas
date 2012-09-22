@@ -1,6 +1,5 @@
 #pragma once
-#include "Types.h"
-
+#include "../Foundation.h"
 
 // A utility for making component buffers
 // that are keyed by node IDs by employing

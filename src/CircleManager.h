@@ -2,7 +2,7 @@
 #include <GL/glfw.h>
 #include "SceneSystem.h"
 #include "util/CompactComponentPool.h"
-#include "math/color.h"
+#include "Color.h"
 
 struct Circle {
 	float radius;

@@ -1,7 +1,13 @@
 #pragma once
-
+#include <limits.h>
+#include <stdint.h>
 #include <cstdio>
 #include <cassert>
+
+#define MAX_NODES 				1024
+#define MAX_COMPONENT_TYPES		32
+
+typedef uint32_t ID;
 
 #define STATIC_ASSERT(_x)  ((void)sizeof(char[1 - 2*!(_x)]))
 
@@ -29,4 +35,7 @@
 #   define LOG_MSG(_msg)
 #	define LOG_INT(_expr)
 #endif
+
+#define MALLOC malloc
+#define FREE free
 

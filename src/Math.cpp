@@ -14,9 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "Curves.h"
-
-static float kColinearSlop = 0.0001f;
+#include "Math.h"
 
 bool LinearIntersection(float2 u0, float2 u1, float2 v0, float2 v1, float& u) {
   float norm = (v1.y - v0.y)*(u1.x-u0.x) - (v1.x-v0.x)*(u1.y-u0.y);

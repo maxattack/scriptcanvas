@@ -1,5 +1,5 @@
 #pragma once
-#include "util/Types.h"
+#include "Foundation.h"
 
 struct RenderBuffer;
 
