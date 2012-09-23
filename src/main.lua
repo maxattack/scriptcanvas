@@ -25,10 +25,16 @@ function createNode(x, y)
 	return result
 end
 
-local p0 = createNode(200, 100)
-local p1 = createNode(200, 700)
-local noodleMaterial = spline.addMaterial(32, 0xffff77)
-spline.addSegment(p0, p1, noodleMaterial)
+local p0 = createNode(0, -50)
+local p1 = createNode(200, 100)
+local p2 = createNode(200, 600)
+local p3 = createNode(300, 850)
+setDirection(p0, 100, 100)
+setDirection(p3, 100, 100)
+local noodle = spline.addMaterial(8, 0x777755)
+spline.addSegment(p0, p1, noodle)
+spline.addSegment(p1, p2, noodle);
+spline.addSegment(p2, p3, noodle);
 
 -- game loop
 
@@ -47,8 +53,9 @@ while not isDone do
 	setPosition(planetx, 0.1*mx + 0.9*x, 0.1*my + 0.9*y)
 
 	-- noodle dance
-	setDirection(p0, 2 * (mx - 200), 2 * (my - 100))
-	setDirection(p1, 2 * (200 - mx), 2 * (700 - my))
+	setDirection(p1, (mx - 200), (my - 100))
+	setDirection(p2, (200 - mx), (600 - my))
+	spline.setWeight(noodle, 8  + 32 * (0.5 + 0.5 * sin(tau*t)))
 
 	paint()
 end

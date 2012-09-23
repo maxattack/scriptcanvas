@@ -9,14 +9,15 @@ struct Material {
 	color_t color;
 };
 
+// TODO: 4-node beziers?
 
-struct Segment {
+struct HermiteSegment {
 	ID start;
 	ID end;
 	ID material;
 };
 
-struct SegmentCommand {
+struct HermiteSegmentCommand {
 	uint16_t queue;
 	uint16_t material;
 	uint16_t start;
@@ -45,7 +46,7 @@ private:
 
 	CompactComponentPool<ControlVertexSlot> mComponents;
 	CompactPool<MaterialSlot, kMaxMaterials> mMaterials;
-	CompactPool<Segment, kMaxSegments> mSegments;
+	CompactPool<HermiteSegment, kMaxSegments> mSegments;
 
 public:
 	StatusCode Initialize();
@@ -57,9 +58,9 @@ public:
 	Material& GetMaterial(ID mid);
 	void DestroyMaterial(ID mid);
 
-	ID CreateSegment(ID start, ID end, ID mid=0);
+	ID CreateHermiteSegment(ID start, ID end, ID mid=0);
 	void SetMaterial(ID sid, ID mid);
-	void DestroySegment(ID sid);
+	void DestroyHermiteSegment(ID sid);
 
 	void CleanUpMaterials();
 

@@ -21,7 +21,7 @@ void RenderSystem::Initialize() {
 void RenderSystem::Clear(RenderBuffer *vbuf) {
 	vbuf->circleCount = 0;
     vbuf->materialCount = 0;
-    vbuf->segmentCount = 0;
+    vbuf->hermiteSegmentCount = 0;
 }
 
 void RenderSystem::SubmitToRenderSystem(RenderBuffer* vbuf) {

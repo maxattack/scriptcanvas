@@ -89,7 +89,6 @@ void ScriptPaint() {
     RenderSystem::RetrieveFromRenderSystem(&vbuf);
     RenderSystem::Clear(vbuf);
     SceneSystem::Update(vbuf);
-    vbuf->circleCount = 0;
 
     // TODO: dispatch updating through SceneSystem
     CircleSystem::gInst.Update(vbuf);

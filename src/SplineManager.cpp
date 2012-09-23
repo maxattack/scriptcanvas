@@ -54,7 +54,7 @@ StatusCode SplineManager::DestroyComponent(ID node) {
 		auto p = mSegments.Begin();
 		while(p != mSegments.End()) {
 			if (p->start == node || p->end == node) {
-				DestroySegment(mSegments.GetID(p));
+				DestroyHermiteSegment(mSegments.GetID(p));
 			} else {
 				++p;
 			}
@@ -88,7 +88,7 @@ void SplineManager::DestroyMaterial(ID mid) {
 	mMaterials.PutBack(mid);
 }
 
-ID SplineManager::CreateSegment(ID start, ID end, ID mid) {
+ID SplineManager::CreateHermiteSegment(ID start, ID end, ID mid) {
 	using namespace SceneSystem;
 	ASSERT(start != end);
 	if (!HasComponent(start, kComponentSpline)) {
@@ -119,7 +119,7 @@ void SplineManager::SetMaterial(ID sid, ID mid) {
 	}
 }
 
-void SplineManager::DestroySegment(ID sid) {
+void SplineManager::DestroyHermiteSegment(ID sid) {
 	using namespace SceneSystem;
 	auto& seg = mSegments[sid];
 	if (seg.material) {
@@ -143,23 +143,23 @@ StatusCode SplineManager::Update(RenderBuffer *vbuf) {
 		vbuf->materialCount++;
 	}
 	for(auto p=mSegments.Begin(); p!=mSegments.End(); ++p) {
-		SegmentCommand cmd = { 0, mMaterials.Index(p->material), SceneSystem::Index(p->start), SceneSystem::Index(p->end) };
-		vbuf->segments[vbuf->segmentCount] = cmd;
-		vbuf->segmentCount++;
+		HermiteSegmentCommand cmd = { 0, mMaterials.Index(p->material), SceneSystem::Index(p->start), SceneSystem::Index(p->end) };
+		vbuf->hermiteSegments[vbuf->hermiteSegmentCount] = cmd;
+		vbuf->hermiteSegmentCount++;
 	}
 	return OK;
 }
 
 StatusCode SplineManager::Render(RenderBuffer *vbuf) {
-	if (vbuf->segmentCount) {
+	if (vbuf->hermiteSegmentCount) {
 	    glUseProgram(mProgram);
 	    glEnableClientState(GL_VERTEX_ARRAY);
 	    glEnableVertexAttribArray(mAttribParameterAndSide);
 	    glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
 	    glLoadIdentity();
 	    // TODO: sort by material?
-	    for(int i=0; i<vbuf->segmentCount; ++i) {
-	    	auto& segment = vbuf->segments[i];
+	    for(int i=0; i<vbuf->hermiteSegmentCount; ++i) {
+	    	auto& segment = vbuf->hermiteSegments[i];
 	    	auto& mat = vbuf->materials[segment.material];
 	    	auto& start = vbuf->transforms[segment.start].t;
 	    	auto& end = vbuf->transforms[segment.end].t;

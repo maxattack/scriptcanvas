@@ -13,13 +13,13 @@ struct RenderBuffer {
 	int circleCount;
 
 	int materialCount;
-	int segmentCount;
+	int hermiteSegmentCount;
 
 	// buffers (one shared, compact buffer?)
 	ztransform transforms[kMaxNodes];
 	CircleCommand circles[kMaxNodes];
 	Material materials[kMaxMaterials];
-	SegmentCommand segments[kMaxSegments];
+	HermiteSegmentCommand hermiteSegments[kMaxSegments];
 	
 };
 

@@ -86,8 +86,8 @@ inline void SetColor(ID mat, uint32_t color) {
 	gInst.GetMaterial(mat).color = RGB(color);
 }
 
-inline ID CreateSegment(ID start, ID end, ID mat) {
-	return gInst.CreateSegment(start, end, mat);
+inline ID CreateHermiteSegment(ID start, ID end, ID mat) {
+	return gInst.CreateHermiteSegment(start, end, mat);
 }
 
 } // SplineSystem

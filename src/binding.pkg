@@ -51,7 +51,7 @@ namespace SplineSystem {
 	uint32_t Color @ color(ID mat);
 	void SetWeight @ setWeight(ID mat, float weight);
 	void SetColor @ setColor(ID mat, uint32_t color);
-	ID CreateSegment @ addSegment(ID start, ID end, ID mat);
+	ID CreateHermiteSegment @ addSegment(ID start, ID end, ID mat);
 
 } // SplineSystem
 
