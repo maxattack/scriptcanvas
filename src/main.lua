@@ -4,7 +4,7 @@ import(math)
 function createPlanet(x, y, color, radius)
 	local result = addNode()
 	setPosition(result, x, y)
-	circle.create(result, color, radius)
+	circle.add(result, color, radius)
 	return result
 end
 
