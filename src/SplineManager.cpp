@@ -10,7 +10,7 @@ struct vertex_t {
 
     void SetValue(float param, float side) {
     	u = param;
-    	uu = u*u;
+    	uu = u * u;
     	uuu = uu * u;
     	s = side;
     }
@@ -76,10 +76,6 @@ Material& SplineManager::GetMaterial(ID mid) {
 	return mMaterials[mid].mat;
 }
 
-Material SplineManager::GetMaterial(ID mid) const {
-	return mMaterials[mid].mat;
-}
-
 void SplineManager::DestroyMaterial(ID mid) {
 	// remove references from segments using this material
 	if (mMaterials[mid].refCount > 0) {
@@ -142,12 +138,10 @@ void SplineManager::DestroySegment(ID sid) {
 
 StatusCode SplineManager::Update(RenderBuffer *vbuf) {
 	// TODO: Culling
-	vbuf->materialCount = mMaterials.Count();
 	for(auto p=mMaterials.Begin(); p!=mMaterials.End(); ++p) {
 		vbuf->materials[vbuf->materialCount] = p->mat;
 		vbuf->materialCount++;
 	}
-
 	for(auto p=mSegments.Begin(); p!=mSegments.End(); ++p) {
 		SegmentCommand cmd = { 0, mMaterials.Index(p->material), SceneSystem::Index(p->start), SceneSystem::Index(p->end) };
 		vbuf->segments[vbuf->segmentCount] = cmd;
@@ -177,6 +171,7 @@ StatusCode SplineManager::Render(RenderBuffer *vbuf) {
 
 	    	auto posMatrix = HermiteMat(p0, p1, t0, t1);
 	    	auto normMatrix = HermiteNormMat(p0, p1, t0, t1);
+	    	//LOG_FLOAT(mat.weight);
 
 		    glUniform1f(mUniformThickness, mat.weight);
 		    glUniformMatrix4fv(mUniformPositionMatrix, 1, GL_FALSE, posMatrix.m);
@@ -187,6 +182,7 @@ StatusCode SplineManager::Render(RenderBuffer *vbuf) {
 			glUniform4f(mUniformColor, r, g, b, 1.f);
 
 		    glVertexAttribPointer(mAttribParameterAndSide, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
 		    glDrawArrays(GL_TRIANGLE_STRIP, 0, kSegmentResolution);
 	    }
 

@@ -43,12 +43,12 @@ while not isDone do
 	setPosition(sun, mx, my)
 	setRotation(sun, -0.11*360*t)
 	setRotation(urth, 360*t)
-	local x,y = positionOf(planetx)
+	local x,y = position(planetx)
 	setPosition(planetx, 0.1*mx + 0.9*x, 0.1*my + 0.9*y)
 
 	-- noodle dance
-	setDirection(p0, mx - 200, my - 100)
-	setDirection(p1, 200 - mx, 700 - my)
+	setDirection(p0, 2 * (mx - 200), 2 * (my - 100))
+	setDirection(p1, 2 * (200 - mx), 2 * (700 - my))
 
 	paint()
 end

@@ -55,7 +55,6 @@ public:
 
 	ID CreateMaterial(float weight=8.f, color_t color=ARGB(0xffffffff));
 	Material& GetMaterial(ID mid);
-	Material GetMaterial(ID mid) const;
 	void DestroyMaterial(ID mid);
 
 	ID CreateSegment(ID start, ID end, ID mid=0);

@@ -20,9 +20,9 @@ namespace SceneSystem {
 	void DestroyNode @ destroyNode(ID node);
 
 	// SceneSystem Util Functions
-	void GetPosition @ positionOf(ID node, float *x=0, float *y=0);
+	void GetPosition @ position(ID node, float *x=0, float *y=0);
 	void SetPosition @ setPosition(ID node, float x, float y);
-	float GetRotation @ rotationOf(ID node);
+	float GetRotation @ rotation(ID node);
 	void SetRotation @ setRotation(ID node, float degrees);
 	void SetDirection @ setDirection(ID node, float dx, float dy);
 

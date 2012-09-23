@@ -51,7 +51,6 @@ public:
 
 	
     T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[mSlot[id & 0xffff].index]; }
-    T operator[](ID id) const { ASSERT(IsActive(id)); return mBuffer[mSlot[id & 0xffff].index]; }
     ID TakeOut();
     void PutBack(ID id);
     
