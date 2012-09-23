@@ -405,7 +405,7 @@ union mat4 {
         v = vaddq_f32(iMatrix.val[0], iMatrix.val[2]);
         
         return *(vec4 *)&v;
-    #elif defined(GLK_SSE3_INTRINSICS)
+    #elif USE_SSE3
       const __m128 v = _mm_load_ps(&vectorRight.values[0]);
       const __m128 r = _mm_load_ps(&m[0])  * _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0))
                      + _mm_load_ps(&m[4])  * _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1))
@@ -577,3 +577,13 @@ inline mat4 BezierDerivMat(vec4 p0, vec4 p1, vec4 p2, vec4 p3) {
     -3, 3, 0, 0
   );
 }
+
+inline mat4 BezierNormMat(vec4 p0, vec4 p1, vec4 t0, vec4 t1) {
+  return Mat4(
+    0, 1, 0, 0,
+    -1, 0, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+  ) * BezierDerivMat(p0, p1, t0, t1);
+}
+
