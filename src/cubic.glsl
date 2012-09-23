@@ -1,19 +1,15 @@
 #ifdef VERTEX
 
 attribute vec4 parameterAndSide;
-
 uniform float thickness;
-uniform mat4 hermite;
-uniform mat4 hermiteDeriv;
+uniform mat4 positionMatrix;
+uniform mat4 normalMatrix;
 
 void main() {
 	vec4 parameter = vec4(parameterAndSide.xyz, 1);
-	float side = parameterAndSide.w;
-	vec4 normal = normalize(hermiteDeriv * parameter);
-	normal = normal.yxzw;
-	normal .x = -normal.x;
 	gl_Position = gl_ModelViewProjectionMatrix * vec4((
-		(hermite * parameter) + (thickness * side) * normal
+		(positionMatrix * parameter) + 
+		(thickness * parameterAndSide.w) * normalize(normalMatrix * parameter)
 	).xy, 0, 1);
 }
 

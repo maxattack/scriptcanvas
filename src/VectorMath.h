@@ -530,38 +530,50 @@ inline mat4 Mat4(vec4 col0, vec4 col1, vec4 col2, vec4 col3) {
 }
 
 // VECTORIZED PARAMETRIC CURVES
-// These compute curves based on linear multiplication by a "cubic parameterc vector", e.g.:
-// U = < u^3, u^2, u, 1 >, Ax^3 + Bx^2 + Cx + D = Dot(U, <A,B,C,D>)
-// These are most useful when bound to static vertex data, for instance.
+// These compute curves based on linear multiplication by a "cubic parameterc vector":
+// U = < u^3, u^2, u, 1 >,
 
 inline mat4 HermiteMat(vec4 p0, vec4 p1, vec4 t0, vec4 t1) {
-	return Mat4(p0, p1, t0, t1) * MatTranspose4(
-		2, -3, 0, 1,
-		-2, 3, 0, 0,
-		1, -2, 1, 0,
-		1, -1, 0, 0
+	return Mat4(p0, p1, t0, t1) * Mat4(
+		2, -2, 1, 1,      // u^3
+		-3, 3, -2, -1,    // u^2
+		0, 0, 1, 0,       // u^1
+		1, 0, 0, 0        // 1
 	);
 }
 
 inline mat4 HermiteDerivMat(vec4 p0, vec4 p1, vec4 t0, vec4 t1) {
-  return Mat4(p0, p1, t0, t1) * MatTranspose4(
-    0, 6, -6, 0,
-    0, -6, 6, 0,
-    0, 3, -4, 1,
-    0, 3, -2, 0
+  return Mat4(p0, p1, t0, t1) * Mat4(
+    0, 0, 0, 0,       // 0
+    6, -6, 3, 3,      // 3 * first row
+    -6, 6, -4, -2,    // 2 * second row
+    0, 0, 1, 0        // third row
   );
 }
 
-inline mat4 CubicBezierMat(vec4 p0, vec4 p1, vec4 p2, vec4 p3) {
-	return Mat4(
+inline mat4 HermiteNormMat(vec4 p0, vec4 p1, vec4 t0, vec4 t1) {
+  return Mat4(
+    0, 1, 0, 0,
+    -1, 0, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+  ) * HermiteDerivMat(p0, p1, t0, t1);
+}
+
+inline mat4 BezierMat(vec4 p0, vec4 p1, vec4 p2, vec4 p3) {
+	return Mat4(p0, p1, p2, p3) * Mat4(
 		-1, 3, -3, 1,
 		3, -6, 3, 0,
 		-3, 3, 0, 0,
 		1, 0, 0, 0
-	) * Mat4(p0, p1, p2, p3);
+	);
 }
 
-inline mat4 QuadraticBezierMat(vec4 p0, vec4 p1, vec4 p2) {
-	// todo
-	return Mat4();
+inline mat4 BezierDerivMat(vec4 p0, vec4 p1, vec4 p2, vec4 p3) {
+  return Mat4(p0, p1, p2, p3) * Mat4(
+    0, 0, 0, 0,
+    -3, 9, -9, 3,
+    6, -12, 6, 0,
+    -3, 3, 0, 0
+  );
 }

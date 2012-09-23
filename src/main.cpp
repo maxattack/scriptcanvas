@@ -57,13 +57,13 @@ int main(int argc, char* argv[]) {
     glfwCreateThread(game, 0);
 
     // TEST hermite curves
-    auto hermiteProgram = RenderSystem::LoadShaderProgram("src/hermite.glsl");
-    glUseProgram(hermiteProgram);
-    auto attribParameterAndSide = glGetAttribLocation(hermiteProgram, "parameterAndSide");
-    auto uniformThickness = glGetUniformLocation(hermiteProgram, "thickness");
-    auto uniformHermite = glGetUniformLocation(hermiteProgram, "hermite");
-    auto uniformHermiteDeriv = glGetUniformLocation(hermiteProgram, "hermiteDeriv");
-    auto uniformColor = glGetUniformLocation(hermiteProgram, "color");
+    auto cubicProgram = RenderSystem::LoadShaderProgram("src/cubic.glsl");
+    glUseProgram(cubicProgram);
+    auto attribParameterAndSide = glGetAttribLocation(cubicProgram, "parameterAndSide");
+    auto uniformThickness = glGetUniformLocation(cubicProgram, "thickness");
+    auto uniformPositionMatrix = glGetUniformLocation(cubicProgram, "positionMatrix");
+    auto uniformNormalMatrix = glGetUniformLocation(cubicProgram, "normalMatrix");
+    auto uniformColor = glGetUniformLocation(cubicProgram, "color");
     GLuint vertexBuffer;
     {
         vertex buf[256];
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
         RenderSystem::Render(vbuf);
 
         // TEST hermite curves
-        glUseProgram(hermiteProgram);
+        glUseProgram(cubicProgram);
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableVertexAttribArray(attribParameterAndSide);
         glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -105,12 +105,12 @@ int main(int argc, char* argv[]) {
         auto t0 = Vec4(mp.x - 200, mp.y - 100);
         auto t1 = -Vec4(mp.x - 200, mp.y - 700);
 
-        auto hermiteMatrix = HermiteMat(p0, p1, t0, t1);
-        auto derivMatrix = HermiteDerivMat(p0, p1, t0, t1);
+        auto posMatrix = HermiteMat(p0, p1, t0, t1);
+        auto normMatrix = HermiteNormMat(p0, p1, t0, t1);
 
         glUniform1f(uniformThickness, 16.f + 32.f * (0.5f + 0.5f * sin(kTau * t)));
-        glUniformMatrix4fv(uniformHermite, 1, GL_FALSE, hermiteMatrix.m);
-        glUniformMatrix4fv(uniformHermiteDeriv, 1, GL_FALSE, derivMatrix.m);
+        glUniformMatrix4fv(uniformPositionMatrix, 1, GL_FALSE, posMatrix.m);
+        glUniformMatrix4fv(uniformNormalMatrix, 1, GL_FALSE, normMatrix.m);
         glUniform4f(uniformColor, 1.f, 1.f, 0.5f, 1.f);
 
         glVertexAttribPointer(attribParameterAndSide, 4, GL_FLOAT, GL_FALSE, 0, 0);
