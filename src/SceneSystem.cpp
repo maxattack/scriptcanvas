@@ -40,9 +40,9 @@ struct PoseData {
 static uint32_t sNodeCount;
 static uint16_t sNodeFreelistEnqueue;
 static uint16_t sNodeFreelistDequeue;
-static NodeSlot sNodeSlots[MAX_NODES];
-static PoseData sNodePoses[MAX_NODES];
-static IManager* sComponentManagers[MAX_COMPONENT_TYPES];
+static NodeSlot sNodeSlots[kMaxNodes];
+static PoseData sNodePoses[kMaxNodes];
+static IManager* sComponentManagers[kMaxComponentTypes];
 
 #if !NO_DAG_SORT
 static int mFirstInvalidDagIndex;
@@ -54,7 +54,7 @@ static int mLastInvalidDagIndex;
 //------------------------------------------------------
 
 static NodeSlot& Slot(ID id) {
-	ASSERT((id&0xffff)<MAX_NODES);
+	ASSERT((id&0xffff)<kMaxNodes);
 	return sNodeSlots[id & 0xffff];
 }
 
@@ -68,15 +68,15 @@ static PoseData& Pose(ID id) {
 //------------------------------------------------------
 
 void SceneSystem::Initialize() {
-	memset(sComponentManagers, 0, MAX_COMPONENT_TYPES * sizeof(IManager*));
+	memset(sComponentManagers, 0, kMaxComponentTypes * sizeof(IManager*));
 	#if !NO_DAG_SORT
 	mFirstInvalidDagIndex = -1;
 	mLastInvalidDagIndex = -1;
 	#endif
 	sNodeCount = 0;
-	sNodeFreelistEnqueue = MAX_NODES-1;
+	sNodeFreelistEnqueue = kMaxNodes-1;
 	sNodeFreelistDequeue = 0;
-	for (unsigned i=0; i<MAX_NODES; ++i) {
+	for (unsigned i=0; i<kMaxNodes; ++i) {
 		sNodeSlots[i].id = i;
 		sNodeSlots[i].poseIndex = USHRT_MAX;
 		sNodeSlots[i].nextFreeSlot = i+1;
@@ -93,7 +93,7 @@ int SceneSystem::NodeCount() {
 }
 
 ID SceneSystem::CreateNode(ID parent) {
-	ASSERT(sNodeCount < MAX_NODES);
+	ASSERT(sNodeCount < kMaxNodes);
 	// Allocate a new node at the end of the buffer
 	// Dequeue a slot
 	auto& slot = sNodeSlots[sNodeFreelistDequeue];
@@ -239,8 +239,8 @@ void SceneSystem::Update(RenderBuffer *vbuf) {
 		//	- increment read pos passed all entires that have already been written
 		
 		// could stack-alloc just enough for the slice?
-		static int scratchpad[MAX_NODES];
-		static uint8_t scratchpadMarks[MAX_NODES];
+		static int scratchpad[kMaxNodes];
+		static uint8_t scratchpadMarks[kMaxNodes];
 		memset(scratchpadMarks+mFirstInvalidDagIndex, 0, mLastInvalidDagIndex-mFirstInvalidDagIndex+1);
 		int readPos = mFirstInvalidDagIndex;
 		int writePos = readPos;
@@ -313,7 +313,7 @@ void SceneSystem::Update(RenderBuffer *vbuf) {
 }
 
 void SceneSystem::RegisterComponentManager(ID componentType, IManager* pMgr) {
-	ASSERT((componentType) < MAX_COMPONENT_TYPES);
+	ASSERT((componentType) < kMaxComponentTypes);
 	ASSERT(sComponentManagers[componentType] == 0);
 	pMgr->Initialize();
 	sComponentManagers[componentType] = pMgr;

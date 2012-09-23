@@ -5,7 +5,7 @@
 #include "RenderSystem.h"
 #include "VectorMath.h"
 
-void CircleManager::Initialize() {
+StatusCode CircleManager::Initialize() {
     mProgram = RenderSystem::LoadShaderProgram("src/circle.glsl");
     // lookup shader storage locations
     glUseProgram(mProgram);
@@ -25,35 +25,37 @@ void CircleManager::Initialize() {
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float2)*64, buffer, GL_STATIC_DRAW);
     glUseProgram(0);
+    return OK;
 }
 
-void CircleManager::Destroy() {
+StatusCode CircleManager::Destroy() {
     // todo: cleanup
+    return OK;
 }
 
-bool CircleManager::CreateComponent(ID node) {
+StatusCode CircleManager::CreateComponent(ID node) {
 	mSlots.Alloc(node);
     auto& circle = mSlots[node].circle;
     circle.radius = 1.f;
     circle.fill = RGB(0xffffff);
-    mSlots[node].node = node;
-    return true;
+    return OK;
 }
 
-bool CircleManager::DestroyComponent(ID node) {
+StatusCode CircleManager::DestroyComponent(ID node) {
     mSlots.Free(node);
-    return true;
+    return OK;
 }
 
-void CircleManager::Update(RenderBuffer* vbuf) {
+StatusCode CircleManager::Update(RenderBuffer* vbuf) {
     // TODO: Culling
     for(auto p=mSlots.Begin(); p!=mSlots.End(); ++p) {
         CircleCommand cmd = { 0, SceneSystem::Index(p->node), p->circle };
         vbuf->circles[vbuf->circleCount++] = cmd;
     }
+    return OK;
 }
 
-void CircleManager::Render(RenderBuffer* vbuf) {
+StatusCode CircleManager::Render(RenderBuffer* vbuf) {
     if (vbuf->circleCount) {
         glUseProgram(mProgram);
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -74,7 +76,7 @@ void CircleManager::Render(RenderBuffer* vbuf) {
         glDisableVertexAttribArray(mAttribUnit);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glUseProgram(0);
-
     }
+    return OK;
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Math.h"
 
-struct color {
+struct color_t {
 	uint8_t a, r, g, b;
 
 	uint32_t ARGB() const {
@@ -26,8 +26,8 @@ struct color {
 	}
 };
 
-inline color Color(float r, float g, float b, float a=1.f) {
-	color result;
+inline color_t Color(float r, float g, float b, float a=1.f) {
+	color_t result;
 	result.a = Clamp01(a);
 	result.r = Clamp01(r);
 	result.g = Clamp01(g);
@@ -35,8 +35,8 @@ inline color Color(float r, float g, float b, float a=1.f) {
 	return result;
 }
 
-inline color RGB(uint32_t rgb) {
-	color result;
+inline color_t RGB(uint32_t rgb) {
+	color_t result;
 	result.r = (rgb & 0xff0000) >> 16;
 	result.g = (rgb & 0x00ff00) >> 8;
 	result.b = (rgb & 0x0000ff);
@@ -44,8 +44,8 @@ inline color RGB(uint32_t rgb) {
 	return result;
 }
 
-inline color ARGB(uint32_t argb) {
-	color result;
+inline color_t ARGB(uint32_t argb) {
+	color_t result;
 	result.a = (argb & 0xff000000) >> 24;
 	result.r = (argb & 0x00ff0000) >> 16;
 	result.g = (argb & 0x0000ff00) >> 8;
@@ -53,4 +53,4 @@ inline color ARGB(uint32_t argb) {
 	return result;
 }
 
-color HSB(float h, float s, float b, float a=1.f);
+color_t HSB(float h, float s, float b, float a=1.f);

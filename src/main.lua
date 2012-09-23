@@ -2,7 +2,7 @@ import(scene)
 import(math)
 
 function createPlanet(x, y, color, radius)
-	local result = createNode()
+	local result = addNode()
 	setPosition(result, x, y)
 	circle.create(result, color, radius)
 	return result
@@ -16,6 +16,9 @@ attachTo(sun, urth)
 attachTo(urth, moon)
 
 local isDone = false
+
+
+
 
 while not isDone do
 	local tau = 2 * 3.14156

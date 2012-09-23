@@ -10,7 +10,7 @@ namespace SceneSystem {
 
 	// SceneSystem Functions
 	int NodeCount @ nodeCount();
-	ID CreateNode @ createNode(ID parent=0);
+	ID CreateNode @ addNode(ID parent=0);
 	void AttachNode @ attachTo(ID parent, ID child);
 	void DetachNode @ detach(ID child);
 	ID Parent @ parentOf(ID node);
@@ -29,7 +29,7 @@ namespace SceneSystem {
 
 namespace CircleSystem {
 	
-	void Create @ create(ID node, uint32_t color, float radius);
+	void Create @ add(ID node, uint32_t color, float radius);
 	void Destroy @ destroy(ID node);
 	void Fill @ fill(ID node, uint32_t *color=0);
 	void Radius @ radius(ID node, float *radius=0);
@@ -43,11 +43,24 @@ namespace InputSystem {
 	double Time @ seconds();
 }
 
+namespace SplineSystem {
+
+ID CreateMaterial @ addMaterial(float weight, uint32_t color);
+float Weight @ weight(ID mat);
+uint32_t Color @ color(ID mat);
+void SetWeight @ setWeight(ID mat, float weight);
+void SetColor @ setColor(ID mat, uint32_t color);
+ID CreateSegment @ addSegment(ID start, ID end, ID mat);
+
+} // SplineSystem
+
+
 $[
 
 scene = SceneSystem
 circle = CircleSystem
 input = InputSystem
+spline = SplineSystem
 
 function import(ns)
 	for key,value in pairs(ns) do

@@ -8,10 +8,22 @@
 #include <cassert>
 #include <GL/glfw.h>
 
-#define MAX_NODES 				1024
-#define MAX_COMPONENT_TYPES		32
+#define kMaxNodes 					1024
+#define kMaxComponentTypes			32
+
+#define kMaxSegments				1024
+#define kMaxMaterials				64
+
+#define kComponentCircle			0
+#define kComponentSpline			1
+#define kSegmentResolution			256
 
 typedef uint32_t ID;
+
+enum StatusCode {
+	OK = 0
+	// TODO: all failure codes
+};
 
 #define STATIC_ASSERT(_x)  ((void)sizeof(char[1 - 2*!(_x)]))
 

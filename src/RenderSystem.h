@@ -1,20 +1,26 @@
 #pragma once
 #include "SceneSystem.h"
 #include "CircleManager.h"
+#include "SplineManager.h"
 
-struct CircleCommand {
-	uint16_t queue;
-	uint16_t transform;
-	Circle properties;
-};
+// TODO: remove explicit commands from this header -- instead
+// individual manager write to a generic buffer which is
+// identified with their component ID.  Only the transforms
+// are known ahead of time.
 
 struct RenderBuffer {
 	// counts
 	int circleCount;
 
+	int materialCount;
+	int segmentCount;
+
 	// buffers (one shared, compact buffer?)
-	ztransform transforms[MAX_NODES];
-	CircleCommand circles[MAX_NODES];
+	ztransform transforms[kMaxNodes];
+	CircleCommand circles[kMaxNodes];
+	Material materials[kMaxMaterials];
+	SegmentCommand segments[kMaxSegments];
+	
 };
 
 namespace RenderSystem {

@@ -20,6 +20,8 @@ void RenderSystem::Initialize() {
 
 void RenderSystem::Clear(RenderBuffer *vbuf) {
 	vbuf->circleCount = 0;
+    vbuf->materialCount = 0;
+    vbuf->segmentCount = 0;
 }
 
 void RenderSystem::SubmitToRenderSystem(RenderBuffer* vbuf) {
@@ -52,15 +54,10 @@ void RenderSystem::RetrieveFromSceneSystem(RenderBuffer** out) {
 
 void RenderSystem::SubmitToSceneSystem(RenderBuffer* vbuf) {
 	glfwLockMutex(gRenderMutex);
-	Clear(vbuf);
 	auto result = mSceneQueue.write(vbuf);
 	ASSERT(result); // eek?
 	glfwUnlockMutex(gRenderMutex);
 	glfwSignalCond(gRenderCondition);
-}
-
-void RenderSystem::Render(RenderBuffer* vbuf) {
-	CircleSystem::inst.Render(vbuf);
 }
 
 GLuint RenderSystem::LoadShaderProgram(const char* filename) {

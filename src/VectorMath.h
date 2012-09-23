@@ -428,21 +428,11 @@ union mat4 {
 
 } VEC4_ALIGNED;
 
-inline mat4 Mat4() {
-	mat4 result = {{
-		1.f, 0.f, 0.f, 0.f,
-		0.f, 1.0, 0.f, 0.f,
-		0.f, 0.f, 1.f, 0.f,
-		0.f, 0.f, 0.f, 1.f
-	}};
-	return result;
-}
-
 inline mat4 Mat4(
-  float m00, float m01, float m02, float m03,
-  float m10, float m11, float m12, float m13,
-  float m20, float m21, float m22, float m23,
-  float m30, float m31, float m32, float m33
+  float m00=1, float m01=0, float m02=0, float m03=0,
+  float m10=0, float m11=1, float m12=0, float m13=0,
+  float m20=0, float m21=0, float m22=1, float m23=0,
+  float m30=0, float m31=0, float m32=0, float m33=1
 ) {
   mat4 result = {{
     m00, m01, m02, m03,
@@ -543,57 +533,30 @@ inline mat4 Mat4(vec4 col0, vec4 col1, vec4 col2, vec4 col3) {
 // These compute curves based on linear multiplication by a "cubic parameterc vector":
 // U = < u^3, u^2, u, 1 >,
 
+#define ORTH_ROTATION_MAT  (Mat4(0, 1, 0, 0, -1, 0, 0, 0))
+#define IDENTITY_MAT  (Mat4())
+
 inline mat4 HermiteMat(vec4 p0, vec4 p1, vec4 t0, vec4 t1) {
-	return Mat4(p0, p1, t0, t1) * Mat4(
-		2, -2, 1, 1,      // u^3
-		-3, 3, -2, -1,    // u^2
-		0, 0, 1, 0,       // u^1
-		1, 0, 0, 0        // 1
-	);
+	return Mat4(p0, p1, t0, t1) * Mat4(2, -2, 1, 1, -3, 3, -2, -1, 0, 0, 1, 0, 1, 0, 0, 0);
 }
 
 inline mat4 HermiteDerivMat(vec4 p0, vec4 p1, vec4 t0, vec4 t1) {
-  return Mat4(p0, p1, t0, t1) * Mat4(
-    0, 0, 0, 0,       // 0
-    6, -6, 3, 3,      // 3 * first row
-    -6, 6, -4, -2,    // 2 * second row
-    0, 0, 1, 0        // third row
-  );
+  return Mat4(p0, p1, t0, t1) * Mat4(0, 0, 0, 0, 6, -6, 3, 3, -6, 6, -4, -2, 0, 0, 1, 0);
 }
 
 inline mat4 HermiteNormMat(vec4 p0, vec4 p1, vec4 t0, vec4 t1) {
-  return Mat4(
-    0, 1, 0, 0,
-    -1, 0, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1
-  ) * HermiteDerivMat(p0, p1, t0, t1);
+  return ORTH_ROTATION_MAT * HermiteDerivMat(p0, p1, t0, t1);
 }
 
 inline mat4 BezierMat(vec4 p0, vec4 p1, vec4 p2, vec4 p3) {
-	return Mat4(p0, p1, p2, p3) * Mat4(
-		-1, 3, -3, 1,
-		3, -6, 3, 0,
-		-3, 3, 0, 0,
-		1, 0, 0, 0
-	);
+	return Mat4(p0, p1, p2, p3) * Mat4(-1, 3, -3, 1, 3, -6, 3, 0, -3, 3, 0, 0, 1, 0, 0, 0);
 }
 
 inline mat4 BezierDerivMat(vec4 p0, vec4 p1, vec4 p2, vec4 p3) {
-  return Mat4(p0, p1, p2, p3) * Mat4(
-    0, 0, 0, 0,
-    -3, 9, -9, 3,
-    6, -12, 6, 0,
-    -3, 3, 0, 0
-  );
+  return Mat4(p0, p1, p2, p3) * Mat4(0, 0, 0, 0, -3, 9, -9, 3, 6, -12, 6, 0, -3, 3, 0, 0);
 }
 
 inline mat4 BezierNormMat(vec4 p0, vec4 p1, vec4 t0, vec4 t1) {
-  return Mat4(
-    0, 1, 0, 0,
-    -1, 0, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1
-  ) * BezierDerivMat(p0, p1, t0, t1);
+  return ORTH_ROTATION_MAT * BezierDerivMat(p0, p1, t0, t1);
 }
 

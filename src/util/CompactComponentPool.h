@@ -9,11 +9,14 @@ template<typename T>
 class CompactComponentPool {
 private:
 	uint32_t mCount;
-	uint16_t mIndex[MAX_NODES];
-	T mBuffer[MAX_NODES];
+	uint16_t mIndex[kMaxNodes];
+	T mBuffer[kMaxNodes];
 
 public:
 	CompactComponentPool();
+
+	bool IsActive(ID node) const { return mIndex[node & 0xffff] != 0xffff; }
+
 	void Alloc(ID node);
 	void Free(ID node);
 	T& operator[](ID node);
@@ -26,12 +29,16 @@ public:
 
 template<typename T>
 CompactComponentPool<T>::CompactComponentPool() : mCount(0) {
+	for(int i=0; i<kMaxNodes; ++i) {
+		mIndex[i] = 0xffff;
+	}
 }
 
 template<typename T>
 void CompactComponentPool<T>::Alloc(ID node) {
-	ASSERT(mCount < MAX_NODES);
+	ASSERT(mCount < kMaxNodes);
 	mIndex[node & 0xffff] = mCount;
+	mBuffer[mCount].node = node;
 	mCount++;
 }
 
@@ -42,14 +49,17 @@ void CompactComponentPool<T>::Free(ID node) {
 		mBuffer[mIndex[node & 0xffff]] = mBuffer[mCount];
 		mIndex[mBuffer[mCount].node] = mIndex[node & 0xffff];
 	}
+	mIndex[node&0xffff] = USHRT_MAX;
 }
 
 template<typename T>
 T& CompactComponentPool<T>::operator[](ID node) {
+	ASSERT(IsActive(node));
 	return mBuffer[mIndex[node & 0xffff]];
 }
 
 template<typename T>
 T CompactComponentPool<T>::operator[](ID node) const {
+	ASSERT(IsActive(node));
 	return mBuffer[mIndex[node & 0xffff]];
 }

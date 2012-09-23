@@ -2,9 +2,6 @@
 #include "SceneSystem.h"
 #include "InputSystem.h"
 #include "RenderSystem.h"
-#include "CircleManager.h"
-
-#define COMPONENT_CIRCLE	0
 
 namespace SceneSystem {
 
@@ -30,36 +27,65 @@ inline void SetRotation(ID node, float degrees) {
 
 namespace CircleSystem {
 
-extern CircleManager inst;
+extern CircleManager gInst;
 
 inline void Create(ID node, uint32_t color, float radius) {
-	SceneSystem::AddComponent(node, COMPONENT_CIRCLE);
-	inst[node].fill = RGB(color);
-	inst[node].radius = radius;
+	SceneSystem::AddComponent(node, kComponentCircle);
+	gInst[node].fill = RGB(color);
+	gInst[node].radius = radius;
 
 }
 
 inline void Destroy(ID node) {
-	inst.DestroyComponent(node);
+	gInst.DestroyComponent(node);
 }
 
 inline void Fill(ID node, uint32_t *color=0) {
-	*color = inst[node].fill.RGB();
+	*color = gInst[node].fill.RGB();
 }
 
 inline void Radius(ID node, float *radius=0) {
-	*radius = inst[node].radius;
+	*radius = gInst[node].radius;
 }
 
 inline void SetFill(ID node, uint32_t fill) {
-	inst[node].fill = RGB(fill);
+	gInst[node].fill = RGB(fill);
 }
 
 inline void SetRadius(ID node, float r) {
-	inst[node].radius = r;
+	gInst[node].radius = r;
 }
 
 } // CircleSystem
 
-void ScriptInitialize();
+namespace SplineSystem {
+
+extern SplineManager gInst;
+
+inline ID CreateMaterial(float weight, uint32_t color) {
+	return gInst.CreateMaterial(weight, RGB(color));
+}
+
+inline float Weight(ID mat) {
+	return gInst.GetMaterial(mat).weight;
+}
+
+inline uint32_t Color(ID mat) {
+	return gInst.GetMaterial(mat).color.RGB();
+}
+
+inline void SetWeight(ID mat, float weight) {
+	gInst.GetMaterial(mat).weight = weight;
+}
+
+inline void SetColor(ID mat, uint32_t color) {
+	gInst.GetMaterial(mat).color = RGB(color);
+}
+
+inline ID CreateSegment(ID start, ID end, ID mat) {
+	return gInst.CreateSegment(start, end, mat);
+}
+
+} // SplineSystem
+
 void ScriptPaint();

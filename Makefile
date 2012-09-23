@@ -23,14 +23,14 @@ LFLAGS += -Os
 endif
 
 OBJS = \
-	src/main.o \
 	src/CircleManager.o \
 	src/InputSystem.o \
 	src/RenderSystem.o \
 	src/SceneSystem.o \
-	src/Script.o \
-	src/binding.o \
+	src/SplineManager.o \
 	src/Math.o \
+	src/binding.o \
+	src/main.o \
 	src/tolua_event.o \
 	src/tolua_is.o \
 	src/tolua_map.o \

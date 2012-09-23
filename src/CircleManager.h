@@ -5,7 +5,13 @@
 
 struct Circle {
 	float radius;
-	color fill;
+	color_t fill;
+};
+
+struct CircleCommand {
+	uint16_t queue;
+	uint16_t transform;
+	Circle properties;
 };
 
 class CircleManager : public IManager {
@@ -24,15 +30,15 @@ private:
 
 public:
 
-	void Initialize();
-	void Destroy();
+	StatusCode Initialize();
+	StatusCode Destroy();
 
-	bool CreateComponent(ID node);
-	bool DestroyComponent(ID node);
+	StatusCode CreateComponent(ID node);
+	StatusCode DestroyComponent(ID node);
 	
 	Circle& operator[](ID node) { return mSlots[node].circle; }
 	Circle operator[](ID node) const { return mSlots[node].circle; }
 	
-	void Update(RenderBuffer *vbuf);
-	void Render(RenderBuffer *vbuf);
+	StatusCode Update(RenderBuffer *vbuf);
+	StatusCode Render(RenderBuffer *vbuf);
 };

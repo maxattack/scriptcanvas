@@ -20,9 +20,7 @@ to the comments.
 */
 
 #include <limits.h>
-#include "Macros.h"
-#include "Alloc.h"
-#include "Types.h"
+#include "../Foundation.h"
 
 #define MAX_CAPACITY (64*1024)
 
@@ -53,6 +51,7 @@ public:
 
 	
     T& operator[](ID id) { ASSERT(IsActive(id)); return mBuffer[mSlot[id & 0xffff].index]; }
+    T operator[](ID id) const { ASSERT(IsActive(id)); return mBuffer[mSlot[id & 0xffff].index]; }
     ID TakeOut();
     void PutBack(ID id);
     

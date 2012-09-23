@@ -8,20 +8,10 @@ extern "C" {
 #include "tolua++.h"
 #include "binding.h"
 
+CircleManager CircleSystem::gInst;
+SplineManager SplineSystem::gInst;
+
 void game(void* ctxt);
-
-#include "VectorMath.h"
-struct vertex {
-    float uuu;
-    float uu;
-    float u;
-    float s;
-};
-
-inline vertex Vertex(float u, bool side) {
-    vertex result = { u*u*u, u*u, u, side ? 0.5f : -0.5f };
-    return result;
-}
 
 int main(int argc, char* argv[]) {
     
@@ -45,8 +35,11 @@ int main(int argc, char* argv[]) {
     SceneSystem::Initialize();
     RenderSystem::Initialize();
     InputSystem::Initialize();
+
+    SceneSystem::RegisterComponentManager(kComponentCircle, &CircleSystem::gInst);
+    SceneSystem::RegisterComponentManager(kComponentSpline, &SplineSystem::gInst);
+
     glfwSetMousePosCallback(InputSystem::SetMousePosition);
-    ScriptInitialize();
 
     // initialize communication channels
     static RenderBuffer buf0;
@@ -56,71 +49,16 @@ int main(int argc, char* argv[]) {
     InputSystem::SetTime(glfwGetTime());
     glfwCreateThread(game, 0);
 
-    // TEST hermite curves
-    auto cubicProgram = RenderSystem::LoadShaderProgram("src/cubic.glsl");
-    glUseProgram(cubicProgram);
-    auto attribParameterAndSide = glGetAttribLocation(cubicProgram, "parameterAndSide");
-    auto uniformThickness = glGetUniformLocation(cubicProgram, "thickness");
-    auto uniformPositionMatrix = glGetUniformLocation(cubicProgram, "positionMatrix");
-    auto uniformNormalMatrix = glGetUniformLocation(cubicProgram, "normalMatrix");
-    auto uniformColor = glGetUniformLocation(cubicProgram, "color");
-    GLuint vertexBuffer;
-    {
-        vertex buf[256];
-        float sideBuffer[256];
-        float du = 1.f / 127.f;
-        float u = 0;
-        for(int i=0; i<128; ++i) {
-            buf[i+i] = Vertex(u, true);
-            buf[i+i+1] = Vertex(u, false);
-            u += du;
-        }
-        glGenBuffers(1, &vertexBuffer);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertex)*256, buf, GL_STATIC_DRAW);
-    }
-    glUseProgram(0);
-
 
     // render loop
     while (glfwGetKey('Q') != GLFW_PRESS) {
         RenderBuffer *vbuf;
         RenderSystem::RetrieveFromSceneSystem(&vbuf);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        RenderSystem::Render(vbuf);
 
-        // TEST hermite curves
-        glUseProgram(cubicProgram);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableVertexAttribArray(attribParameterAndSide);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-        glLoadIdentity();
-
-        auto p0 = Vec4(200, 100);
-        auto p1 = Vec4(200, 700);
-
-        auto mp = InputSystem::MousePosition();
-        auto t = InputSystem::Time();
-
-        auto t0 = Vec4(mp.x - 200, mp.y - 100);
-        auto t1 = -Vec4(mp.x - 200, mp.y - 700);
-
-        auto posMatrix = HermiteMat(p0, p1, t0, t1);
-        auto normMatrix = HermiteNormMat(p0, p1, t0, t1);
-
-        glUniform1f(uniformThickness, 16.f + 32.f * (0.5f + 0.5f * sin(kTau * t)));
-        glUniformMatrix4fv(uniformPositionMatrix, 1, GL_FALSE, posMatrix.m);
-        glUniformMatrix4fv(uniformNormalMatrix, 1, GL_FALSE, normMatrix.m);
-        glUniform4f(uniformColor, 1.f, 1.f, 0.5f, 1.f);
-
-        glVertexAttribPointer(attribParameterAndSide, 4, GL_FLOAT, GL_FALSE, 0, 0);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 256);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableVertexAttribArray(attribParameterAndSide);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glUseProgram(0);
-
+        // TODO: dispatch rendering through SceneSystem
+        CircleSystem::gInst.Render(vbuf);
+        SplineSystem::gInst.Render(vbuf);
 
         glfwSwapBuffers();
         InputSystem::SetTime(glfwGetTime());
@@ -137,11 +75,25 @@ int main(int argc, char* argv[]) {
 
 void game(void* ctxt) {
     // run scripts
-    auto virtualMachine = luaL_newstate();    // todo: hook memory allocator
+    auto virtualMachine = luaL_newstate();          // todo: hook memory allocator
     luaL_openlibs(virtualMachine);                  // todo: limit libs
     tolua_binding_open(virtualMachine);
     luaL_loadfile(virtualMachine, "src/main.lua");  // todo: hook physFS
     lua_call(virtualMachine, 0, 0);                 // todo: handle panic
     lua_close(virtualMachine);
     // todo: terminate at script end
+}
+
+void ScriptPaint() {
+    RenderBuffer *vbuf;
+    RenderSystem::RetrieveFromRenderSystem(&vbuf);
+    RenderSystem::Clear(vbuf);
+    SceneSystem::Update(vbuf);
+    vbuf->circleCount = 0;
+
+    // TODO: dispatch updating through SceneSystem
+    CircleSystem::gInst.Update(vbuf);
+    SplineSystem::gInst.Update(vbuf);
+
+    RenderSystem::SubmitToRenderSystem(vbuf);
 }
