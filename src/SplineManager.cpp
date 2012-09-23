@@ -157,54 +157,44 @@ StatusCode SplineManager::Update(RenderBuffer *vbuf) {
 }
 
 StatusCode SplineManager::Render(RenderBuffer *vbuf) {
+	if (vbuf->segmentCount) {
+	    glUseProgram(mProgram);
+	    glEnableClientState(GL_VERTEX_ARRAY);
+	    glEnableVertexAttribArray(mAttribParameterAndSide);
+	    glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
+	    glLoadIdentity();
+	    // TODO: sort by material?
+	    for(int i=0; i<vbuf->segmentCount; ++i) {
+	    	auto& segment = vbuf->segments[i];
+	    	auto& mat = vbuf->materials[segment.material];
+	    	auto& start = vbuf->transforms[segment.start].t;
+	    	auto& end = vbuf->transforms[segment.end].t;
 
-    glUseProgram(mProgram);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableVertexAttribArray(mAttribParameterAndSide);
-    glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-    glLoadIdentity();
-    // TODO: sort by material?
-    for(int i=0; i<vbuf->segmentCount; ++i) {
-    	auto& segment = vbuf->segments[i];
-    	auto& mat = vbuf->materials[segment.material];
-    	auto& start = vbuf->transforms[segment.start].t;
-    	auto& end = vbuf->transforms[segment.end].t;
+	    	auto p0 = Vec4(start.t);
+	    	auto p1 = Vec4(end.t);
+	    	auto t0 = Vec4(start.q);
+	    	auto t1 = Vec4(end.q);
 
-    	auto p0 = Vec4(start.t);
-    	auto p1 = Vec4(end.t);
-    	auto t0 = Vec4(start.q);
-    	auto t1 = Vec4(end.q);
+	    	auto posMatrix = HermiteMat(p0, p1, t0, t1);
+	    	auto normMatrix = HermiteNormMat(p0, p1, t0, t1);
 
-    	auto posMatrix = HermiteMat(p0, p1, t0, t1);
-    	auto normMatrix = HermiteNormMat(p0, p1, t0, t1);
+		    glUniform1f(mUniformThickness, mat.weight);
+		    glUniformMatrix4fv(mUniformPositionMatrix, 1, GL_FALSE, posMatrix.m);
+		    glUniformMatrix4fv(mUniformNormalMatrix, 1, GL_FALSE, normMatrix.m);
+			
+			float r,g,b;
+			mat.color.ToFloatRGB(&r, &g, &b);
+			glUniform4f(mUniformColor, r, g, b, 1.f);
 
-	    glUniform1f(mUniformThickness, mat.weight);
-	    glUniformMatrix4fv(mUniformPositionMatrix, 1, GL_FALSE, posMatrix.m);
-	    glUniformMatrix4fv(mUniformNormalMatrix, 1, GL_FALSE, normMatrix.m);
-		
-		float r,g,b;
-		mat.color.ToFloatRGB(&r, &g, &b);
-		glUniform4f(mUniformColor, r, g, b, 1.f);
+		    glVertexAttribPointer(mAttribParameterAndSide, 4, GL_FLOAT, GL_FALSE, 0, 0);
+		    glDrawArrays(GL_TRIANGLE_STRIP, 0, kSegmentResolution);
+	    }
 
-	    glVertexAttribPointer(mAttribParameterAndSide, 4, GL_FLOAT, GL_FALSE, 0, 0);
-	    glDrawArrays(GL_TRIANGLE_STRIP, 0, kSegmentResolution);
-    }
-
-    // auto p0 = Vec4(200, 100);
-    // auto p1 = Vec4(200, 700);
-
-    // auto mp = InputSystem::MousePosition();
-    // auto t = InputSystem::Time();
-
-    // auto t0 = Vec4(mp.x - 200, mp.y - 100);
-    // auto t1 = -Vec4(mp.x - 200, mp.y - 700);
-
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableVertexAttribArray(mAttribParameterAndSide);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glUseProgram(0);
-
+	    glDisableClientState(GL_VERTEX_ARRAY);
+	    glDisableVertexAttribArray(mAttribParameterAndSide);
+	    glBindBuffer(GL_ARRAY_BUFFER, 0);
+	    glUseProgram(0);
+	}
 	return OK;
 }
 

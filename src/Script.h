@@ -23,6 +23,10 @@ inline void SetRotation(ID node, float degrees) {
 	LocalToParent(node).t.q = Polar(1.f, degrees * (M_PI/180.0f));
 }
 
+inline void SetDirection(ID node, float dx, float dy) {
+	LocalToParent(node).t.q = Float2(dx, dy);
+}
+
 } // SceneSystem
 
 namespace CircleSystem {

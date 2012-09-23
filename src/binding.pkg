@@ -24,6 +24,7 @@ namespace SceneSystem {
 	void SetPosition @ setPosition(ID node, float x, float y);
 	float GetRotation @ rotationOf(ID node);
 	void SetRotation @ setRotation(ID node, float degrees);
+	void SetDirection @ setDirection(ID node, float dx, float dy);
 
 }
 
@@ -45,12 +46,12 @@ namespace InputSystem {
 
 namespace SplineSystem {
 
-ID CreateMaterial @ addMaterial(float weight, uint32_t color);
-float Weight @ weight(ID mat);
-uint32_t Color @ color(ID mat);
-void SetWeight @ setWeight(ID mat, float weight);
-void SetColor @ setColor(ID mat, uint32_t color);
-ID CreateSegment @ addSegment(ID start, ID end, ID mat);
+	ID CreateMaterial @ addMaterial(float weight, uint32_t color);
+	float Weight @ weight(ID mat);
+	uint32_t Color @ color(ID mat);
+	void SetWeight @ setWeight(ID mat, float weight);
+	void SetColor @ setColor(ID mat, uint32_t color);
+	ID CreateSegment @ addSegment(ID start, ID end, ID mat);
 
 } // SplineSystem
 
