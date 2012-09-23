@@ -11,8 +11,8 @@ struct IManager {
 	virtual StatusCode Update(RenderBuffer *vbuf) = 0;
 
 	// RENDER THREAD
-	virtual StatusCode Initialize();
+	virtual StatusCode Initialize() = 0;
 	virtual StatusCode Render(RenderBuffer *vbuf) = 0;
-	virtual StatusCode Destroy();
+	virtual StatusCode Destroy() = 0;
 
 };

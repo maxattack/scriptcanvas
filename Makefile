@@ -3,7 +3,7 @@
 BIN = bubble
 CC = clang
 CXXC = clang++
-CFLAGS = -fno-common -I/usr/local/include -Wall -Werror -Wno-unused-variable $(OFLAG)
+CFLAGS = -I/usr/local/include -Wall -Werror -Wno-unused-variable $(OFLAG)
 CXXFLAGS = -fno-exceptions -fno-rtti -std=c++11 -stdlib=libc++
 LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw $(OFLAG)
 
@@ -56,14 +56,6 @@ LUA_OBJS = \
 	src/lua/lvm.o \
 	src/lua/lzio.o
 	
-TOLUA_OBJS = \
-	src/tolua_event.o \
-	src/tolua_is.o \
-	src/tolua_map.o \
-	src/tolua_push.o \
-	src/tolua_to.o \
-    
-
 OBJS = \
 	src/CircleManager.o \
 	src/InputSystem.o \
@@ -71,21 +63,22 @@ OBJS = \
 	src/SceneSystem.o \
 	src/SplineManager.o \
 	src/Math.o \
-	src/binding.o \
 	src/main.o \
 
-OBJS += LUA_OBJS
-OBJS += TOLUA_OBJS	
+TOOLS = \
+	tools/lua \
+	tools/luac
 
+$(BIN): $(OBJS) $(LUA_OBJS)
+	$(CC) $(OBJS) $(LUA_OBJS) -o $(BIN) $(LFLAGS)
 
-$(BIN): $(OBJS)
-	$(CC) $(OBJS) -o $(BIN) $(LFLAGS)
+tools: $(TOOLS)
 
-tools/tolua++: tolua/*.c $(LUA_OBJS) $(TOLUA_OBJS)
-	$(CC) tolua/*.c $(LUA_OBJS) $(TOLUA_OBJS) $(CFLAGS) $(LFLAGS) -o tools/tolua++
+tools/lua: $(LUA_OBJS) src/lua/lua.o
+	$(CC) $(LUA_OBJS) src/lua/lua.o $(LFLAGS) -o tools/lua
 
-src/binding.cpp src/binding.h :  tools/tolua++ src/binding.pkg
-	tools/tolua++ -o src/binding.cpp -H src/binding.h src/binding.pkg
+tools/luac: $(LUA_OBJS) src/lua/luac.o
+	$(CC) $(LUA_OBJS) src/lua/luac.o $(LFLAGS) -o tools/luac
 
 %.o : %.cpp src/binding.h src/**.h
 	$(CXXC) $(CFLAGS) $(CXXFLAGS) -c $< -o $@
@@ -97,4 +90,4 @@ run: $(BIN)
 	./bubble main.lua
 
 clean:
-	rm -f $(OBJS) $(BIN) tools/tolua++ src/binding.cpp src/binding.h
+	rm -f $(OBJS) $(LUA_OBJS) $(BIN) $(TOOLS)
