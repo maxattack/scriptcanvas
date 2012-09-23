@@ -3,7 +3,7 @@
 BIN = bubble
 CC = clang
 CXXC = clang++
-CFLAGS = -I/usr/local/include -Wall -Werror -Wno-unused-variable $(OFLAG)
+CFLAGS = -fno-common -I/usr/local/include -Wall -Werror -Wno-unused-variable $(OFLAG)
 CXXFLAGS = -fno-exceptions -fno-rtti -std=c++11 -stdlib=libc++
 LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw $(OFLAG)
 
@@ -63,7 +63,7 @@ OBJS = \
 	src/SceneSystem.o \
 	src/SplineManager.o \
 	src/Math.o \
-	src/main.o \
+	src/main.o
 
 TOOLS = \
 	tools/lua \
@@ -80,7 +80,7 @@ tools/lua: $(LUA_OBJS) src/lua/lua.o
 tools/luac: $(LUA_OBJS) src/lua/luac.o
 	$(CC) $(LUA_OBJS) src/lua/luac.o $(LFLAGS) -o tools/luac
 
-%.o : %.cpp src/binding.h src/**.h
+%.o : %.cpp src/**.h
 	$(CXXC) $(CFLAGS) $(CXXFLAGS) -c $< -o $@
 
 %.o : %.c src/**.h

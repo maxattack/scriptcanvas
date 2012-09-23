@@ -73,13 +73,17 @@ int main(int argc, char* argv[]) {
 
 void game(void* ctxt) {
     // run scripts
-    auto virtualMachine = luaL_newstate();          // todo: hook memory allocator
-    luaL_openlibs(virtualMachine);                  // todo: limit libs
-    //tolua_binding_open(virtualMachine);
-    luaL_loadfile(virtualMachine, "src/main.lua");  // todo: hook physFS
-    lua_call(virtualMachine, 0, 0);                 // todo: handle panic
-    lua_close(virtualMachine);
+    // auto virtualMachine = luaL_newstate();          // todo: hook memory allocator
+    // luaL_openlibs(virtualMachine);                  // todo: limit libs
+    // tolua_binding_open(virtualMachine);
+    // luaL_loadfile(virtualMachine, "src/main.lua");  // todo: hook physFS
+    // lua_call(virtualMachine, 0, 0);                 // todo: handle panic
+    // lua_close(virtualMachine);
     // todo: terminate at script end
+
+    for(;;) {
+        ScriptPaint();
+    }
 }
 
 void ScriptPaint() {
