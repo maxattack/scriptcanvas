@@ -22,24 +22,14 @@ CFLAGS += -Os
 LFLAGS += -Os
 endif
 
-OBJS = \
-	src/CircleManager.o \
-	src/InputSystem.o \
-	src/RenderSystem.o \
-	src/SceneSystem.o \
-	src/SplineManager.o \
-	src/Math.o \
-	src/binding.o \
-	src/main.o \
-	src/tolua_event.o \
-	src/tolua_is.o \
-	src/tolua_map.o \
-	src/tolua_push.o \
-	src/tolua_to.o \
+LUA_OBJS = \
 	src/lua/lapi.o \
 	src/lua/lauxlib.o \
 	src/lua/lbaselib.o \
+	src/lua/lbitlib.o \
 	src/lua/lcode.o \
+	src/lua/lcorolib.o \
+	src/lua/lctype.o \
 	src/lua/ldblib.o \
 	src/lua/ldebug.o \
 	src/lua/ldo.o \
@@ -64,15 +54,35 @@ OBJS = \
 	src/lua/ltm.o \
 	src/lua/lundump.o \
 	src/lua/lvm.o \
-	src/lua/lzio.o \
-	src/lua/print.o \
+	src/lua/lzio.o
+	
+TOLUA_OBJS = \
+	src/tolua_event.o \
+	src/tolua_is.o \
+	src/tolua_map.o \
+	src/tolua_push.o \
+	src/tolua_to.o \
+    
+
+OBJS = \
+	src/CircleManager.o \
+	src/InputSystem.o \
+	src/RenderSystem.o \
+	src/SceneSystem.o \
+	src/SplineManager.o \
+	src/Math.o \
+	src/binding.o \
+	src/main.o \
+
+OBJS += LUA_OBJS
+OBJS += TOLUA_OBJS	
 
 
 $(BIN): $(OBJS)
 	$(CC) $(OBJS) -o $(BIN) $(LFLAGS)
 
-tools/tolua++: tolua/*.c src/lua/*.c src/tolua_*.c
-	$(CC) tolua/*.c src/lua/*.c src/tolua_*.c -o tools/tolua++
+tools/tolua++: tolua/*.c $(LUA_OBJS) $(TOLUA_OBJS)
+	$(CC) tolua/*.c $(LUA_OBJS) $(TOLUA_OBJS) $(CFLAGS) $(LFLAGS) -o tools/tolua++
 
 src/binding.cpp src/binding.h :  tools/tolua++ src/binding.pkg
 	tools/tolua++ -o src/binding.cpp -H src/binding.h src/binding.pkg
