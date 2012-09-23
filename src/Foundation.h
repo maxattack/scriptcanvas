@@ -2,7 +2,11 @@
 #include <limits.h>
 #include <stdint.h>
 #include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
 #include <cassert>
+#include <GL/glfw.h>
 
 #define MAX_NODES 				1024
 #define MAX_COMPONENT_TYPES		32

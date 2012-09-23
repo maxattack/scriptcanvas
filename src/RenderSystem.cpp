@@ -62,3 +62,70 @@ void RenderSystem::SubmitToSceneSystem(RenderBuffer* vbuf) {
 void RenderSystem::Render(RenderBuffer* vbuf) {
 	CircleSystem::inst.Render(vbuf);
 }
+
+GLuint RenderSystem::LoadShaderProgram(const char* filename) {
+    GLuint prog, vert, frag;
+    GLint cnt = 0;
+    GLchar* buf = 0;
+    {
+        FILE* file = fopen(filename, "r");
+        if (!file) { 
+            return 0; 
+        }
+        fseek(file, 0, SEEK_END);
+        cnt = ftell(file);
+        rewind(file);
+        buf = new char[cnt+1];
+        if (buf) {
+          unsigned acnt = fread(buf, 1, cnt, file);
+          fclose(file);
+          if (cnt != acnt) {
+            delete[] buf;
+            return 0;
+          } else {
+            buf[cnt] = 0;
+          }
+        }
+    }
+     // initialize shader program
+    prog = glCreateProgram();
+    vert = glCreateShader(GL_VERTEX_SHADER);
+    frag = glCreateShader(GL_FRAGMENT_SHADER);
+    {
+        const GLchar sCondVert[] = "#define VERTEX\n";
+        const GLchar sCondFrag[] = "#define FRAGMENT\n";
+        const GLchar *vsrc[] = { sCondVert, buf };
+        const GLchar *fsrc[] = { sCondFrag, buf };
+        GLint vcnt[] = { static_cast<GLint>(strlen(sCondVert)), cnt };
+        GLint fcnt[] = { static_cast<GLint>(strlen(sCondFrag)), cnt };
+        glShaderSource(vert, 2, vsrc, vcnt);
+        glShaderSource(frag, 2, fsrc, fcnt);
+        glCompileShader(vert);
+        glCompileShader(frag);
+        delete[] buf;
+
+        GLint result;
+        glGetShaderiv(vert, GL_COMPILE_STATUS, &result);
+        if (result != GL_TRUE) {
+            GLchar buf[256];
+            int len;
+            glGetShaderInfoLog(vert, 256, &len, buf);
+            printf("%s\n", buf);
+            return 0;
+        }
+
+        glGetShaderiv(frag, GL_COMPILE_STATUS, &result);
+        if (result != GL_TRUE) {
+            GLchar buf[256];
+            int len;
+            glGetShaderInfoLog(frag, 256, &len, buf);
+            printf("%s\n", buf);
+            return 0;
+        }
+
+        glAttachShader(prog, vert);
+        glAttachShader(prog, frag);
+        glLinkProgram(prog);
+    }
+    return prog;
+}

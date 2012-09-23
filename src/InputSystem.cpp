@@ -38,7 +38,7 @@ void InputSystem::GetMousePosition(int *x, int *y) {
 	*y = position.y;
 }
 
-double InputSystem::GetTime() {
+double InputSystem::Time() {
 	glfwLockMutex(lock);
 	double result = seconds;
 	glfwUnlockMutex(lock);

@@ -31,4 +31,8 @@ void RetrieveFromSceneSystem(RenderBuffer** out);
 void SubmitToSceneSystem(RenderBuffer* vbuf);
 void Render(RenderBuffer* vbuf);
 
+
+// utils
+GLuint LoadShaderProgram(const char* filename);
+
 }

@@ -40,7 +40,7 @@ namespace CircleSystem {
 
 namespace InputSystem {
 	void GetMousePosition @ mousePosition(int *x=0, int *y=0);
-	double GetTime @ seconds();
+	double Time @ seconds();
 }
 
 $[

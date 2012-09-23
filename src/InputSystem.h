@@ -10,7 +10,7 @@ void SetTime(double t);
 
 float2 MousePosition();
 void GetMousePosition(int *x=0, int *y=0);
-double GetTime();
+double Time();
 
 void Finalize();
 

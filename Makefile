@@ -77,10 +77,10 @@ tools/tolua++: tolua/*.c src/lua/*.c src/tolua_*.c
 src/binding.cpp src/binding.h :  tools/tolua++ src/binding.pkg
 	tools/tolua++ -o src/binding.cpp -H src/binding.h src/binding.pkg
 
-%.o : %.cpp src/binding.h
+%.o : %.cpp src/binding.h src/**.h
 	$(CXXC) $(CFLAGS) $(CXXFLAGS) -c $< -o $@
 
-%.o : %.c
+%.o : %.c src/**.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 run: $(BIN)

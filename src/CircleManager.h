@@ -1,5 +1,4 @@
 #pragma once
-#include <GL/glfw.h>
 #include "SceneSystem.h"
 #include "util/CompactComponentPool.h"
 #include "Color.h"
@@ -31,8 +30,8 @@ public:
 	bool CreateComponent(ID node);
 	bool DestroyComponent(ID node);
 	
-	Circle& operator[](ID node);
-	Circle operator[](ID node) const;
+	Circle& operator[](ID node) { return mSlots[node].circle; }
+	Circle operator[](ID node) const { return mSlots[node].circle; }
 	
 	void Update(RenderBuffer *vbuf);
 	void Render(RenderBuffer *vbuf);
