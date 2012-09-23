@@ -463,6 +463,16 @@ inline mat4 Mat4(transform t, float z=0.f) {
   return result;
 }
 
+inline mat4 Mat4(ztransform t) {
+  mat4 result = {{
+    t.t.q.x, t.t.q.y, 0.f, 0.f,
+    -t.t.q.y, t.t.q.x, 0.f, 0.f,
+    0.f, 0.f, 1.f, 0.f,
+    t.t.t.x, t.t.t.y, t.z, 1.f
+  }};
+  return result;
+}
+
 inline mat4 Mat4(float values[16]) {
   mat4 m = {{ 
     values[0], values[1], values[2], values[3],

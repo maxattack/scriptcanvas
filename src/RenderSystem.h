@@ -13,7 +13,7 @@ struct RenderBuffer {
 	int circleCount;
 
 	// buffers (one shared, compact buffer?)
-	transform transforms[MAX_NODES];
+	ztransform transforms[MAX_NODES];
 	CircleCommand circles[MAX_NODES];
 };
 

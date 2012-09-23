@@ -133,3 +133,20 @@ inline transform Scale(float k) {
 inline transform TRS(float2 t, float radians, float scale) {
   return Transform(Polar(scale, radians), t);
 }
+
+struct ztransform {
+  float z;
+  transform t;
+  ztransform operator*(const ztransform& rhs) const {
+    ztransform result = {
+      z + rhs.z,
+      t * rhs.t
+    };
+    return result;
+  }
+};
+
+inline ztransform ZTransform() {
+  ztransform result = { 0, Transform() };
+  return result;
+}

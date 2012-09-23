@@ -10,20 +10,20 @@ namespace SceneSystem {
 
 inline void GetPosition(ID node, float *x=0, float *y=0) {
 	auto position = LocalToParent(node).t;
-	*x = position.x;
-	*y = position.y;
+	*x = position.t.x;
+	*y = position.t.y;
 }
 
 inline void SetPosition(ID node, float x, float y) {
-	LocalToParent(node).t = Float2(x,y);
+	LocalToParent(node).t.t = Float2(x,y);
 }
 
 inline float GetRotation(ID node) {
-	return LocalToParent(node).q.Radians() * (180.0f/M_PI);
+	return LocalToParent(node).t.q.Radians() * (180.0f/M_PI);
 }
 
 inline void SetRotation(ID node, float degrees) {
-	LocalToParent(node).q = Polar(1.f, degrees * (M_PI/180.0f));
+	LocalToParent(node).t.q = Polar(1.f, degrees * (M_PI/180.0f));
 }
 
 } // SceneSystem
