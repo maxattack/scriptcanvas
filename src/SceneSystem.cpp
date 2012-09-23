@@ -30,6 +30,7 @@ struct NodeSlot {
 struct PoseData {
 	uint16_t parentIndex;
 	uint16_t slotIndex;
+	float z;
 	transform localToParent;
 };
 
@@ -103,7 +104,7 @@ ID SceneSystem::CreateNode(ID parent) {
 	// Allocate a new buffer location
 	slot.poseIndex = sNodeCount++;
 	// initialize records
-	sNodePoses[slot.poseIndex] = { USHRT_MAX, uint16_t(0xffff&slot.id), Transform() };
+	sNodePoses[slot.poseIndex] = { USHRT_MAX, uint16_t(0xffff&slot.id), 0.f, Transform() };
 	slot.componentMask = 0;
 	slot.parent = 0;
 	slot.firstChild = 0;
