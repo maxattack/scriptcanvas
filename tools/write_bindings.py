@@ -58,16 +58,11 @@ HEADER = '''#include "ScriptSystem.h"
 namespace ScriptSystem {
 namespace Internal {
 
-struct syscall_t {
-	const char* name;
-	lua_CFunction impl;
-};
-
-static void LoadModule(lua_State* L, const char* name, const syscall_t *p) {
+static void LoadModule(lua_State* L, const char* name, const luaL_Reg *p) {
 	lua_newtable(L);
 	while(p->name) {
 		lua_pushstring(L, p->name);
-		lua_pushcfunction(L, p->impl);
+		lua_pushcfunction(L, p->func);
 		lua_settable(L, -3);
 		++p;
 	}
@@ -82,14 +77,15 @@ def main():
 		for module, signatures in MODULES.iteritems():
 			for name,sig in signatures.iteritems():
 				write_function_implementation(src, module, name, sig)
-			src.write("static syscall_t _%s[] = {\n" % module)
+			src.write("static const luaL_Reg _%s[] = {\n" % module)
 			for name in signatures:
 				write_line(src, '{ "%s", _%s_%s  },' % (name, module, name))
-			write_line(src, '{ 0, 0 }')
+			write_line(src, '{ NULL, NULL }')
 			src.write("};\n\n")
 		src.write("}\n\n")
 		src.write('void Bind(lua_State* L) {\n')
 		for module in MODULES:
+			#write_line(src, 'luaL_newlib(L, %s);' % module)
 			write_line(src, 'Internal::LoadModule(L, "%s", Internal::_%s);' % (module, module))
 		src.write('}\n\n}\n\n')
 
