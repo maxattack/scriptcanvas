@@ -14,12 +14,11 @@ CFLAGS += -DLUA_USE_POSIX
 ifeq ($(PRODUCTION),1)
 CFLAGS += -Os
 LFLAGS += -Os
-CFLAGS += -DTOLUA_RELEASE
 else
 CFLAGS += -DDEBUG
 CFLAGS += -g
-CFLAGS += -Os
-LFLAGS += -Os
+CFLAGS += -O0
+LFLAGS += -O0
 endif
 
 LUA_OBJS = \
@@ -53,6 +52,7 @@ LUA_OBJS = \
 	src/lua/ltablib.o \
 	src/lua/ltm.o \
 	src/lua/lundump.o \
+	src/lua/lvec.o \
 	src/lua/lvm.o \
 	src/lua/lzio.o
 	

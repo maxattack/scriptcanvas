@@ -14,7 +14,7 @@
 
 
 #include "luaconf.h"
-
+#include "lvec.h"
 
 #define LUA_VERSION_MAJOR	"5"
 #define LUA_VERSION_MINOR	"2"
@@ -79,15 +79,14 @@ typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
 #define LUA_TBOOLEAN		1
 #define LUA_TLIGHTUSERDATA	2
 #define LUA_TNUMBER		3
-#define LUA_TSTRING		4
-#define LUA_TTABLE		5
-#define LUA_TFUNCTION		6
-#define LUA_TUSERDATA		7
-#define LUA_TTHREAD		8
+#define LUA_TVEC    4  /* LUA-VEC */
+#define LUA_TSTRING		5
+#define LUA_TTABLE		6
+#define LUA_TFUNCTION		7
+#define LUA_TUSERDATA		8
+#define LUA_TTHREAD		9
 
-#define LUA_NUMTAGS		9
-
-
+#define LUA_NUMTAGS		10
 
 /* minimum Lua stack available to a C function */
 #define LUA_MINSTACK	20
@@ -170,6 +169,7 @@ LUA_API lua_CFunction   (lua_tocfunction) (lua_State *L, int idx);
 LUA_API void	       *(lua_touserdata) (lua_State *L, int idx);
 LUA_API lua_State      *(lua_tothread) (lua_State *L, int idx);
 LUA_API const void     *(lua_topointer) (lua_State *L, int idx);
+LUA_API lua_Vector      (lua_tovec) (lua_State *L, int idx);  /* LUA-VEC */
 
 
 /*
@@ -210,7 +210,7 @@ LUA_API void  (lua_pushcclosure) (lua_State *L, lua_CFunction fn, int n);
 LUA_API void  (lua_pushboolean) (lua_State *L, int b);
 LUA_API void  (lua_pushlightuserdata) (lua_State *L, void *p);
 LUA_API int   (lua_pushthread) (lua_State *L);
-
+LUA_API void  (lua_pushvec) (lua_State *L, float x, float y);  /* LUA-VEC */
 
 /*
 ** get functions (Lua -> stack)
@@ -331,6 +331,7 @@ LUA_API void      (lua_setallocf) (lua_State *L, lua_Alloc f, void *ud);
 #define lua_isthread(L,n)	(lua_type(L, (n)) == LUA_TTHREAD)
 #define lua_isnone(L,n)		(lua_type(L, (n)) == LUA_TNONE)
 #define lua_isnoneornil(L, n)	(lua_type(L, (n)) <= 0)
+#define lua_isvec(L, n)   (lua_type(L, (n)) == LUA_TVEC)  /* LUA-VEC */
 
 #define lua_pushliteral(L, s)	\
 	lua_pushlstring(L, "" s, (sizeof(s)/sizeof(char))-1)

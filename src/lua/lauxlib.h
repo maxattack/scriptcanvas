@@ -40,6 +40,10 @@ LUALIB_API const char *(luaL_optlstring) (lua_State *L, int numArg,
 LUALIB_API lua_Number (luaL_checknumber) (lua_State *L, int numArg);
 LUALIB_API lua_Number (luaL_optnumber) (lua_State *L, int nArg, lua_Number def);
 
+/* LUA-VEC */
+LUALIB_API lua_Vector (luaL_checkvec) (lua_State *L, int numArg);
+LUALIB_API lua_Vector (luaL_optvec) (lua_State *L, int nArg, const lua_Vector def);
+
 LUALIB_API lua_Integer (luaL_checkinteger) (lua_State *L, int numArg);
 LUALIB_API lua_Integer (luaL_optinteger) (lua_State *L, int nArg,
                                           lua_Integer def);

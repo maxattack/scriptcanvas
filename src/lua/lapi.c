@@ -12,7 +12,7 @@
 #define LUA_CORE
 
 #include "lua.h"
-
+#include "lvec.h"
 #include "lapi.h"
 #include "ldebug.h"
 #include "ldo.h"
@@ -26,7 +26,6 @@
 #include "ltm.h"
 #include "lundump.h"
 #include "lvm.h"
-
 
 
 const char lua_ident[] =
@@ -446,7 +445,15 @@ LUA_API const void *lua_topointer (lua_State *L, int idx) {
   }
 }
 
-
+/* LUA-VEC */
+LUA_API lua_Vector lua_tovec (lua_State *L, int idx) {
+  StkId o = index2addr(L, idx);
+  if (!ttisvec(o)) {
+    lua_Vector zero = { 0, 0 };
+    return zero;
+  }
+  return vecvalue(o); // TODO: indicate failure?
+}
 
 /*
 ** push functions (C -> stack)
@@ -589,7 +596,13 @@ LUA_API int lua_pushthread (lua_State *L) {
   return (G(L)->mainthread == L);
 }
 
-
+/* LUA-VEC */
+LUA_API void lua_pushvec (lua_State *L, float x, float y) {
+  lua_lock(L);
+  setvecvalue(L->top, x, y);
+  api_incr_top(L);
+  lua_unlock(L);
+}
 
 /*
 ** get functions (Lua -> stack)

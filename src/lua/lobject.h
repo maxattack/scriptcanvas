@@ -11,7 +11,7 @@
 
 #include <stdarg.h>
 
-
+#include "lvec.h"
 #include "llimits.h"
 #include "lua.h"
 
@@ -147,6 +147,7 @@ typedef struct lua_TValue TValue;
 #define ttisuserdata(o)		checktag((o), ctb(LUA_TUSERDATA))
 #define ttisthread(o)		checktag((o), ctb(LUA_TTHREAD))
 #define ttisdeadkey(o)		checktag((o), LUA_TDEADKEY)
+#define ttisvec(o)      checktag((o), LUA_TVEC) /* LUA-VEC */
 
 #define ttisequal(o1,o2)	(rttype(o1) == rttype(o2))
 
@@ -167,6 +168,8 @@ typedef struct lua_TValue TValue;
 #define thvalue(o)	check_exp(ttisthread(o), &val_(o).gc->th)
 /* a dead value may get the 'gc' field, but cannot access its contents */
 #define deadvalue(o)	check_exp(ttisdeadkey(o), cast(void *, val_(o).gc))
+#define vecvalue(o)     check_exp(ttisvec(o), val_(o).vec)  /* LUA-VEC */
+
 
 #define l_isfalse(o)	(ttisnil(o) || (ttisboolean(o) && bvalue(o) == 0))
 
@@ -238,6 +241,12 @@ typedef struct lua_TValue TValue;
 
 #define setdeadvalue(obj)	settt_(obj, LUA_TDEADKEY)
 
+/* LUA-VEC */
+#define setvecvalue(obj,ax,ay) \
+  { TValue *io=(obj);  \
+    val_(io).vec.x=(ax); \
+    val_(io).vec.y=(ay); \
+    settt_(io, LUA_TVEC); }
 
 
 #define setobj(L,obj1,obj2) \
@@ -393,7 +402,8 @@ union Value {
   void *p;         /* light userdata */
   int b;           /* booleans */
   lua_CFunction f; /* light C functions */
-  numfield         /* numbers */
+  lua_Vector vec;     /* LUA-VEC */
+  numfield;         /* numbers */
 };
 
 

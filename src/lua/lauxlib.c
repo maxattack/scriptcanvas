@@ -384,6 +384,18 @@ LUALIB_API lua_Number luaL_optnumber (lua_State *L, int narg, lua_Number def) {
   return luaL_opt(L, luaL_checknumber, narg, def);
 }
 
+/* LUA-VEC */
+LUALIB_API lua_Vector luaL_checkvec (lua_State *L, int narg) {
+  const lua_Vector v = lua_tovec(L, narg);
+  if (v.x == 0 && v.y == 0 && !lua_isvec(L, narg))  /* avoid extra test when d is not 0 */
+    tag_error(L, narg, LUA_TVEC);
+  return v;
+}
+
+/* LUA-VEC */
+LUALIB_API lua_Vector luaL_optvec (lua_State *L, int narg, lua_Vector def) {
+  return luaL_opt(L, luaL_checkvec, narg, def);
+}
 
 LUALIB_API lua_Integer luaL_checkinteger (lua_State *L, int narg) {
   int isnum;
@@ -746,6 +758,14 @@ LUALIB_API const char *luaL_tolstring (lua_State *L, int idx, size_t *len) {
       case LUA_TNIL:
         lua_pushliteral(L, "nil");
         break;
+      /* LUA-VEC */
+      case LUA_TVEC:
+        {
+          const lua_Vector v = lua_tovec(L, 1);
+          lua_pushfstring(L, "<%f, %f>", v.x, v.y); 
+        }
+        break;
+
       default:
         lua_pushfstring(L, "%s: %p", luaL_typename(L, idx),
                                             lua_topointer(L, idx));

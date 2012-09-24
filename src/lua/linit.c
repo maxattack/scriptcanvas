@@ -36,6 +36,8 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_STRLIBNAME, luaopen_string},
   {LUA_BITLIBNAME, luaopen_bit32},
   {LUA_MATHLIBNAME, luaopen_math},
+  /* LUA-VEC */
+  {LUA_VECLIBNAME, luaopen_vec},
   {LUA_DBLIBNAME, luaopen_debug},
   {NULL, NULL}
 };
