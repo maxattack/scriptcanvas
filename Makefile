@@ -12,13 +12,13 @@ CFLAGS += -DLUA_USE_POSIX
 #CFLAGS += -DNO_SIMD
 
 ifeq ($(PRODUCTION),1)
-CFLAGS += -Os
-LFLAGS += -Os
+CFLAGS += -O4
+LFLAGS += -O4
 else
 CFLAGS += -DDEBUG
 CFLAGS += -g
-CFLAGS += -O0
-LFLAGS += -O0
+CFLAGS += -Os
+LFLAGS += -Os
 endif
 
 LUA_OBJS = \
