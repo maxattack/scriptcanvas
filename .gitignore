@@ -1,7 +1,7 @@
 src/*.o
 src/lua/*.o
 src/math/*.o
-src/Script.cpp
+src/ScriptSystem_Bind.cpp
 tools/lua
 tools/luac
 **dSYM**

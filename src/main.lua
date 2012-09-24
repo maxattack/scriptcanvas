@@ -1,3 +1,7 @@
+local isDone = false
+while not isDone do
+	paint()
+end
 
 -- import(scene)
 -- import(math)
@@ -5,7 +9,7 @@
 -- -- create the planets
 
 -- function createPlanet(x, y, color, radius)
--- 	local result = addNode()
+-- 	local result = createNode()
 -- 	setPosition(result, x, y)
 -- 	circle.add(result, color, radius)
 -- 	return result
@@ -20,16 +24,16 @@
 
 -- -- create the noodle
 
--- function createNode(x, y)
--- 	local result = addNode()
+-- function addNode(x, y)
+-- 	local result = createNode()
 -- 	setPosition(result, x, y)
 -- 	return result
 -- end
 
--- local p0 = createNode(0, -50)
--- local p1 = createNode(200, 100)
--- local p2 = createNode(200, 600)
--- local p3 = createNode(300, 850)
+-- local p0 = addNode(0, -50)
+-- local p1 = addNode(200, 100)
+-- local p2 = addNode(200, 600)
+-- local p3 = addNode(300, 850)
 -- setDirection(p0, 50, 50)
 -- setDirection(p3, 50, 50)
 -- local noodle = spline.addMaterial(8, 0x777755)

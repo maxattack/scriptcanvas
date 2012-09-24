@@ -1,6 +1,5 @@
 #include "RenderSystem.h"
 #include "util/ProducerConsumerQueue.h"
-#include "Script.h"
 #include <algorithm>
 #include <functional>
 
