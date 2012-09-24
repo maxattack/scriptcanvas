@@ -1,6 +1,6 @@
 local isDone = false
 while not isDone do
-	paint()
+	scene.paint()
 end
 
 -- import(scene)
