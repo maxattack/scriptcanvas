@@ -445,7 +445,7 @@ LUA_API const void *lua_topointer (lua_State *L, int idx) {
   }
 }
 
-/* LUA-VEC */
+/* MAXATTACK */
 LUA_API lua_Vector lua_tovec (lua_State *L, int idx) {
   StkId o = index2addr(L, idx);
   if (!ttisvec(o)) {
@@ -596,7 +596,7 @@ LUA_API int lua_pushthread (lua_State *L) {
   return (G(L)->mainthread == L);
 }
 
-/* LUA-VEC */
+/* MAXATTACK */
 LUA_API void lua_pushvec (lua_State *L, float x, float y) {
   lua_lock(L);
   setvecvalue(L->top, x, y);

@@ -384,7 +384,7 @@ LUALIB_API lua_Number luaL_optnumber (lua_State *L, int narg, lua_Number def) {
   return luaL_opt(L, luaL_checknumber, narg, def);
 }
 
-/* LUA-VEC */
+/* MAXATTACK */
 LUALIB_API lua_Vector luaL_checkvec (lua_State *L, int narg) {
   const lua_Vector v = lua_tovec(L, narg);
   if (v.x == 0 && v.y == 0 && !lua_isvec(L, narg))  /* avoid extra test when d is not 0 */
@@ -392,7 +392,7 @@ LUALIB_API lua_Vector luaL_checkvec (lua_State *L, int narg) {
   return v;
 }
 
-/* LUA-VEC */
+/* MAXATTACK */
 LUALIB_API lua_Vector luaL_optvec (lua_State *L, int narg, lua_Vector def) {
   return luaL_opt(L, luaL_checkvec, narg, def);
 }
@@ -758,7 +758,7 @@ LUALIB_API const char *luaL_tolstring (lua_State *L, int idx, size_t *len) {
       case LUA_TNIL:
         lua_pushliteral(L, "nil");
         break;
-      /* LUA-VEC */
+      /* MAXATTACK */
       case LUA_TVEC:
         {
           const lua_Vector v = lua_tovec(L, 1);

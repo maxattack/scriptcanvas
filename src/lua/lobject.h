@@ -147,7 +147,7 @@ typedef struct lua_TValue TValue;
 #define ttisuserdata(o)		checktag((o), ctb(LUA_TUSERDATA))
 #define ttisthread(o)		checktag((o), ctb(LUA_TTHREAD))
 #define ttisdeadkey(o)		checktag((o), LUA_TDEADKEY)
-#define ttisvec(o)      checktag((o), LUA_TVEC) /* LUA-VEC */
+#define ttisvec(o)      checktag((o), LUA_TVEC) /* MAXATTACK */
 
 #define ttisequal(o1,o2)	(rttype(o1) == rttype(o2))
 
@@ -168,7 +168,7 @@ typedef struct lua_TValue TValue;
 #define thvalue(o)	check_exp(ttisthread(o), &val_(o).gc->th)
 /* a dead value may get the 'gc' field, but cannot access its contents */
 #define deadvalue(o)	check_exp(ttisdeadkey(o), cast(void *, val_(o).gc))
-#define vecvalue(o)     check_exp(ttisvec(o), val_(o).vec)  /* LUA-VEC */
+#define vecvalue(o)     check_exp(ttisvec(o), val_(o).vec)  /* MAXATTACK */
 
 
 #define l_isfalse(o)	(ttisnil(o) || (ttisboolean(o) && bvalue(o) == 0))
@@ -241,7 +241,7 @@ typedef struct lua_TValue TValue;
 
 #define setdeadvalue(obj)	settt_(obj, LUA_TDEADKEY)
 
-/* LUA-VEC */
+/* MAXATTACK */
 #define setvecvalue(obj,ax,ay) \
   { TValue *io=(obj);  \
     val_(io).vec.x=(ax); \
@@ -402,7 +402,7 @@ union Value {
   void *p;         /* light userdata */
   int b;           /* booleans */
   lua_CFunction f; /* light C functions */
-  lua_Vector vec;     /* LUA-VEC */
+  lua_Vector vec;     /* MAXATTACK */
   numfield;         /* numbers */
 };
 

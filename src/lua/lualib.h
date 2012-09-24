@@ -35,7 +35,7 @@ LUAMOD_API int (luaopen_bit32) (lua_State *L);
 #define LUA_MATHLIBNAME	"math"
 LUAMOD_API int (luaopen_math) (lua_State *L);
 
-/* LUA-VEC */
+/* MAXATTACK */
 #define LUA_VECLIBNAME	"vec"
 LUAMOD_API int (luaopen_vec) (lua_State *L);
 

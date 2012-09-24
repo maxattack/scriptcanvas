@@ -123,7 +123,7 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
       /* else will try the tag method */
     }
 
-    else if (ttisvec(t)) { /* LUA-VEC -- vec[idx] operator */
+    else if (ttisvec(t)) { /* MAXATTACK -- vec[idx] operator */
       /* issue: "index" may not be the correct arg for luaG_typeerror in here */
       if (ttisnumber(key) &&   /* acessing vec by a number? */
           (nvalue(key) >= 1 && nvalue(key) <= 2)) {  /* index is between 1-2? */
@@ -371,7 +371,7 @@ void luaV_objlen (lua_State *L, StkId ra, const TValue *rb) {
       setnvalue(ra, cast_num(tsvalue(rb)->len));
       return;
     }
-    /* LUA-VEC -- #vec operator */
+    /* MAXATTACK -- #vec operator */
     case LUA_TVEC: {
       setnvalue(ra, 2);
       return;
@@ -553,7 +553,7 @@ void luaV_finishOp (lua_State *L) {
         if (ttisnumber(rb) && ttisnumber(rc)) { \
           lua_Number nb = nvalue(rb), nc = nvalue(rc); \
           setnvalue(ra, op(L, nb, nc)); \
-        /* LUA-VEC - added add, sub and mul operators for 'vec op vec' case */ \
+        /* MAXATTACK - added add, sub and mul operators for 'vec op vec' case */ \
         } else if (ttisvec(rb) && ttisvec(rc) && (tm==TM_ADD || tm==TM_SUB || tm==TM_MUL)) { \
           /* vector add/sub/mul vector */ \
           lua_Vector nb = vecvalue(rb); \
@@ -682,7 +682,7 @@ void luaV_execute (lua_State *L) {
         if (ttisnumber(rb)) {
           lua_Number nb = nvalue(rb);
           setnvalue(ra, luai_numunm(L, nb));
-        } else if (ttisvec(rb)) { /* LUA-VEC - added unary negate */
+        } else if (ttisvec(rb)) { /* MAXATTACK - added unary negate */
           lua_Vector nb = vecvalue(rb);
           setvecvalue(ra, -nb.x, -nb.y);
         } else {
