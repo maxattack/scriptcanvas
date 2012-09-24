@@ -82,11 +82,11 @@ void game(void* ctxt) {
     // todo: terminate at script end
 
     for(;;) {
-        ScriptPaint();
+        SceneSystem::Paint();
     }
 }
 
-void ScriptPaint() {
+void SceneSystem::Paint() {
     RenderBuffer *vbuf;
     RenderSystem::RetrieveFromRenderSystem(&vbuf);
     RenderSystem::Clear(vbuf);

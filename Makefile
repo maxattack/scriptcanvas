@@ -57,11 +57,12 @@ LUA_OBJS = \
 	src/lua/lzio.o
 	
 OBJS = \
-	src/CircleManager.o \
 	src/InputSystem.o \
 	src/RenderSystem.o \
 	src/SceneSystem.o \
+	src/CircleManager.o \
 	src/SplineManager.o \
+	src/Script.o \
 	src/Math.o \
 	src/main.o
 
@@ -80,6 +81,9 @@ tools/lua: $(LUA_OBJS) src/lua/lua.o
 tools/luac: $(LUA_OBJS) src/lua/luac.o
 	$(CC) $(LUA_OBJS) src/lua/luac.o $(LFLAGS) -o tools/luac
 
+src/Script.cpp: tools/write_bindings.py
+	python tools/write_bindings.py src/Script.cpp
+
 %.o : %.cpp src/**.h
 	$(CXXC) $(CFLAGS) $(CXXFLAGS) -c $< -o $@
 
@@ -90,4 +94,4 @@ run: $(BIN)
 	./bubble main.lua
 
 clean:
-	rm -f $(OBJS) $(LUA_OBJS) $(BIN) $(TOOLS)
+	rm -f $(OBJS) $(LUA_OBJS) $(BIN) $(TOOLS) src/Script.cpp

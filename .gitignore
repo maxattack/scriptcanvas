@@ -1,8 +1,8 @@
 src/*.o
 src/lua/*.o
 src/math/*.o
-src/binding.cpp
-src/binding.h
-tools/tolua++
+src/Script.cpp
+tools/lua
+tools/luac
 **dSYM**
 bubble
