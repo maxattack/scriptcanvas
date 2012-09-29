@@ -5,7 +5,7 @@ CC = clang
 CXXC = clang++
 CFLAGS = -fno-common -I/usr/local/include -Wall -Werror -Wno-unused-variable $(OFLAG)
 CXXFLAGS = -fno-exceptions -fno-rtti -std=c++11 -stdlib=libc++
-LFLAGS = -L/usr/local/lib -lstdc++ -framework OpenGL -framework Cocoa -lglfw $(OFLAG)
+LFLAGS = -L/usr/local/lib  -stdlib=libc++ -framework OpenGL -framework Cocoa -lglfw $(OFLAG)
 
 CFLAGS += -DLUA_USE_POSIX
 #CFLAGS += -DNO_DAG_SORT
@@ -57,14 +57,15 @@ LUA_OBJS = \
 	src/lua/lzio.o
 	
 OBJS = \
+	src/CircleSystem.o \
 	src/CommandSystem.o \
 	src/InputSystem.o \
+	src/Math.o \
+	src/NameSystem.o \
 	src/RenderSystem.o \
 	src/SceneSystem.o \
 	src/ScriptSystem_Bind.o \
-	src/CircleSystem.o \
 	src/SplineSystem.o \
-	src/Math.o \
 	src/main.o
 
 TOOLS = \
@@ -72,7 +73,7 @@ TOOLS = \
 	tools/luac
 
 $(BIN): $(OBJS) $(LUA_OBJS)
-	$(CC) $(OBJS) $(LUA_OBJS) -o $(BIN) $(LFLAGS)
+	$(CXXC) $(OBJS) $(LUA_OBJS) -o $(BIN) $(LFLAGS)
 
 tools: $(TOOLS)
 

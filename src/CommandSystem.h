@@ -1,6 +1,7 @@
 #pragma once
 #include "SceneSystem.h"
 #include "RenderSystem.h"
+#include "NameSystem.h"
 #include "CircleSystem.h"
 #include "SplineSystem.h"
 

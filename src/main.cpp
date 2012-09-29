@@ -7,6 +7,7 @@ int main(int argc, char* argv[]) {
     RenderSystem::Initialize();
     SceneSystem::Initialize();
     CommandSystem::Initialize();
+    NameSystem::Initialize();
     CircleSystem::Initialize();
     SplineSystem::Initialize();
     InputSystem::Initialize();
@@ -35,6 +36,7 @@ int main(int argc, char* argv[]) {
     InputSystem::Destroy();
     SplineSystem::Destroy();
     CircleSystem::Destroy();
+    NameSystem::Destroy();
     CommandSystem::Destroy();
     SceneSystem::Destroy();
     RenderSystem::Destroy();

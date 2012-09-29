@@ -329,7 +329,9 @@ bool SceneSystem::HasComponent(ID node, ID componentType) {
 
 void SceneSystem::RemoveComponent(ID node, ID componentType) {
 	ASSERT(HasComponent(node, componentType));
+	// Do this like an abstract factory / array of function-pointers instead?
 	switch(componentType) {
+	case kComponentName: NameSystem::OnNodeDestroyed(node); break;
 	case kComponentCircle: CircleSystem::OnNodeDestroyed(node); break;
 	case kComponentSpline: SplineSystem::OnNodeDestroyed(node); break;
 	}

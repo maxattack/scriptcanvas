@@ -9,14 +9,15 @@
 #include <GL/glfw.h>
 
 #define kMaxNodes 					1024
-#define kMaxComponentTypes			32
 
+#define kSegmentResolution			256
 #define kMaxSegments				1024
 #define kMaxMaterials				64
 
-#define kComponentCircle			0
-#define kComponentSpline			1
-#define kSegmentResolution			256
+#define kComponentName				0
+#define kComponentCircle			1
+#define kComponentSpline			2
+#define kMaxComponentTypes			32
 
 typedef uint32_t ID;
 struct CommandBuffer;
