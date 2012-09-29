@@ -42,7 +42,10 @@ static uint16_t sNodeFreelistEnqueue;
 static uint16_t sNodeFreelistDequeue;
 static NodeSlot sNodeSlots[kMaxNodes];
 static PoseData sNodePoses[kMaxNodes];
+static uint32_t sComponentRegMask = 0;
 static IManager* sComponentManagers[kMaxComponentTypes];
+
+#define COMP_MASK(id)	(0x80000000 >> (id))
 
 #if !NO_DAG_SORT
 static int mFirstInvalidDagIndex;
@@ -310,31 +313,51 @@ void SceneSystem::Update(RenderBuffer *vbuf) {
 	}
 
 	#endif
+
+	// update components
+	uint32_t mask = sComponentRegMask;
+	while(mask) {
+		unsigned componentType = CLZ(mask);
+		sComponentManagers[componentType]->Update(vbuf);
+		mask ^= COMP_MASK(componentType);
+	}	
+}
+
+void SceneSystem::Render(RenderBuffer *vbuf) {
+	uint32_t mask = sComponentRegMask;
+	while(mask) {
+		unsigned componentType = CLZ(mask);
+		sComponentManagers[componentType]->Render(vbuf);
+		mask ^= COMP_MASK(componentType);
+	}
 }
 
 void SceneSystem::RegisterComponentManager(ID componentType, IManager* pMgr) {
-	ASSERT((componentType) < kMaxComponentTypes);
+	ASSERT(pMgr);
+	ASSERT(componentType < kMaxComponentTypes);
+	ASSERT((COMP_MASK(componentType) & sComponentRegMask) == 0);
 	ASSERT(sComponentManagers[componentType] == 0);
-	pMgr->Initialize();
 	sComponentManagers[componentType] = pMgr;
+	sComponentRegMask |= COMP_MASK(componentType);
+	pMgr->Initialize();
 }
 
 void SceneSystem::AddComponent(ID node, ID componentType) {
 	ASSERT(sComponentManagers[componentType]);
 	ASSERT(!HasComponent(node, componentType));
-	Slot(node).componentMask |= (0x80000000 >> componentType);
+	Slot(node).componentMask |= COMP_MASK(componentType);
 	sComponentManagers[componentType]->CreateComponent(node);
 }
 
 bool SceneSystem::HasComponent(ID node, ID componentType) {
-	return Slot(node).componentMask & (0x80000000 >> componentType);
+	return Slot(node).componentMask & COMP_MASK(componentType);
 }
 
 void SceneSystem::RemoveComponent(ID node, ID componentType) {
 	ASSERT(sComponentManagers[componentType]);
 	ASSERT(HasComponent(node, componentType));
 	sComponentManagers[componentType]->DestroyComponent(node);
-	Slot(node).componentMask ^= (0x80000000 >> componentType);
+	Slot(node).componentMask ^= COMP_MASK(componentType);
 }
 
 SceneSystem::ComponentIterator::ComponentIterator(ID node) {
@@ -344,7 +367,7 @@ SceneSystem::ComponentIterator::ComponentIterator(ID node) {
 bool SceneSystem::ComponentIterator::Next(ID *outComponentType) {
 	if (mask) {
 		*outComponentType = __builtin_clz(mask);
-		mask ^= (0x80000000 >> (*outComponentType));
+		mask ^= COMP_MASK(*outComponentType);
 		return true;
 	} else {
 		return false;

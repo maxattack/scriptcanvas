@@ -47,11 +47,7 @@ int main(int argc, char* argv[]) {
         RenderBuffer *vbuf;
         RenderSystem::RetrieveFromSceneSystem(&vbuf);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // TODO: dispatch rendering through SceneSystem
-        CircleSystem::gInst.Render(vbuf);
-        SplineSystem::gInst.Render(vbuf);
-
+        SceneSystem::Render(vbuf);
         glfwSwapBuffers();
         InputSystem::SetTime(glfwGetTime());
         RenderSystem::SubmitToSceneSystem(vbuf);
@@ -82,10 +78,5 @@ void SceneSystem::Paint() {
     RenderSystem::RetrieveFromRenderSystem(&vbuf);
     RenderSystem::Clear(vbuf);
     SceneSystem::Update(vbuf);
-
-    // TODO: dispatch updating through SceneSystem
-    CircleSystem::gInst.Update(vbuf);
-    SplineSystem::gInst.Update(vbuf);
-
     RenderSystem::SubmitToRenderSystem(vbuf);
 }

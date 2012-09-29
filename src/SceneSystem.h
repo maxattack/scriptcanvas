@@ -59,7 +59,11 @@ uint16_t Index(ID node);
 // For mid-frame one-shots -- the RenderQueue will get this batched.
 ztransform LocalToWorld(ID node);
 
+// For GAME thread -> write render state to vbuf
 void Update(RenderBuffer *vbuf);
+
+// For MAIN thread -> submit draw calls
+void Render(RenderBuffer *vbuf);
 
 // Register a component system with the scene system (belongs in basesystem?)
 void RegisterComponentManager(ID componentType, IManager* pMgr);

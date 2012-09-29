@@ -40,6 +40,8 @@ enum StatusCode {
 #define MAX(a,b)   ((a) > (b) ? (a) : (b))
 #endif
 
+#define CLZ(_expr)	(__builtin_clz(_expr))
+
 #ifdef DEBUG
 #   define ASSERT(cond) (assert(cond))
 #   define LOG(_x)   printf _x
