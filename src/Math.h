@@ -20,10 +20,10 @@ inline float Clamp01(uint8_t byte) {
 
 // 2D VECTOR MATH
 
-struct float2;
-inline float2 Float2(float x, float y);
+struct float2_t;
+inline float2_t Float2(float x, float y);
 
-struct float2 {
+struct float2_t {
   float x;
   float y;
 
@@ -32,113 +32,113 @@ struct float2 {
   float Norm() const { return x*x + y*y; }
   float Manhattan() const { return fabs(x)+fabs(y); }
   float Magnitude() const { return sqrtf(Norm()); }
-  float2 Conjugate() const { return Float2(x,-y); }
+  float2_t Conjugate() const { return Float2(x,-y); }
   float Radians() const { return atan2f(y,x); }
-  float2 Reflection() const { return Float2(y,x); }
-  float2 Anticlockwise() const { return Float2(-y, x); }
-  float2 Clockwise() const { return Float2(y, -x); }
-  float2 Normalized() const { return (*this) / Magnitude(); }
+  float2_t Reflection() const { return Float2(y,x); }
+  float2_t Anticlockwise() const { return Float2(-y, x); }
+  float2_t Clockwise() const { return Float2(y, -x); }
+  float2_t Normalized() const { return (*this) / Magnitude(); }
   
-  float2 operator+(float2 q) const { return Float2(x+q.x, y+q.y); }
-  float2 operator-(float2 q) const { return Float2(x-q.x, y-q.y); }
-  float2 operator-() const { return Float2(-x, -y); }
-  float2 operator*(float2 q) const { return Float2(x*q.x-y*q.y, x*q.y+y*q.x); }
-  float2 operator*(float k) const { return Float2(k*x, k*y); }
-  float2 operator/(float2 q) const {
+  float2_t operator+(float2_t q) const { return Float2(x+q.x, y+q.y); }
+  float2_t operator-(float2_t q) const { return Float2(x-q.x, y-q.y); }
+  float2_t operator-() const { return Float2(-x, -y); }
+  float2_t operator*(float2_t q) const { return Float2(x*q.x-y*q.y, x*q.y+y*q.x); }
+  float2_t operator*(float k) const { return Float2(k*x, k*y); }
+  float2_t operator/(float2_t q) const {
     float normInv = 1.0f/q.Norm();
     return Float2((x*q.x+y*q.y)*normInv, (q.x*y-x*q.y)*normInv);
   }
-  float2 operator/(float k) const { return Float2(x/k, y/k); }
+  float2_t operator/(float k) const { return Float2(x/k, y/k); }
   
-  float2 operator +=(float2 u) { x+=u.x; y+=u.y; return *this; }
-  float2 operator -=(float2 u) { x-=u.x; y-=u.y; return *this; } 
-  float2 operator *=(float2 u) { *this = (*this)*u; return *this; }
-  float2 operator *=(float k) { x*=k; y*=k; return *this; }
-  float2 operator /=(float2 u) { *this = (*this)/u; return *this; }
-  float2 operator /=(float k) { x/=k; y/=k; return *this; }
+  float2_t operator +=(float2_t u) { x+=u.x; y+=u.y; return *this; }
+  float2_t operator -=(float2_t u) { x-=u.x; y-=u.y; return *this; } 
+  float2_t operator *=(float2_t u) { *this = (*this)*u; return *this; }
+  float2_t operator *=(float k) { x*=k; y*=k; return *this; }
+  float2_t operator /=(float2_t u) { *this = (*this)/u; return *this; }
+  float2_t operator /=(float k) { x/=k; y/=k; return *this; }
 };
 
-inline float2 Float2(float x, float y) {
-  float2 result = { x, y };
+inline float2_t Float2(float x, float y) {
+  float2_t result = { x, y };
   return result;
 }
 
-inline float2 Polar(float radius, float radians) { 
+inline float2_t Polar(float radius, float radians) { 
   return Float2(radius*cosf(radians), radius*sinf(radians)); 
 }
 
-inline float2 operator*(float k, float2 q) { return Float2(k*q.x, k*q.y); }
-inline float Dot(float2 u, float2 v) { return u.x*v.x + u.y*v.y; }
-inline float Cross(float2 u, float2 v) { return u.x * v.y - v.x* u.y; }
-inline float2 Lerp(float2 u, float2 v, float t) { return u + t * (v - u); }
+inline float2_t operator*(float k, float2_t q) { return Float2(k*q.x, k*q.y); }
+inline float Dot(float2_t u, float2_t v) { return u.x*v.x + u.y*v.y; }
+inline float Cross(float2_t u, float2_t v) { return u.x * v.y - v.x* u.y; }
+inline float2_t Lerp(float2_t u, float2_t v, float t) { return u + t * (v - u); }
 
 // 2D PARAMETRIC FUNCTIONS
 
-bool LinearIntersection(float2 u0, float2 u1, float2 v0, float2 v1, float& u);
-bool LinearIntersection(float2 u0, float2 u1, float2 v0, float2 v1, float& u, float& v);
+bool LinearIntersection(float2_t u0, float2_t u1, float2_t v0, float2_t v1, float& u);
+bool LinearIntersection(float2_t u0, float2_t u1, float2_t v0, float2_t v1, float& u, float& v);
 
-float2 QuadraticBezier(float2 p0, float2 p1, float2 p2, float u);
-float2 QuadraticBezierDeriv(float2 p0, float2 p1, float2 p2, float u);
-float2 CubicBezier(float2 p0, float2 p1, float2 p2, float2 p3, float u);
-float2 CubicBezierDeriv(float2 p0, float2 p1, float2 p2, float2 p3, float u);
-float2 CubicHermite(float2 p0, float2 m0, float2 p1, float2 m1, float u);
-float2 CubicHermiteDeriv(float2 p0, float2 m0, float2 p1, float2 m1, float u);
+float2_t QuadraticBezier(float2_t p0, float2_t p1, float2_t p2, float u);
+float2_t QuadraticBezierDeriv(float2_t p0, float2_t p1, float2_t p2, float u);
+float2_t CubicBezier(float2_t p0, float2_t p1, float2_t p2, float2_t p3, float u);
+float2_t CubicBezierDeriv(float2_t p0, float2_t p1, float2_t p2, float2_t p3, float u);
+float2_t CubicHermite(float2_t p0, float2_t m0, float2_t p1, float2_t m1, float u);
+float2_t CubicHermiteDeriv(float2_t p0, float2_t m0, float2_t p1, float2_t m1, float u);
 
 // 2D COMPLEX TRANSFORMS OF THE FORM: q*v + t
 
-struct transform;
-inline transform Transform(float2 q=Float2(1,0), float2 t=Float2(0,0));
+struct transform_t;
+inline transform_t Transform(float2_t q=Float2(1,0), float2_t t=Float2(0,0));
 
-struct transform {
+struct transform_t {
 
-  float2 q;
-  float2 t;
+  float2_t q;
+  float2_t t;
 
-  float2 TransformPoint(float2 p) const { return q*p + t; }
-  float2 TransformVector(float2 v) const { return q*v; }
-  float2 InvTransformPoint(float2 p) const { return (p - t)/q; }
-  float2 InvTransformVector(float2 v) const { return v/q; }
+  float2_t TransformPoint(float2_t p) const { return q*p + t; }
+  float2_t TransformVector(float2_t v) const { return q*v; }
+  float2_t InvTransformPoint(float2_t p) const { return (p - t)/q; }
+  float2_t InvTransformVector(float2_t v) const { return v/q; }
 
   bool Identity() const { 
     return t.Norm() < 0.001f && (q-Float2(1,0)).Norm() < 0.001f; 
   }
   
-  transform Inverse() const { 
-    float2 qInv = Float2(1,0)/q;
+  transform_t Inverse() const { 
+    float2_t qInv = Float2(1,0)/q;
     return Transform(qInv, -t*qInv);
   }
 
-  transform operator*(transform u) const { 
+  transform_t operator*(transform_t u) const { 
     return Transform(q*u.q, u.q*t + u.t);
   }
 };
 
-inline transform Transform(float2 q, float2 t) {
-  transform result = { q, t };
+inline transform_t Transform(float2_t q, float2_t t) {
+  transform_t result = { q, t };
   return result;
 }
 
-inline transform Translation(float2 t) {
+inline transform_t Translation(float2_t t) {
   return Transform(Float2(1,0), t);
 }
 
-inline transform Rotation(float radians) {
+inline transform_t Rotation(float radians) {
   return Transform(Polar(1,radians), Float2(0,0));
 }
 
-inline transform Scale(float k) {
+inline transform_t Scale(float k) {
   return Transform(Float2(k,0), Float2(0,0));
 }
 
-inline transform TRS(float2 t, float radians, float scale) {
+inline transform_t TRS(float2_t t, float radians, float scale) {
   return Transform(Polar(scale, radians), t);
 }
 
-struct ztransform {
+struct ztransform_t {
   float z;
-  transform t;
-  ztransform operator*(const ztransform& rhs) const {
-    ztransform result = {
+  transform_t t;
+  ztransform_t operator*(const ztransform_t& rhs) const {
+    ztransform_t result = {
       z + rhs.z,
       t * rhs.t
     };
@@ -146,7 +146,7 @@ struct ztransform {
   }
 };
 
-inline ztransform ZTransform() {
-  ztransform result = { 0, Transform() };
+inline ztransform_t ZTransform() {
+  ztransform_t result = { 0, Transform() };
   return result;
 }

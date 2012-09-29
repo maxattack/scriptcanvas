@@ -63,6 +63,6 @@ while not isDone do
 	setDirection(p2, vec(200,600) - mp)
 	spline.setWeight(noodle, 8  + 32 * (0.5 + 0.5 * sin(tau*t)))
 
-	paint()
+	script.yield()
 end
 

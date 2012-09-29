@@ -1,6 +1,6 @@
 #pragma once
-#include "IManager.h"
 #include "Math.h"
+#include "RenderSystem.h"
 
 namespace SceneSystem {
 
@@ -14,7 +14,7 @@ namespace SceneSystem {
 //
 // Components themselves are completely managed in separate systems.  
 // The SceneSystem only manages the rapid manipulation of the scene
-// and efficient computation of a worldspace-transform buffer for 
+// and efficient computation of a worldspace-transform_t buffer for 
 // the RenderSystem.
 //
 // The SceneSystem itself performs no dynamic memory allocation.  All
@@ -24,6 +24,7 @@ namespace SceneSystem {
 
 // Initialize the scene system
 void Initialize();
+void Destroy();
 
 // Is this ID defined for the current scene?
 bool NodeValid(ID id);
@@ -51,22 +52,16 @@ struct ChildIterator {
 	bool Next(ID *outNode);
 };
 
-// Lookup a node's local-to-parent transform
-ztransform& LocalToParent(ID node);
+// Lookup a node's local-to-parent transform_t
+ztransform_t& LocalToParent(ID node);
 
 uint16_t Index(ID node);
 
 // For mid-frame one-shots -- the RenderQueue will get this batched.
-ztransform LocalToWorld(ID node);
+ztransform_t LocalToWorld(ID node);
 
-// For GAME thread -> write render state to vbuf
-void Update(RenderBuffer *vbuf);
-
-// For MAIN thread -> submit draw calls
-void Render(RenderBuffer *vbuf);
-
-// Register a component system with the scene system (belongs in basesystem?)
-void RegisterComponentManager(ID componentType, IManager* pMgr);
+// write render state to vbuf
+void Update(CommandBuffer *buf);
 
 // Add a component to a node.  Each node can have multiple components,
 // but only one component of a given type.
@@ -89,6 +84,31 @@ struct ComponentIterator {
 // Recursively destroy a node's children, then the node's
 // components, and then the node itself.
 void DestroyNode(ID node);
+
+// Helper Methods
+inline float2_t Position(ID node) { 
+	return LocalToParent(node).t.t; 
+}
+
+inline float Rotation(ID node) { 
+	return LocalToParent(node).t.q.Radians() * (180.0f/M_PI); 
+}
+
+inline float2_t Direction(ID node) { 
+	return LocalToParent(node).t.q; 
+}
+
+inline void SetPosition(ID node, float2_t p) { 
+	LocalToParent(node).t.t = p; 
+}
+
+inline void SetRotation(ID node, float degrees) { 
+	LocalToParent(node).t.q = Polar(1.f, degrees * (M_PI/180.0f)); 
+}
+
+inline void SetDirection(ID node, float2_t d) { 
+	LocalToParent(node).t.q = d; 
+}
 
 //------------------------------------------------------------------------------
 // TODO

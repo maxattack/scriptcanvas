@@ -1,6 +1,7 @@
-#include "RenderSystem.h"
 #include <algorithm>
 #include <cstring>
+#include "SceneSystem.h"
+#include "CommandSystem.h"
 
 //------------------------------------------------------
 // INTERNAL DATA
@@ -30,7 +31,7 @@ struct NodeSlot {
 struct PoseData {
 	uint16_t parentIndex;
 	uint16_t slotIndex;
-	ztransform localToParent;
+	ztransform_t localToParent;
 };
 
 //------------------------------------------------------
@@ -42,8 +43,6 @@ static uint16_t sNodeFreelistEnqueue;
 static uint16_t sNodeFreelistDequeue;
 static NodeSlot sNodeSlots[kMaxNodes];
 static PoseData sNodePoses[kMaxNodes];
-static uint32_t sComponentRegMask = 0;
-static IManager* sComponentManagers[kMaxComponentTypes];
 
 #define COMP_MASK(id)	(0x80000000 >> (id))
 
@@ -71,7 +70,6 @@ static PoseData& Pose(ID id) {
 //------------------------------------------------------
 
 void SceneSystem::Initialize() {
-	memset(sComponentManagers, 0, kMaxComponentTypes * sizeof(IManager*));
 	#if !NO_DAG_SORT
 	mFirstInvalidDagIndex = -1;
 	mLastInvalidDagIndex = -1;
@@ -84,6 +82,10 @@ void SceneSystem::Initialize() {
 		sNodeSlots[i].poseIndex = USHRT_MAX;
 		sNodeSlots[i].nextFreeSlot = i+1;
 	}
+}
+
+void SceneSystem::Destroy() {
+	// NOOP
 }
 
 bool SceneSystem::NodeValid(ID id) {
@@ -189,11 +191,11 @@ uint16_t SceneSystem::Index(ID node) {
 	return Slot(node).poseIndex;
 }
 
-ztransform& SceneSystem::LocalToParent(ID node) {
+ztransform_t& SceneSystem::LocalToParent(ID node) {
 	return Pose(node).localToParent;
 }
 
-static ztransform ComputeLocalToWorld(const PoseData& pose) {
+static ztransform_t ComputeLocalToWorld(const PoseData& pose) {
 	if (pose.parentIndex == USHRT_MAX) {
 		return pose.localToParent;
 	} else {
@@ -201,15 +203,15 @@ static ztransform ComputeLocalToWorld(const PoseData& pose) {
 	}
 }
 
-ztransform SceneSystem::LocalToWorld(ID node) {
+ztransform_t SceneSystem::LocalToWorld(ID node) {
 	return ComputeLocalToWorld(Pose(node));
 }
 
 #if NO_DAG_SORT
 
-static void Update(RenderBuffer *vbuf, uint16_t i) {
+static void Update(CommandBuffer *vbuf, uint16_t i) {
 	auto& pose = sNodePoses[i];
-	vbuf->transforms[i] = pose.localToParent * vbuf->transforms[pose.parentIndex];
+	vbuf->transform_ts[i] = pose.localToParent * vbuf->transform_ts[pose.parentIndex];
 	for(ID cid=Slot(pose.slotIndex).firstChild; cid; cid=Slot(cid).nextSibling) {
 		Update(vbuf, Slot(cid).poseIndex);
 	}
@@ -217,14 +219,14 @@ static void Update(RenderBuffer *vbuf, uint16_t i) {
 
 #endif
 
-void SceneSystem::Update(RenderBuffer *vbuf) {
+void SceneSystem::Update(CommandBuffer *vbuf) {
 	
 	#if NO_DAG_SORT
 	// have to walk the heirarchy recursively :P
 	for(int i=0; i<sNodeCount; ++i) {
 		auto& pose = sNodePoses[i];
 		if (pose.parentIndex == USHRT_MAX) {
-			vbuf->transforms[i] = pose.localToParent;
+			vbuf->transform_ts[i] = pose.localToParent;
 			for(ID cid=Slot(pose.slotIndex).firstChild; cid; cid=Slot(cid).nextSibling) {
 				Update(vbuf, Slot(cid).poseIndex);
 			}
@@ -306,47 +308,19 @@ void SceneSystem::Update(RenderBuffer *vbuf) {
 	// fast-compute local-to-world buffer
 	for(int i=0; i<sNodeCount; ++i) {
 		if (sNodePoses[i].parentIndex == USHRT_MAX) {
-			vbuf->transforms[i] = sNodePoses[i].localToParent;
+			vbuf->transform_ts[i] = sNodePoses[i].localToParent;
 		} else {
-			vbuf->transforms[i] = sNodePoses[i].localToParent * vbuf->transforms[sNodePoses[i].parentIndex];
+			vbuf->transform_ts[i] = sNodePoses[i].localToParent * vbuf->transform_ts[sNodePoses[i].parentIndex];
 		}
 	}
 
 	#endif
 
-	// update components
-	uint32_t mask = sComponentRegMask;
-	while(mask) {
-		unsigned componentType = CLZ(mask);
-		sComponentManagers[componentType]->Update(vbuf);
-		mask ^= COMP_MASK(componentType);
-	}	
-}
-
-void SceneSystem::Render(RenderBuffer *vbuf) {
-	uint32_t mask = sComponentRegMask;
-	while(mask) {
-		unsigned componentType = CLZ(mask);
-		sComponentManagers[componentType]->Render(vbuf);
-		mask ^= COMP_MASK(componentType);
-	}
-}
-
-void SceneSystem::RegisterComponentManager(ID componentType, IManager* pMgr) {
-	ASSERT(pMgr);
-	ASSERT(componentType < kMaxComponentTypes);
-	ASSERT((COMP_MASK(componentType) & sComponentRegMask) == 0);
-	ASSERT(sComponentManagers[componentType] == 0);
-	sComponentManagers[componentType] = pMgr;
-	sComponentRegMask |= COMP_MASK(componentType);
-	pMgr->Initialize();
 }
 
 void SceneSystem::AddComponent(ID node, ID componentType) {
-	ASSERT(sComponentManagers[componentType]);
 	ASSERT(!HasComponent(node, componentType));
 	Slot(node).componentMask |= COMP_MASK(componentType);
-	sComponentManagers[componentType]->CreateComponent(node);
 }
 
 bool SceneSystem::HasComponent(ID node, ID componentType) {
@@ -354,9 +328,11 @@ bool SceneSystem::HasComponent(ID node, ID componentType) {
 }
 
 void SceneSystem::RemoveComponent(ID node, ID componentType) {
-	ASSERT(sComponentManagers[componentType]);
 	ASSERT(HasComponent(node, componentType));
-	sComponentManagers[componentType]->DestroyComponent(node);
+	switch(componentType) {
+	case kComponentCircle: CircleSystem::OnNodeDestroyed(node); break;
+	case kComponentSpline: SplineSystem::OnNodeDestroyed(node); break;
+	}
 	Slot(node).componentMask ^= COMP_MASK(componentType);
 }
 
@@ -387,7 +363,7 @@ void SceneSystem::DestroyNode(ID node) {
 	ComponentIterator listComponents(node);
 	ID componentType;
 	while(listComponents.Next(&componentType)) {
-		sComponentManagers[componentType]->DestroyComponent(node);
+		RemoveComponent(node, componentType);
 	}
 
 	// relocate last element into this slot and deallocate the last slot

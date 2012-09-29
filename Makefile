@@ -57,12 +57,13 @@ LUA_OBJS = \
 	src/lua/lzio.o
 	
 OBJS = \
+	src/CommandSystem.o \
 	src/InputSystem.o \
 	src/RenderSystem.o \
 	src/SceneSystem.o \
 	src/ScriptSystem_Bind.o \
-	src/CircleManager.o \
-	src/SplineManager.o \
+	src/CircleSystem.o \
+	src/SplineSystem.o \
 	src/Math.o \
 	src/main.o
 

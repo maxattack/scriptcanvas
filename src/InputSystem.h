@@ -5,13 +5,11 @@ namespace InputSystem {
 
 // These methods are all synchronized
 void Initialize();
-void SetMousePosition(int x, int y);
-void SetTime(double t);
+void Update();
 
-float2 MousePosition();
-void GetMousePosition(int *x=0, int *y=0);
+float2_t MousePosition();
 double Time();
 
-void Finalize();
+void Destroy();
 
 }

@@ -4,38 +4,33 @@
 // TODO - Add an atomic "dirty bit" and copy
 
 static GLFWmutex lock;
-static float2 mousePosition;
 static double seconds;
+static float2_t mousePosition;
 
-void InputSystem::Initialize() {
-	lock = glfwCreateMutex();
-	mousePosition = Float2(0,0);
-	seconds = 0;
-}
-
-void InputSystem::SetMousePosition(int x, int y) {
+static void OnMouseMoved(int x, int y) {
 	glfwLockMutex(lock);
 	mousePosition = Float2(x, y);
 	glfwUnlockMutex(lock);
 }
 
-void InputSystem::SetTime(double t) {
+void InputSystem::Initialize() {
+	lock = glfwCreateMutex();
+	seconds = glfwGetTime();
+	mousePosition = Float2(0,0);
+    glfwSetMousePosCallback(OnMouseMoved);
+}
+
+void InputSystem::Update() {
 	glfwLockMutex(lock);
-	seconds = t;
+	seconds = glfwGetTime();
 	glfwUnlockMutex(lock);
 }
 
-float2 InputSystem::MousePosition() {
+float2_t InputSystem::MousePosition() {
 	glfwLockMutex(lock);
-	float2 result = mousePosition;
+	float2_t result = mousePosition;
 	glfwUnlockMutex(lock);
 	return result;
-}
-
-void InputSystem::GetMousePosition(int *x, int *y) {
-	auto position = MousePosition();
-	*x = position.x;
-	*y = position.y;
 }
 
 double InputSystem::Time() {
@@ -45,6 +40,6 @@ double InputSystem::Time() {
 	return seconds;
 }
 
-void InputSystem::Finalize() {
+void InputSystem::Destroy() {
 	glfwDestroyMutex(lock);
 }

@@ -6,20 +6,23 @@ import os, os.path, sys, traceback
 
 MODULES = {
 
+	'script': {
+		'yield':			'void ScriptSystem::Yield()'
+	},
+
 	'scene': {
-		'paint': 			'void SceneSystem::Paint()',
 		'nodeCount': 		'int SceneSystem::NodeCount()',
 		'createNode': 		'ID SceneSystem::CreateNode(ID parent=0)',
 		'attachTo': 		'void SceneSystem::AttachNode(ID parent, ID child)',
 		'detach': 			'void SceneSystem::DetachNode(ID child)',
 		'parent': 			'ID SceneSystem::Parent(ID node)',
 		'destroyNode':		'void SceneSystem::DestroyNode(ID node)',
-		'position': 		'float2 SceneSystem::Position(ID node)',
+		'position': 		'float2_t SceneSystem::Position(ID node)',
 		'rotation': 		'float SceneSystem::Rotation(ID node)',
-		'direction': 		'float2 SceneSystem::Direction(ID node)',
-		'setPosition': 		'void SceneSystem::SetPosition(ID node, float2 pos)',
+		'direction': 		'float2_t SceneSystem::Direction(ID node)',
+		'setPosition': 		'void SceneSystem::SetPosition(ID node, float2_t pos)',
 		'setRotation': 		'void SceneSystem::SetRotation(ID node, float degrees)',
-		'setDirection': 	'void SceneSystem::SetDirection(ID node, float2 dir)'
+		'setDirection': 	'void SceneSystem::SetDirection(ID node, float2_t dir)'
 	},
 
 	'circle': {
@@ -32,7 +35,7 @@ MODULES = {
 	},
 
 	'input': {
-		'mousePosition': 	'float2 InputSystem::MousePosition()',
+		'mousePosition': 	'float2_t InputSystem::MousePosition()',
 		'seconds': 			'double InputSystem::Time()'
 	},
 
@@ -42,7 +45,7 @@ MODULES = {
 		'color':			'color_t SplineSystem::Color(ID mat)',
 		'setWeight':		'void SplineSystem::SetWeight(ID mat, float weight)',
 		'setColor':			'void SplineSystem::SetColor(ID mat, color_t color)',
-		'addSegment':		'ID SplineSystem::CreateHermiteSegment(ID start, ID end, ID mat)'
+		'addSegment':		'ID SplineSystem::CreateSegment(ID start, ID end, ID mat)'
 	}
 
 }
@@ -68,8 +71,8 @@ static void LoadModule(lua_State* L, const char* name, const luaL_Reg *p, int nf
 	lua_setglobal(L, name);
 }
 
-inline float2 Float2(lua_Vector v) {
-	return *(float2*)(&v);
+inline float2_t Float2(lua_Vector v) {
+	return *(float2_t*)(&v);
 }
 
 '''
@@ -113,7 +116,7 @@ def write_function_implementation(src, module, name, sig):
 				return 'luaL_checkunsigned(L, %d)' % stack_index
 			elif type in ('float', 'double'):
 				return 'luaL_checknumber(L, %d)' % stack_index
-			elif type in ('float2'):
+			elif type in ('float2_t'):
 				return 'Float2(luaL_checkvec(L, %d))' % stack_index
 			elif type in ('color_t'):
 				return 'RGB(luaL_checkunsigned(L, %d))' % stack_index
@@ -127,7 +130,7 @@ def write_function_implementation(src, module, name, sig):
 				return 'luaL_optunsigned(L, %d, %s)' % (stack_index, def_value)
 			elif type in ('float', 'double'):
 				return 'luaL_optnumber(L, %d, %s)' % (stack_index, def_value)
-			elif type in ('float2'):
+			elif type in ('float2_t'):
 				return 'Float2(luaL_optvec(L, %d, %s))' % (stack_index, def_value)
 			elif type in ('color_t'):
 				return 'RGB(luaL_optunsigned(L, %d, %s))' % (stack_index, def_value)
@@ -158,7 +161,7 @@ def write_function_implementation(src, module, name, sig):
 	elif result_type in ('float', 'double'):
 		num_results = 1
 		write_line(src, "lua_pushnumber(L, result);")
-	elif result_type in ("float2"):
+	elif result_type in ("float2_t"):
 		num_results = 1
 		write_line(src, "lua_pushvec(L, result.x, result.y);")
 	elif result_type in ("color_t"):

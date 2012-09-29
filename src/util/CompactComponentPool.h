@@ -7,10 +7,17 @@
 
 template<typename T>
 class CompactComponentPool {
+public:
+	struct Slot {
+		ID node;
+		T component;
+	};
+	
 private:
+
 	uint32_t mCount;
 	uint16_t mIndex[kMaxNodes];
-	T mBuffer[kMaxNodes];
+	Slot mBuffer[kMaxNodes];
 
 public:
 	CompactComponentPool();
@@ -22,8 +29,8 @@ public:
 	T& operator[](ID node);
 	T operator[](ID node) const;
 	int Count() const { return mCount; }
-    T* Begin() { return mBuffer; }
-    T* End() { return mBuffer + mCount; }
+    Slot* Begin() { return mBuffer; }
+    Slot* End() { return mBuffer + mCount; }
 	
 };
 
@@ -55,11 +62,11 @@ void CompactComponentPool<T>::Free(ID node) {
 template<typename T>
 T& CompactComponentPool<T>::operator[](ID node) {
 	ASSERT(IsActive(node));
-	return mBuffer[mIndex[node & 0xffff]];
+	return mBuffer[mIndex[node & 0xffff]].component;
 }
 
 template<typename T>
 T CompactComponentPool<T>::operator[](ID node) const {
 	ASSERT(IsActive(node));
-	return mBuffer[mIndex[node & 0xffff]];
+	return mBuffer[mIndex[node & 0xffff]].component;
 }

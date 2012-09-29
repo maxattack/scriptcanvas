@@ -1,62 +1,32 @@
 #include "RenderSystem.h"
-#include "util/ProducerConsumerQueue.h"
 #include <algorithm>
 #include <functional>
 
-static folly::ProducerConsumerQueue<RenderBuffer*, 4> mRenderQueue;
-static folly::ProducerConsumerQueue<RenderBuffer*, 4> mSceneQueue;
-static GLFWcond gRenderCondition;
-static GLFWcond gSceneCondition;
-static GLFWmutex gRenderMutex;
-static GLFWmutex gSceneMutex;
-
 void RenderSystem::Initialize() {
-	gRenderCondition = glfwCreateCond();
-	gSceneCondition = glfwCreateCond();
-	gRenderMutex = glfwCreateMutex();
-	gSceneMutex = glfwCreateMutex();
+    // Initialize Display
+    glfwInit();
+    if (glfwOpenWindow(800, 800,8, 8, 8, 8, 8, 0, GLFW_WINDOW) != GL_TRUE) {
+        printf("[ERROR] Window Failed to Open.\n");
+        // TODO: return error code
+        exit(-1);
+    }
+    glfwSetWindowTitle("Bubbles!?");
+    int w,h;
+    glfwGetWindowSize(&w, &h);
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glOrtho(0, w, h, 0, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 }
 
-void RenderSystem::Clear(RenderBuffer *vbuf) {
-	vbuf->circleCount = 0;
-    vbuf->materialCount = 0;
-    vbuf->hermiteSegmentCount = 0;
+void RenderSystem::Render(CommandBuffer *vbuf) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderSystem::SubmitToRenderSystem(RenderBuffer* vbuf) {
-	glfwLockMutex(gSceneMutex);
-	auto result = mRenderQueue.write(vbuf);
-	ASSERT(result); // eek?
-	glfwUnlockMutex(gSceneMutex);
-	glfwSignalCond(gSceneCondition);
-}
-
-void RenderSystem::RetrieveFromRenderSystem(RenderBuffer** out) {
-	if (!mSceneQueue.read(*out)) {
-		//puts("waiting on renderer...");
-		glfwLockMutex(gRenderMutex);
-		glfwWaitCond(gRenderCondition, gRenderMutex, GLFW_INFINITY);
-		glfwUnlockMutex(gRenderMutex);
-		mSceneQueue.read(*out);
-	}
-}
-
-void RenderSystem::RetrieveFromSceneSystem(RenderBuffer** out) {
-	if (!mRenderQueue.read(*out)) {
-		//puts("waiting on scene...");
-		glfwLockMutex(gSceneMutex);
-		glfwWaitCond(gSceneCondition, gSceneMutex, GLFW_INFINITY);
-		glfwUnlockMutex(gSceneMutex);
-		mRenderQueue.read(*out);
-	}
-}
-
-void RenderSystem::SubmitToSceneSystem(RenderBuffer* vbuf) {
-	glfwLockMutex(gRenderMutex);
-	auto result = mSceneQueue.write(vbuf);
-	ASSERT(result); // eek?
-	glfwUnlockMutex(gRenderMutex);
-	glfwSignalCond(gRenderCondition);
+void RenderSystem::Destroy() {
+    glfwTerminate();
 }
 
 GLuint RenderSystem::LoadShaderProgram(const char* filename) {

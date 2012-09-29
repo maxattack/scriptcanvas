@@ -26,30 +26,38 @@ struct color_t {
 	}
 };
 
+inline color_t Color() {
+		color_t result = { 255, 255, 255, 255 };
+		return result;
+}
+
 inline color_t Color(float r, float g, float b, float a=1.f) {
-	color_t result;
-	result.a = Clamp01(a);
-	result.r = Clamp01(r);
-	result.g = Clamp01(g);
-	result.b = Clamp01(b);
+	color_t result = {
+		uint8_t(255 * Clamp01(a)),
+		uint8_t(255 * Clamp01(r)),
+		uint8_t(255 * Clamp01(g)),
+		uint8_t(255 * Clamp01(b))
+	};
 	return result;
 }
 
 inline color_t RGB(uint32_t rgb) {
-	color_t result;
-	result.r = (rgb & 0xff0000) >> 16;
-	result.g = (rgb & 0x00ff00) >> 8;
-	result.b = (rgb & 0x0000ff);
-	result.a = 255;
+	color_t result = {
+		255,
+		uint8_t((rgb & 0xff0000) >> 16),
+		uint8_t((rgb & 0x00ff00) >> 8),
+		uint8_t(rgb & 0x0000ff)
+	};
 	return result;
 }
 
 inline color_t ARGB(uint32_t argb) {
-	color_t result;
-	result.a = (argb & 0xff000000) >> 24;
-	result.r = (argb & 0x00ff0000) >> 16;
-	result.g = (argb & 0x0000ff00) >> 8;
-	result.b = (argb & 0x000000ff);
+	color_t result = {
+		uint8_t((argb & 0xff000000) >> 24),
+		uint8_t((argb & 0x00ff0000) >> 16),
+		uint8_t((argb & 0x0000ff00) >> 8),
+		uint8_t(argb & 0x000000ff)
+	};
 	return result;
 }
 
