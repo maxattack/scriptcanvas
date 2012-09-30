@@ -4,7 +4,7 @@
 #include <string>
 
 struct Name {
-	const char* name;
+	char name[kMaxNameLength];
 };
 
 CompactComponentPool<Name> mNames;
@@ -17,10 +17,11 @@ void NameSystem::Destroy() {
 	mDict.clear();
 }
 
-void NameSystem::SetName(ID node, const char* name) {
+void NameSystem::SetName(ID node, std::string name) {
+	ASSERT(name.size() < kMaxNameLength);
 	SceneSystem::AddComponent(node, kComponentName);
 	mNames.Alloc(node);
-	mNames[node].name = name;
+	strcpy(mNames[node].name,  name.c_str());
 	mDict[name] = node;
 }
 
@@ -33,11 +34,11 @@ void NameSystem::OnNodeDestroyed(ID node) {
 	mNames.Free(node);
 }
 
-const char* NameSystem::Name(ID node) {
+std::string NameSystem::Name(ID node) {
 	return mNames[node].name;
 }
 
-ID NameSystem::FindNode(const char *name) {
+ID NameSystem::FindNode(std::string name) {
 	auto result = mDict.find(name);
 	return result == mDict.end() ? 0 : result->second;
 }

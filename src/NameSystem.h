@@ -1,15 +1,18 @@
 #pragma once
 #include "Foundation.h"
+#include <string>
+
+#define kMaxNameLength	32
 
 namespace NameSystem {
 
 	void Initialize();
 	void Destroy();
-	void SetName(ID node, const char* name);
+	void SetName(ID node, std::string name);
 	void ClearName(ID node);
 	void OnNodeDestroyed(ID node);
 
-	const char* Name(ID node);
-	ID FindNode(const char *name);
+	std::string Name(ID node);
+	ID FindNode(std::string name);
 
 }

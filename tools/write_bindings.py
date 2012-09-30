@@ -22,7 +22,11 @@ MODULES = {
 		'direction': 		'float2_t SceneSystem::Direction(ID node)',
 		'setPosition': 		'void SceneSystem::SetPosition(ID node, float2_t pos)',
 		'setRotation': 		'void SceneSystem::SetRotation(ID node, float degrees)',
-		'setDirection': 	'void SceneSystem::SetDirection(ID node, float2_t dir)'
+		'setDirection': 	'void SceneSystem::SetDirection(ID node, float2_t dir)',
+		#'setName': 			'void NameSystem::SetName(ID node, std::string name)',
+		#'clearName':		'void NameSystem::ClearName(ID node)',
+		#'name':				'std::string NameSystem::Name(ID node)',
+		#'find':				'ID NameSystem::FindNode(std::string name)'
 	},
 
 	'circle': {
@@ -36,7 +40,8 @@ MODULES = {
 
 	'input': {
 		'mousePosition': 	'float2_t InputSystem::MousePosition()',
-		'seconds': 			'double InputSystem::Time()'
+		'seconds': 			'double InputSystem::Time()',
+		'quit':				'bool InputSystem::Quit()'
 	},
 
 	'spline': {
@@ -46,7 +51,7 @@ MODULES = {
 		'setWeight':		'void SplineSystem::SetWeight(ID mat, float weight)',
 		'setColor':			'void SplineSystem::SetColor(ID mat, color_t color)',
 		'addSegment':		'ID SplineSystem::CreateSegment(ID start, ID end, ID mat)'
-	}
+	},
 
 }
 
@@ -120,6 +125,8 @@ def write_function_implementation(src, module, name, sig):
 				return 'Float2(luaL_checkvec(L, %d))' % stack_index
 			elif type in ('color_t'):
 				return 'RGB(luaL_checkunsigned(L, %d))' % stack_index
+			elif type in ('bool'):
+				return '(luaL_checkunsigned(L, %d) != 0)' % stack_index
 			else:
 				dofail()
 
@@ -134,6 +141,8 @@ def write_function_implementation(src, module, name, sig):
 				return 'Float2(luaL_optvec(L, %d, %s))' % (stack_index, def_value)
 			elif type in ('color_t'):
 				return 'RGB(luaL_optunsigned(L, %d, %s))' % (stack_index, def_value)
+			elif type in ('bool'):
+				return '(luaL_optunsigned(L, %d) != 0)' % stack_index
 			else:
 				dofail()
 
@@ -158,6 +167,9 @@ def write_function_implementation(src, module, name, sig):
 	elif result_type in ('uint32_t', 'ID'):
 		num_results = 1
 		write_line(src, "lua_pushunsigned(L, result);")
+	elif result_type in ('bool'):
+		num_results = 1
+		write_line(src, "lua_pushboolean(L, result);")
 	elif result_type in ('float', 'double'):
 		num_results = 1
 		write_line(src, "lua_pushnumber(L, result);")

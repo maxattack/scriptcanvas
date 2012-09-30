@@ -44,8 +44,7 @@ spline.addSegment(p2, p3, noodle);
 
 -- game loop
 
-local isDone = false
-while not isDone do
+while not input.quit() do
 	local tau = 2 * 3.14156
 	local t = input.seconds()
 	local mp = input.mousePosition()
@@ -65,4 +64,3 @@ while not isDone do
 
 	script.yield()
 end
-

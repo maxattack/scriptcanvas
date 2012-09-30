@@ -17,20 +17,19 @@ int main(int argc, char* argv[]) {
     static CommandBuffer buf1;
     CommandSystem::SubmitToSceneSystem(&buf0);
     CommandSystem::SubmitToSceneSystem(&buf1);
-    glfwCreateThread(game, 0);
+    GLFWthread hThread = glfwCreateThread(game, 0);
 
     // render loop
-    // TODO: move terminating condition to lua
-    while (glfwGetKey('Q') != GLFW_PRESS) {
+    do {
         CommandBuffer *vbuf;
         CommandSystem::RetrieveFromSceneSystem(&vbuf);
         RenderSystem::Render(vbuf);
         CircleSystem::Render(vbuf);
         SplineSystem::Render(vbuf);
         glfwSwapBuffers();
-        InputSystem::Update();
         CommandSystem::SubmitToSceneSystem(vbuf);
-    }
+        InputSystem::Update();
+    } while(glfwWaitThread(hThread, GLFW_NOWAIT) == GL_FALSE);
 
     // Teardown
     InputSystem::Destroy();
@@ -50,7 +49,6 @@ void game(void* ctxt) {
     luaL_loadfile(virtualMachine, "src/main.lua");  // TODO: hook physFS
     lua_call(virtualMachine, 0, 0);                 // TODO: handle panic
     lua_close(virtualMachine);
-    // TODO: terminate at script end
 }
 
 void ScriptSystem::Yield() {
