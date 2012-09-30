@@ -80,17 +80,13 @@ inline float2_t Float2(lua_Vector v) {
 	return *(float2_t*)(&v);
 }
 
-std::string GetString(lua_State* L, int arg) {
-
-	// lua strings aren't null terminated
+inline std::string GetString(lua_State* L, int arg) {
 	size_t length;
 	const char* result = luaL_checklstring(L, arg, &length);
 	return std::string(result, length);
 }
 
-std::string OptString(lua_State* L, int arg) {
-
-	// lua strings aren't null terminated
+inline std::string OptString(lua_State* L, int arg) {
 	size_t length;
 	const char* result = luaL_optlstring(L, arg, "", &length);
 	return std::string(result, length);
