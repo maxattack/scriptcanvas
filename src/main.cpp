@@ -49,6 +49,8 @@ void game(void* ctxt) {
     luaL_loadfile(virtualMachine, "src/main.lua");  // TODO: hook physFS
     lua_call(virtualMachine, 0, 0);                 // TODO: handle panic
     lua_close(virtualMachine);
+    // yield one more time to prevent a potential deadlock
+    ScriptSystem::Yield();    
 }
 
 void ScriptSystem::Yield() {
