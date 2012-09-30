@@ -50,7 +50,10 @@ MODULES = {
 		'color':			'color_t SplineSystem::Color(ID mat)',
 		'setWeight':		'void SplineSystem::SetWeight(ID mat, float weight)',
 		'setColor':			'void SplineSystem::SetColor(ID mat, color_t color)',
-		'addSegment':		'ID SplineSystem::CreateSegment(ID start, ID end, ID mat)'
+		'addSegment':		'ID SplineSystem::CreateSegment(ID start, ID end, ID mat)',
+		'taper':			'float SplineSystem::Taper(ID node)',
+		'setTaper':			'void SplineSystem::SetTaper(ID node, float taper)'
+
 	},
 
 }

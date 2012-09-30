@@ -7,6 +7,8 @@ struct HermiteSegmentCommand {
 	uint16_t material;
 	uint16_t start;
 	uint16_t end;
+	float taperStart;
+	float taperDelta;
 };
 
 struct Material {
@@ -18,7 +20,11 @@ struct HermiteSegment {
 	ID start;
 	ID end;
 	ID material;
-	// TODO: tangent scaling factor?
+};
+
+struct ControlVertex {
+	int refCount;
+	float taper;
 };
 
 namespace SplineSystem {
@@ -43,6 +49,8 @@ void OnNodeDestroyed(ID node);
 
 // Helper Functions
 
+ControlVertex& GetControlVertex(ID node);
+
 inline float Weight(ID mat) { return GetMaterial(mat).weight; }
 inline color_t Color(ID mat) { return GetMaterial(mat).color; }
 
@@ -54,5 +62,7 @@ inline ID End(ID sid) { return GetSegment(sid).end; }
 inline ID SegmentMaterialID(ID sid) { return GetSegment(sid).material; }
 inline Material& SegmentMaterial(ID sid) { return GetMaterial(GetSegment(sid).material); }
 
+inline float Taper(ID node) { return GetControlVertex(node).taper; }
+inline void SetTaper(ID node, float taper) { GetControlVertex(node).taper = taper; }
 
 }

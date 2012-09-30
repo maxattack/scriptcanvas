@@ -5,10 +5,6 @@
 
 // TYPES
 
-struct CV {
-	int refCount;
-};
-
 struct MaterialSlot {
 	Material mat;
 	int refCount;
@@ -36,9 +32,11 @@ static GLuint mUniformThickness;
 static GLuint mUniformPositionMatrix;
 static GLuint mUniformNormalMatrix;
 static GLuint mUniformColor;
+static GLuint mUniformTaperStart;
+static GLuint mUniformTaperDelta;
 static GLuint mVertexBuffer;
 
-static CompactComponentPool<CV> mComponents;
+static CompactComponentPool<ControlVertex> mComponents;
 static CompactPool<MaterialSlot, kMaxMaterials> mMaterials;
 static CompactPool<HermiteSegment, kMaxSegments> mSegments;
 
@@ -52,6 +50,8 @@ void SplineSystem::Initialize() {
     mUniformPositionMatrix = glGetUniformLocation(mProgram, "positionMatrix");
     mUniformNormalMatrix = glGetUniformLocation(mProgram, "normalMatrix");
     mUniformColor = glGetUniformLocation(mProgram, "color");
+    mUniformTaperStart = glGetUniformLocation(mProgram, "taperStart");
+    mUniformTaperDelta = glGetUniformLocation(mProgram, "taperDelta");
     {
         vertex_t buf[kSegmentResolution];
         float sideBuffer[kSegmentResolution];
@@ -80,7 +80,15 @@ void SplineSystem::Update(CommandBuffer *vbuf) {
 		vbuf->materialCount++;
 	}
 	for(auto p=mSegments.Begin(); p!=mSegments.End(); ++p) {
-		HermiteSegmentCommand cmd = { 0, mMaterials.Index(p->material), SceneSystem::Index(p->start), SceneSystem::Index(p->end) };
+		float taperStart = Taper(p->start);
+		HermiteSegmentCommand cmd = { 
+			0, 
+			mMaterials.Index(p->material), 
+			SceneSystem::Index(p->start), 
+			SceneSystem::Index(p->end),
+			taperStart,
+			Taper(p->end)-taperStart
+		 };
 		vbuf->hermiteSegments[vbuf->segmentCount] = cmd;
 		vbuf->segmentCount++;
 	}
@@ -110,6 +118,8 @@ void SplineSystem::Render(CommandBuffer *vbuf) {
 	    	//LOG_FLOAT(mat.weight);
 
 		    glUniform1f(mUniformThickness, mat.weight);
+		    glUniform1f(mUniformTaperStart, segment.taperStart);
+		    glUniform1f(mUniformTaperDelta, segment.taperDelta);
 		    glUniformMatrix4fv(mUniformPositionMatrix, 1, GL_FALSE, posMatrix.m);
 		    glUniformMatrix4fv(mUniformNormalMatrix, 1, GL_FALSE, normMatrix.m);
 			
@@ -154,9 +164,14 @@ void SplineSystem::DestroyMaterial(ID mid) {
 	mMaterials.PutBack(mid);
 }
 
-static void CreateCV(ID node) {
+static void CreateControlVertex(ID node) {
 	mComponents.Alloc(node);
 	mComponents[node].refCount = 0;
+	mComponents[node].taper = 1.f;
+}
+
+ControlVertex& SplineSystem::GetControlVertex(ID node) {
+	return mComponents[node];
 }
 
 ID SplineSystem::CreateSegment(ID start, ID end, ID mat) {
@@ -164,11 +179,11 @@ ID SplineSystem::CreateSegment(ID start, ID end, ID mat) {
 	ASSERT(start != end);
 	if (!HasComponent(start, kComponentSpline)) {
 		AddComponent(start, kComponentSpline);
-		CreateCV(start);
+		CreateControlVertex(start);
 	}
 	if (!HasComponent(end, kComponentSpline)) {
 		AddComponent(end, kComponentSpline);
-		CreateCV(end);
+		CreateControlVertex(end);
 	}
 	mComponents[start].refCount++;
 	mComponents[end].refCount--;

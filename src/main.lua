@@ -41,6 +41,8 @@ local noodle = spline.addMaterial(8, 0x777755)
 spline.addSegment(p0, p1, noodle)
 spline.addSegment(p1, p2, noodle);
 spline.addSegment(p2, p3, noodle);
+spline.setTaper(p0, 0)
+spline.setTaper(p3, 0)
 
 -- game loop
 
