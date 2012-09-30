@@ -23,10 +23,10 @@ MODULES = {
 		'setPosition': 		'void SceneSystem::SetPosition(ID node, float2_t pos)',
 		'setRotation': 		'void SceneSystem::SetRotation(ID node, float degrees)',
 		'setDirection': 	'void SceneSystem::SetDirection(ID node, float2_t dir)',
-		#'setName': 			'void NameSystem::SetName(ID node, std::string name)',
-		#'clearName':		'void NameSystem::ClearName(ID node)',
-		#'name':				'std::string NameSystem::Name(ID node)',
-		#'find':				'ID NameSystem::FindNode(std::string name)'
+		'setName': 			'void NameSystem::SetName(ID node, std::string name)',
+		'clearName':		'void NameSystem::ClearName(ID node)',
+		'name':				'std::string NameSystem::Name(ID node)',
+		'find':				'ID NameSystem::FindNode(std::string name)'
 	},
 
 	'circle': {
@@ -80,6 +80,22 @@ inline float2_t Float2(lua_Vector v) {
 	return *(float2_t*)(&v);
 }
 
+std::string GetString(lua_State* L, int arg) {
+
+	// lua strings aren't null terminated
+	size_t length;
+	const char* result = luaL_checklstring(L, arg, &length);
+	return std::string(result, length);
+}
+
+std::string OptString(lua_State* L, int arg) {
+
+	// lua strings aren't null terminated
+	size_t length;
+	const char* result = luaL_optlstring(L, arg, "", &length);
+	return std::string(result, length);
+}
+
 '''
 
 def main():
@@ -127,6 +143,8 @@ def write_function_implementation(src, module, name, sig):
 				return 'RGB(luaL_checkunsigned(L, %d))' % stack_index
 			elif type in ('bool'):
 				return '(luaL_checkunsigned(L, %d) != 0)' % stack_index
+			elif type in ('std::string'):
+				return 'GetString(L, %d)' % stack_index
 			else:
 				dofail()
 
@@ -143,6 +161,8 @@ def write_function_implementation(src, module, name, sig):
 				return 'RGB(luaL_optunsigned(L, %d, %s))' % (stack_index, def_value)
 			elif type in ('bool'):
 				return '(luaL_optunsigned(L, %d) != 0)' % stack_index
+			elif type in ('std::string'):
+				return 'OptString(L, %d)' % stack_index
 			else:
 				dofail()
 
@@ -179,6 +199,9 @@ def write_function_implementation(src, module, name, sig):
 	elif result_type in ("color_t"):
 		num_results = 1
 		write_line(src, "lua_pushunsigned(L, result.RGB());")
+	elif result_type in ('std::string'):
+		num_results = 1
+		write_line(src, 'lua_pushstring(L, result.c_str());')
 	elif result_type !='void':
 		fail("Unknown return type: %s" % result_type)
 	write_line(src, "return %d;"  % num_results)
