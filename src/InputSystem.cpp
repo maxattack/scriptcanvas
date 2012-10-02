@@ -6,11 +6,11 @@
 static GLFWmutex lock;
 static double seconds;
 static bool wantsQuit;
-static float2_t mousePosition;
+static vec2_t mousePosition;
 
 static void OnMouseMoved(int x, int y) {
 	glfwLockMutex(lock);
-	mousePosition = Float2(x, y);
+	mousePosition = Vec2(x, y);
 	glfwUnlockMutex(lock);
 }
 
@@ -18,7 +18,7 @@ void InputSystem::Initialize() {
 	lock = glfwCreateMutex();
 	wantsQuit = false;
 	seconds = glfwGetTime();
-	mousePosition = Float2(0,0);
+	mousePosition = Vec2(0,0);
     glfwSetMousePosCallback(OnMouseMoved);
 }
 
@@ -29,9 +29,9 @@ void InputSystem::Update() {
 	glfwUnlockMutex(lock);
 }
 
-float2_t InputSystem::MousePosition() {
+vec2_t InputSystem::MousePosition() {
 	glfwLockMutex(lock);
-	float2_t result = mousePosition;
+	vec2_t result = mousePosition;
 	glfwUnlockMutex(lock);
 	return result;
 }

@@ -97,7 +97,7 @@ int SceneSystem::NodeCount() {
 	return sNodeCount;
 }
 
-ID SceneSystem::CreateNode(ID parent) {
+ID SceneSystem::CreateNode(ID parent, vec2_t position, vec2_t attitude, float depth) {
 	ASSERT(sNodeCount < kMaxNodes);
 	// Allocate a new node at the end of the buffer
 	// Dequeue a slot
@@ -108,7 +108,7 @@ ID SceneSystem::CreateNode(ID parent) {
 	// Allocate a new buffer location
 	slot.poseIndex = sNodeCount++;
 	// initialize records
-	sNodePoses[slot.poseIndex] = { USHRT_MAX, uint16_t(0xffff&slot.id), ZTransform() };
+	sNodePoses[slot.poseIndex] = { USHRT_MAX, uint16_t(0xffff&slot.id), ZTransform(attitude, position, depth) };
 	slot.componentMask = 0;
 	slot.parent = 0;
 	slot.firstChild = 0;

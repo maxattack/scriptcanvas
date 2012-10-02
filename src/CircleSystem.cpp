@@ -20,17 +20,17 @@ void CircleSystem::Initialize() {
     mUniformRadius = glGetUniformLocation(mProgram, "radius");
     mUniformColor = glGetUniformLocation(mProgram, "color");
     // create circle vertex buffer
-    float2_t unit = Float2(1,0);
-    float2_t rotor = Polar(1.f, kTau / (64-2.f));
-    float2_t buffer[64];
-    buffer[0] = Float2(0,0);
+    vec2_t unit = Vec2(1,0);
+    vec2_t rotor = Polar(1.f, kTau / (64-2.f));
+    vec2_t buffer[64];
+    buffer[0] = Vec2(0,0);
     for(int i=1; i<64; ++i) {
         buffer[i] = unit;
         unit *= rotor;
     }
     glGenBuffers(1, &mVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float2_t)*64, buffer, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec2_t)*64, buffer, GL_STATIC_DRAW);
     glUseProgram(0);
 }
 

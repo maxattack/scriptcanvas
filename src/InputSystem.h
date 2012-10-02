@@ -9,7 +9,7 @@ void Destroy();
 
 void Update();
 
-float2_t MousePosition();
+vec2_t MousePosition();
 double Time();
 bool Quit();
 

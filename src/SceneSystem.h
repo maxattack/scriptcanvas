@@ -34,7 +34,7 @@ int NodeCount();
 
 // Create a new node, potentially rooted to another node and
 // retrieve it's handle.
-ID CreateNode(ID parent=0);
+ID CreateNode(ID parent=0, vec2_t position=Vec2(0,0), vec2_t attitude=Vec2(1,0), float depth=0.f);
 
 // Attach a node as a child of another node
 void AttachNode(ID parent, ID child);
@@ -86,35 +86,42 @@ struct ComponentIterator {
 void DestroyNode(ID node);
 
 // Helper Methods
-inline float2_t Position(ID node) { 
-	return LocalToParent(node).t.t; 
+inline vec2_t Position(ID node) { 
+	return LocalToParent(node).t.translation; 
 }
 
 inline float Rotation(ID node) { 
-	return LocalToParent(node).t.q.Radians(); 
+	return LocalToParent(node).t.attitude.Radians(); 
 }
 
-inline float2_t Direction(ID node) { 
-	return LocalToParent(node).t.q; 
+inline float Depth(ID node) {
+	return LocalToParent(node).depth;
 }
 
-inline void SetPosition(ID node, float2_t p) { 
-	LocalToParent(node).t.t = p; 
+inline vec2_t Direction(ID node) { 
+	return LocalToParent(node).t.attitude; 
+}
+
+inline void SetPosition(ID node, vec2_t p) { 
+	LocalToParent(node).t.translation = p; 
 }
 
 inline void SetRotation(ID node, float angle) { 
-	LocalToParent(node).t.q = Polar(1.f, angle); 
+	LocalToParent(node).t.attitude = Polar(1.f, angle); 
 }
 
-inline void SetDirection(ID node, float2_t d) { 
-	LocalToParent(node).t.q = d; 
+inline void SetDirection(ID node, vec2_t d) { 
+	LocalToParent(node).t.attitude = d; 
+}
+
+inline void SetDepth(ID node, float d) {
+	LocalToParent(node).depth = d;
 }
 
 //------------------------------------------------------------------------------
 // TODO
 // Worldspace Reparenting
 // Serialization of Node Manager and Component Managers
-// Scripting Interface / Component Retrieval
 //------------------------------------------------------------------------------
 
 }

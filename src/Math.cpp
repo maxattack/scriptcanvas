@@ -16,7 +16,7 @@
 
 #include "Math.h"
 
-bool LinearIntersection(float2_t u0, float2_t u1, float2_t v0, float2_t v1, float& u) {
+bool LinearIntersection(vec2_t u0, vec2_t u1, vec2_t v0, vec2_t v1, float& u) {
   float norm = (v1.y - v0.y)*(u1.x-u0.x) - (v1.x-v0.x)*(u1.y-u0.y);
   if (norm > -kColinearSlop && norm < kColinearSlop) {
     // lines are parallel
@@ -27,7 +27,7 @@ bool LinearIntersection(float2_t u0, float2_t u1, float2_t v0, float2_t v1, floa
   return true;  
 }
 
-bool LinearIntersection(float2_t u0, float2_t u1, float2_t v0, float2_t v1, float& u, float& v) {
+bool LinearIntersection(vec2_t u0, vec2_t u1, vec2_t v0, vec2_t v1, float& u, float& v) {
   float norm = (v1.y - v0.y)*(u1.x-u0.x) - (v1.x-v0.x)*(u1.y-u0.y);
   if (norm > -kColinearSlop && norm < kColinearSlop) {
     // lines are parallel
@@ -41,15 +41,15 @@ bool LinearIntersection(float2_t u0, float2_t u1, float2_t v0, float2_t v1, floa
   return true;  
 }
 
-float2_t QuadraticBezier(float2_t p0, float2_t p1, float2_t p2, float u) {
+vec2_t QuadraticBezier(vec2_t p0, vec2_t p1, vec2_t p2, float u) {
   return ((1.0f-u)*(1.0f-u))*p0 + (2.0f*(1.0f-u)*u)*p1 + (u*u)*p2;
 }
     
-float2_t QuadraticBezierDeriv(float2_t p0, float2_t p1, float2_t p2, float u) {
+vec2_t QuadraticBezierDeriv(vec2_t p0, vec2_t p1, vec2_t p2, float u) {
   return (2.0f*(1.0f-u))*(p1-p0) + (2.0f*u)*(p2-p1);
 }
 
-float2_t CubicBezier(float2_t p0, float2_t p1, float2_t p2, float2_t p3, float u) {
+vec2_t CubicBezier(vec2_t p0, vec2_t p1, vec2_t p2, vec2_t p3, float u) {
     return 
       ((1.0f-u) * (1.0f-u) * (1.0f-u)) * p0 +
       (3.0f * (1.0f-u) * (1.0f-u) * u) * p1 +
@@ -57,7 +57,7 @@ float2_t CubicBezier(float2_t p0, float2_t p1, float2_t p2, float2_t p3, float u
       (u * u * u) * p3;
   }
   
-float2_t CubicBezierDeriv(float2_t p0, float2_t p1, float2_t p2, float2_t p3, float u){
+vec2_t CubicBezierDeriv(vec2_t p0, vec2_t p1, vec2_t p2, vec2_t p3, float u){
   return 3.0f * (
     (-(1.0f-u) * (1.0f-u)) * p0 +
     (1.0f - 4.0f * u + 3.0f * u * u) * p1 +
@@ -65,14 +65,14 @@ float2_t CubicBezierDeriv(float2_t p0, float2_t p1, float2_t p2, float2_t p3, fl
     (u * u) * p3
   );
 }
-float2_t CubicHermite(float2_t p0, float2_t m0, float2_t p1, float2_t m1, float u) {
+vec2_t CubicHermite(vec2_t p0, vec2_t m0, vec2_t p1, vec2_t m1, float u) {
   return (2.f*u*u*u - 3.f*u*u + 1.f) * p0 + 
     (u*u*u - 2.f*u*u + u) * m0 + 
     (-2.f*u*u*u + 3.f *u*u) * p1 + 
     (u*u*u - u*u) * m1;
 }
 
-float2_t CubicHermiteDeriv(float2_t p0, float2_t m0, float2_t p1, float2_t m1, float u) {
+vec2_t CubicHermiteDeriv(vec2_t p0, vec2_t m0, vec2_t p1, vec2_t m1, float u) {
   return (6.f*(u*u - u)) * p0 + 
     (3.f*u*u - 4.f*u + 1.f) * m0 + 
     (6.f*(u - u*u)) * p1 + 

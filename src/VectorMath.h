@@ -173,7 +173,7 @@ inline vec4 Vec4(float values[4]) {
   return result;
 }
 
-inline vec4 Vec4(float2_t f2, float z=0.f, float w=0.f) {
+inline vec4 Vec4(vec2_t f2, float z=0.f, float w=0.f) {
   vec4 result = {{ f2.x, f2.y, z, w }};
   return result;
 }
@@ -445,20 +445,20 @@ inline mat4 Mat4(
 
 inline mat4 Mat4(transform_t t, float z=0.f) {
   mat4 result = {{
-    t.q.x, t.q.y, 0.f, 0.f,
-    -t.q.y, t.q.x, 0.f, 0.f,
+    t.attitude.x, t.attitude.y, 0.f, 0.f,
+    -t.attitude.y, t.attitude.x, 0.f, 0.f,
     0.f, 0.f, 1.f, 0.f,
-    t.t.x, t.t.y, z, 1.f
+    t.translation.x, t.translation.y, z, 1.f
   }};
   return result;
 }
 
 inline mat4 Mat4(ztransform_t t) {
   mat4 result = {{
-    t.t.q.x, t.t.q.y, 0.f, 0.f,
-    -t.t.q.y, t.t.q.x, 0.f, 0.f,
+    t.t.attitude.x, t.t.attitude.y, 0.f, 0.f,
+    -t.t.attitude.y, t.t.attitude.x, 0.f, 0.f,
     0.f, 0.f, 1.f, 0.f,
-    t.t.t.x, t.t.t.y, t.z, 1.f
+    t.t.translation.x, t.t.translation.y, t.depth, 1.f
   }};
   return result;
 }
