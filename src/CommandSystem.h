@@ -12,9 +12,9 @@ struct CommandBuffer {
 	CircleCommand circles[kMaxNodes];
 
 	int materialCount;
-	int segmentCount;
+	int cubicSegmentCount;
 	Material materials[kMaxMaterials];
-	HermiteSegmentCommand hermiteSegments[kMaxSegments];	
+	CubicSegmentCommand cubicSegments[kMaxSegments];	
 };
 
 namespace CommandSystem {

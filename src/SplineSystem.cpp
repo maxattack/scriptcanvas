@@ -38,7 +38,7 @@ static GLuint mVertexBuffer;
 
 static CompactComponentPool<ControlVertex> mComponents;
 static CompactPool<MaterialSlot, kMaxMaterials> mMaterials;
-static CompactPool<HermiteSegment, kMaxSegments> mSegments;
+static CompactPool<CubicSegment, kMaxSegments> mSegments;
 
 // FUNCTIONS
 
@@ -81,7 +81,7 @@ void SplineSystem::Update(CommandBuffer *vbuf) {
 	}
 	for(auto p=mSegments.Begin(); p!=mSegments.End(); ++p) {
 		float taperStart = Taper(p->start);
-		HermiteSegmentCommand cmd = { 
+		CubicSegmentCommand cmd = { 
 			0, 
 			mMaterials.Index(p->material), 
 			SceneSystem::Index(p->start), 
@@ -89,21 +89,21 @@ void SplineSystem::Update(CommandBuffer *vbuf) {
 			taperStart,
 			Taper(p->end)-taperStart
 		 };
-		vbuf->hermiteSegments[vbuf->segmentCount] = cmd;
-		vbuf->segmentCount++;
+		vbuf->cubicSegments[vbuf->cubicSegmentCount] = cmd;
+		vbuf->cubicSegmentCount++;
 	}
 }
 
 void SplineSystem::Render(CommandBuffer *vbuf) {
-	if (vbuf->segmentCount) {
+	if (vbuf->cubicSegmentCount) {
 	    glUseProgram(mProgram);
 	    glEnableClientState(GL_VERTEX_ARRAY);
 	    glEnableVertexAttribArray(mAttribParameterAndSide);
 	    glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
 	    glLoadIdentity();
 	    // TODO: sort by material?
-	    for(int i=0; i<vbuf->segmentCount; ++i) {
-	    	auto& segment = vbuf->hermiteSegments[i];
+	    for(int i=0; i<vbuf->cubicSegmentCount; ++i) {
+	    	auto& segment = vbuf->cubicSegments[i];
 	    	auto& mat = vbuf->materials[segment.material];
 	    	auto& start = vbuf->transform_ts[segment.start].t;
 	    	auto& end = vbuf->transform_ts[segment.end].t;
@@ -113,8 +113,17 @@ void SplineSystem::Render(CommandBuffer *vbuf) {
 	    	auto t0 = Vec4(start.q);
 	    	auto t1 = Vec4(end.q);
 
-	    	auto posMatrix = HermiteMat(p0, p1, t0, t1);
-	    	auto normMatrix = HermiteNormMat(p0, p1, t0, t1);
+	    	//auto posMatrix = HermiteMatrix(p0, p1, t0, t1);
+	    	//auto normMatrix = HermiteNormMatrix(p0, p1, t0, t1);
+
+	    	auto d = Vec4((end.t - start.t).Clockwise());
+
+	    	float e = Lerp(-0.2f, 0.2f, 0.5f + 0.5f * sinf(4.f * 3.14159f * glfwGetTime()));
+	    	auto m = p0 + 0.5f * (p1 - p0) + e * d;
+
+	    	auto posMatrix = QuadraticBezierMatrix(p0, m, p1);
+	    	auto normMatrix = QuadraticBezierNormMatrix(p0, m, p1);
+
 	    	//LOG_FLOAT(mat.weight);
 
 		    glUniform1f(mUniformThickness, mat.weight);
@@ -174,7 +183,7 @@ ControlVertex& SplineSystem::GetControlVertex(ID node) {
 	return mComponents[node];
 }
 
-ID SplineSystem::CreateSegment(ID start, ID end, ID mat) {
+ID SplineSystem::CreateCubicSegment(ID start, ID end, ID mat) {
 	using namespace SceneSystem;
 	ASSERT(start != end);
 	if (!HasComponent(start, kComponentSpline)) {
@@ -195,7 +204,7 @@ ID SplineSystem::CreateSegment(ID start, ID end, ID mat) {
 	return result;
 }
 
-void SplineSystem::SetSegmentMaterial(ID sid, ID mid) {
+void SplineSystem::SetCubicSegmentMaterial(ID sid, ID mid) {
 	ASSERT(mSegments.IsActive(sid));
 	ASSERT(mMaterials.IsActive(mid));
 	auto& seg = mSegments[sid];
@@ -207,11 +216,11 @@ void SplineSystem::SetSegmentMaterial(ID sid, ID mid) {
 	}
 }
 
-HermiteSegment SplineSystem::GetSegment(ID sid) {
+CubicSegment SplineSystem::GetCubicSegment(ID sid) {
 	return mSegments[sid];
 }
 
-void SplineSystem::DestroySegment(ID sid) {
+void SplineSystem::DestroyCubicSegment(ID sid) {
 	using namespace SceneSystem;
 	auto& seg = mSegments[sid];
 	if (seg.material) {
@@ -234,7 +243,7 @@ void SplineSystem::OnNodeDestroyed(ID node) {
 		auto p = mSegments.Begin();
 		while(p != mSegments.End()) {
 			if (p->start == node || p->end == node) {
-				DestroySegment(mSegments.GetID(p));
+				DestroyCubicSegment(mSegments.GetID(p));
 			} else {
 				++p;
 			}

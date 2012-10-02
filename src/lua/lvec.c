@@ -62,10 +62,29 @@ static int vec_length (lua_State *L) {
   return 1;
 }
 
+static int vec_conjugate(lua_State *L) {
+  lua_Vector v = luaL_checkvec(L, 1);
+  lua_pushvec(L, v.x, -v.y);
+  return 1;
+}
+
+static int vec_angle(lua_State *L) {
+  lua_Vector v = luaL_checkvec(L, 1);
+  lua_pushnumber(L, atan2f(v.y, v.x));
+  return 1;
+}
+
 static int vec_normalize (lua_State *L) {
   lua_Vector v = luaL_checkvec(L, 1);
   float s = 1.0f / sqrtf(v.x*v.x + v.y*v.y);
   lua_pushvec(L, v.x*s, v.y*s);
+  return 1;
+}
+
+static int vec_polar(lua_State *L) {
+  float r = (float)lua_tonumber(L, 1);
+  float t = (float)lua_tonumber(L, 2);
+  lua_pushvec(L, r * cosf(t), r * sinf(t));
   return 1;
 }
 
@@ -74,9 +93,12 @@ static const luaL_Reg veclib[] = {
   {"cmul",       vec_cmul},
   {"dot",        vec_dot},
   {"cross",      vec_cross},
+  {"lengthsq",   vec_length_sq},
   {"length",     vec_length},
-  {"lengthsq",  vec_length_sq},
+  {"conjugate",  vec_conjugate},
+  {"angle",      vec_angle},
   {"normalize",  vec_normalize},
+  {"polar",      vec_polar},
   {NULL, NULL}
 };
 

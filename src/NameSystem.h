@@ -4,6 +4,8 @@
 
 #define kMaxNameLength	32
 
+// replace w/ a "tag" system that can be one-to-many (linked list?)
+
 namespace NameSystem {
 
 	void Initialize();

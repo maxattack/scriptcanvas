@@ -7,52 +7,52 @@ import os, os.path, sys, traceback
 MODULES = {
 
 	'script': {
-		'yield':			'void ScriptSystem::Yield()'
+		'yield':				'void ScriptSystem::Yield()'
 	},
 
 	'scene': {
-		'nodeCount': 		'int SceneSystem::NodeCount()',
-		'createNode': 		'ID SceneSystem::CreateNode(ID parent=0)',
-		'attachTo': 		'void SceneSystem::AttachNode(ID parent, ID child)',
-		'detach': 			'void SceneSystem::DetachNode(ID child)',
-		'parent': 			'ID SceneSystem::Parent(ID node)',
-		'destroyNode':		'void SceneSystem::DestroyNode(ID node)',
-		'position': 		'float2_t SceneSystem::Position(ID node)',
-		'rotation': 		'float SceneSystem::Rotation(ID node)',
-		'direction': 		'float2_t SceneSystem::Direction(ID node)',
-		'setPosition': 		'void SceneSystem::SetPosition(ID node, float2_t pos)',
-		'setRotation': 		'void SceneSystem::SetRotation(ID node, float degrees)',
-		'setDirection': 	'void SceneSystem::SetDirection(ID node, float2_t dir)',
-		'setName': 			'void NameSystem::SetName(ID node, std::string name)',
-		'clearName':		'void NameSystem::ClearName(ID node)',
-		'name':				'std::string NameSystem::Name(ID node)',
-		'find':				'ID NameSystem::FindNode(std::string name)'
+		'nodeCount': 			'int SceneSystem::NodeCount()',
+		'createNode': 			'ID SceneSystem::CreateNode(ID parent=0)',
+		'attachTo': 			'void SceneSystem::AttachNode(ID parent, ID child)',
+		'detach': 				'void SceneSystem::DetachNode(ID child)',
+		'parent': 				'ID SceneSystem::Parent(ID node)',
+		'destroyNode':			'void SceneSystem::DestroyNode(ID node)',
+		'position': 			'float2_t SceneSystem::Position(ID node)',
+		'rotation': 			'float SceneSystem::Rotation(ID node)',
+		'direction': 			'float2_t SceneSystem::Direction(ID node)',
+		'setPosition': 			'void SceneSystem::SetPosition(ID node, float2_t pos)',
+		'setRotation': 			'void SceneSystem::SetRotation(ID node, float degrees)',
+		'setDirection': 		'void SceneSystem::SetDirection(ID node, float2_t dir)',
+		'setName': 				'void NameSystem::SetName(ID node, std::string name)',
+		'clearName':			'void NameSystem::ClearName(ID node)',
+		'name':					'std::string NameSystem::Name(ID node)',
+		'find':					'ID NameSystem::FindNode(std::string name)'
 	},
 
 	'circle': {
-		'create':			'void CircleSystem::Create(ID node, color_t color, float radius)',
-		'destroy': 			'void CircleSystem::Destroy(ID node)',
-		'fill': 			'color_t CircleSystem::Fill(ID node)',
-		'radius': 			'float CircleSystem::Radius(float radius)',
-		'setFill': 			'void CircleSystem::SetFill(ID node, color_t fill)',
-		'setRadius': 		'void CircleSystem::SetRadius(ID node, float radius)'
+		'create':				'void CircleSystem::Create(ID node, color_t color, float radius)',
+		'destroy': 				'void CircleSystem::Destroy(ID node)',
+		'fill': 				'color_t CircleSystem::Fill(ID node)',
+		'radius': 				'float CircleSystem::Radius(float radius)',
+		'setFill': 				'void CircleSystem::SetFill(ID node, color_t fill)',
+		'setRadius': 			'void CircleSystem::SetRadius(ID node, float radius)'
 	},
 
 	'input': {
-		'mousePosition': 	'float2_t InputSystem::MousePosition()',
-		'seconds': 			'double InputSystem::Time()',
-		'quit':				'bool InputSystem::Quit()'
+		'mousePosition': 		'float2_t InputSystem::MousePosition()',
+		'seconds': 				'double InputSystem::Time()',
+		'quit':					'bool InputSystem::Quit()'
 	},
 
 	'spline': {
-		'addMaterial':		'ID SplineSystem::CreateMaterial(float weight, color_t color)',
-		'weight':			'float SplineSystem::Weight(ID node)',
-		'color':			'color_t SplineSystem::Color(ID mat)',
-		'setWeight':		'void SplineSystem::SetWeight(ID mat, float weight)',
-		'setColor':			'void SplineSystem::SetColor(ID mat, color_t color)',
-		'addSegment':		'ID SplineSystem::CreateSegment(ID start, ID end, ID mat)',
-		'taper':			'float SplineSystem::Taper(ID node)',
-		'setTaper':			'void SplineSystem::SetTaper(ID node, float taper)'
+		'addMaterial':			'ID SplineSystem::CreateMaterial(float weight, color_t color)',
+		'weight':				'float SplineSystem::Weight(ID node)',
+		'color':				'color_t SplineSystem::Color(ID mat)',
+		'setWeight':			'void SplineSystem::SetWeight(ID mat, float weight)',
+		'setColor':				'void SplineSystem::SetColor(ID mat, color_t color)',
+		'addCubicSegment':		'ID SplineSystem::CreateCubicSegment(ID start, ID end, ID mat)',
+		'taper':				'float SplineSystem::Taper(ID node)',
+		'setTaper':				'void SplineSystem::SetTaper(ID node, float taper)'
 
 	},
 
