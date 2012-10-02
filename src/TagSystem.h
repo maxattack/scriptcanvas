@@ -6,7 +6,7 @@
 
 // replace w/ a "tag" system that can be one-to-many (linked list?)
 
-namespace NameSystem {
+namespace TagSystem {
 
 	void Initialize();
 	void Destroy();

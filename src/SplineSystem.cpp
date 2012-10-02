@@ -73,8 +73,8 @@ void SplineSystem::Update(CommandBuffer *vbuf) {
 	for(auto p=mCubicSegments.Begin(); p!=mCubicSegments.End(); ++p) {
 		float taperStart = Taper(p->start);
 		cmd->mid = MaterialSystem::Index(p->material);
-		cmd->start = SceneSystem::Index(p->start);
-		cmd->end = SceneSystem::Index(p->end);
+		cmd->start = NodeSystem::Index(p->start);
+		cmd->end = NodeSystem::Index(p->end);
 		cmd->taperStart = taperStart;
 		cmd->taperDelta = Taper(p->end)-taperStart;
 		vbuf->cubicSegmentCount++;
@@ -84,8 +84,8 @@ void SplineSystem::Update(CommandBuffer *vbuf) {
 	for(auto p=mEccentricSegments.Begin(); p!=mEccentricSegments.End(); ++p) {
 		float taperStart = Taper(p->start);
 		ecmd->mid = MaterialSystem::Index(p->material);
-		ecmd->start = SceneSystem::Index(p->start);
-		ecmd->end = SceneSystem::Index(p->end);
+		ecmd->start = NodeSystem::Index(p->start);
+		ecmd->end = NodeSystem::Index(p->end);
 		ecmd->taperStart = taperStart;
 		ecmd->taperDelta = Taper(p->end)-taperStart;
 		ecmd->eccentricity = p->eccentricity;
@@ -170,7 +170,7 @@ void SplineSystem::Render(CommandBuffer *vbuf) {
 
 
 static void CreateControlVertex(ID node) {
-	SceneSystem::AddComponent(node, kComponentSpline);
+	NodeSystem::AddComponent(node, kComponentSpline);
 	mComponents.Alloc(node);
 	mComponents[node].refCount = 0;
 	mComponents[node].taper = 1.f;
@@ -207,8 +207,8 @@ void SplineSystem::OnNodeDestroyed(ID node) {
 
 ID SplineSystem::CreateCubicSegment(ID start, ID end, ID mat) {
 	ASSERT(start != end);
-	if (!SceneSystem::HasComponent(start, kComponentSpline)) { CreateControlVertex(start); }
-	if (!SceneSystem::HasComponent(end, kComponentSpline)) { CreateControlVertex(end); }
+	if (!NodeSystem::HasComponent(start, kComponentSpline)) { CreateControlVertex(start); }
+	if (!NodeSystem::HasComponent(end, kComponentSpline)) { CreateControlVertex(end); }
 	mComponents[start].refCount++;
 	mComponents[end].refCount--;
 	auto result = mCubicSegments.TakeOut();
@@ -232,11 +232,11 @@ void SplineSystem::DestroyCubicSegment(ID csid) {
 	auto& seg = mCubicSegments[csid];
 	mComponents[seg.start].refCount--;
 	if (mComponents[seg.start].refCount == 0) {
-		SceneSystem::RemoveComponent(seg.start, kComponentSpline);
+		NodeSystem::RemoveComponent(seg.start, kComponentSpline);
 	}
 	mComponents[seg.end].refCount--;
 	if (mComponents[seg.end].refCount == 0) {
-		SceneSystem::RemoveComponent(seg.end, kComponentSpline);
+		NodeSystem::RemoveComponent(seg.end, kComponentSpline);
 	}
 	mCubicSegments.PutBack(csid);
 }
@@ -244,8 +244,8 @@ void SplineSystem::DestroyCubicSegment(ID csid) {
 
 ID SplineSystem::CreateEccentricSegment(ID start, ID end, ID mat, float eccentricity) {
 	ASSERT(start != end);
-	if (!SceneSystem::HasComponent(start, kComponentSpline)) { CreateControlVertex(start); }
-	if (!SceneSystem::HasComponent(end, kComponentSpline)) { CreateControlVertex(end); }
+	if (!NodeSystem::HasComponent(start, kComponentSpline)) { CreateControlVertex(start); }
+	if (!NodeSystem::HasComponent(end, kComponentSpline)) { CreateControlVertex(end); }
 	mComponents[start].refCount++;
 	mComponents[end].refCount--;
 	auto result = mEccentricSegments.TakeOut();
@@ -274,11 +274,11 @@ void SplineSystem::DestroyEccentricSegment(ID esid) {
 	auto& seg = mEccentricSegments[esid];
 	mComponents[seg.start].refCount--;
 	if (mComponents[seg.start].refCount == 0) {
-		SceneSystem::RemoveComponent(seg.start, kComponentSpline);
+		NodeSystem::RemoveComponent(seg.start, kComponentSpline);
 	}
 	mComponents[seg.end].refCount--;
 	if (mComponents[seg.end].refCount == 0) {
-		SceneSystem::RemoveComponent(seg.end, kComponentSpline);
+		NodeSystem::RemoveComponent(seg.end, kComponentSpline);
 	}
 	mCubicSegments.PutBack(esid);
 }

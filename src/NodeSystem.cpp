@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <cstring>
-#include "SceneSystem.h"
+#include "NodeSystem.h"
 #include "CommandSystem.h"
 
 //------------------------------------------------------
@@ -61,7 +61,7 @@ static NodeSlot& Slot(ID id) {
 }
 
 static PoseData& Pose(ID id) {
-	ASSERT(SceneSystem::NodeValid(id));
+	ASSERT(NodeSystem::NodeValid(id));
 	return sNodePoses[sNodeSlots[id&0xffff].poseIndex];
 }
 
@@ -69,7 +69,7 @@ static PoseData& Pose(ID id) {
 // PUBLIC METHODS
 //------------------------------------------------------
 
-void SceneSystem::Initialize() {
+void NodeSystem::Initialize() {
 	#if !NO_DAG_SORT
 	mFirstInvalidDagIndex = -1;
 	mLastInvalidDagIndex = -1;
@@ -84,20 +84,20 @@ void SceneSystem::Initialize() {
 	}
 }
 
-void SceneSystem::Destroy() {
+void NodeSystem::Destroy() {
 	// NOOP
 }
 
-bool SceneSystem::NodeValid(ID id) {
+bool NodeSystem::NodeValid(ID id) {
 	NodeSlot& slot = sNodeSlots[id & 0xffff];
 	return slot.id == id && slot.poseIndex != USHRT_MAX;
 }
 
-int SceneSystem::NodeCount() {
+int NodeSystem::NodeCount() {
 	return sNodeCount;
 }
 
-ID SceneSystem::CreateNode(ID parent, vec2_t position, vec2_t attitude, float depth) {
+ID NodeSystem::CreateNode(ID parent, vec2_t position, vec2_t attitude, float depth) {
 	ASSERT(sNodeCount < kMaxNodes);
 	// Allocate a new node at the end of the buffer
 	// Dequeue a slot
@@ -120,7 +120,7 @@ ID SceneSystem::CreateNode(ID parent, vec2_t position, vec2_t attitude, float de
 	return slot.id;
 }
 
-void SceneSystem::AttachNode(ID parent, ID child) {
+void NodeSystem::AttachNode(ID parent, ID child) {
 	ASSERT(parent != child);
 	auto& childData = Slot(child);
 	// check existing parents
@@ -155,7 +155,7 @@ void SceneSystem::AttachNode(ID parent, ID child) {
 	#endif
 }
 
-void SceneSystem::DetachNode(ID child) {
+void NodeSystem::DetachNode(ID child) {
 	auto& data = Slot(child);
 	if (data.parent) {
 		auto& parent = Slot(data.parent);
@@ -169,15 +169,15 @@ void SceneSystem::DetachNode(ID child) {
 	}
 }
 
-ID SceneSystem::Parent(ID node) {
+ID NodeSystem::Parent(ID node) {
 	return Slot(node).parent;
 }
 
-SceneSystem::ChildIterator::ChildIterator(ID node) {
+NodeSystem::ChildIterator::ChildIterator(ID node) {
 	current = Slot(node).firstChild;
 }
 
-bool SceneSystem::ChildIterator::Next(ID *outNode) {
+bool NodeSystem::ChildIterator::Next(ID *outNode) {
 	if (current) {
 		*outNode = current;
 		current = Slot(current).nextSibling;
@@ -187,11 +187,11 @@ bool SceneSystem::ChildIterator::Next(ID *outNode) {
 	}
 }
 
-uint16_t SceneSystem::Index(ID node) {
+uint16_t NodeSystem::Index(ID node) {
 	return Slot(node).poseIndex;
 }
 
-ztransform_t& SceneSystem::LocalToParent(ID node) {
+ztransform_t& NodeSystem::LocalToParent(ID node) {
 	return Pose(node).localToParent;
 }
 
@@ -203,7 +203,7 @@ static ztransform_t ComputeLocalToWorld(const PoseData& pose) {
 	}
 }
 
-ztransform_t SceneSystem::LocalToWorld(ID node) {
+ztransform_t NodeSystem::LocalToWorld(ID node) {
 	return ComputeLocalToWorld(Pose(node));
 }
 
@@ -219,7 +219,7 @@ static void Update(CommandBuffer *vbuf, uint16_t i) {
 
 #endif
 
-void SceneSystem::Update(CommandBuffer *vbuf) {
+void NodeSystem::Update(CommandBuffer *vbuf) {
 	
 	#if NO_DAG_SORT
 	// have to walk the heirarchy recursively :P
@@ -318,31 +318,31 @@ void SceneSystem::Update(CommandBuffer *vbuf) {
 
 }
 
-void SceneSystem::AddComponent(ID node, ID componentType) {
+void NodeSystem::AddComponent(ID node, ID componentType) {
 	ASSERT(!HasComponent(node, componentType));
 	Slot(node).componentMask |= COMP_MASK(componentType);
 }
 
-bool SceneSystem::HasComponent(ID node, ID componentType) {
+bool NodeSystem::HasComponent(ID node, ID componentType) {
 	return Slot(node).componentMask & COMP_MASK(componentType);
 }
 
-void SceneSystem::RemoveComponent(ID node, ID componentType) {
+void NodeSystem::RemoveComponent(ID node, ID componentType) {
 	ASSERT(HasComponent(node, componentType));
 	// Do this like an abstract factory / array of function-pointers instead?
 	switch(componentType) {
-	case kComponentName: NameSystem::OnNodeDestroyed(node); break;
+	case kComponentName: TagSystem::OnNodeDestroyed(node); break;
 	case kComponentCircle: CircleSystem::OnNodeDestroyed(node); break;
 	case kComponentSpline: SplineSystem::OnNodeDestroyed(node); break;
 	}
 	Slot(node).componentMask ^= COMP_MASK(componentType);
 }
 
-SceneSystem::ComponentIterator::ComponentIterator(ID node) {
+NodeSystem::ComponentIterator::ComponentIterator(ID node) {
 	mask = Slot(node).componentMask;
 }
 
-bool SceneSystem::ComponentIterator::Next(ID *outComponentType) {
+bool NodeSystem::ComponentIterator::Next(ID *outComponentType) {
 	if (mask) {
 		*outComponentType = __builtin_clz(mask);
 		mask ^= COMP_MASK(*outComponentType);
@@ -353,7 +353,7 @@ bool SceneSystem::ComponentIterator::Next(ID *outComponentType) {
 
 }
 
-void SceneSystem::DestroyNode(ID node) {
+void NodeSystem::DestroyNode(ID node) {
 	ASSERT(NodeValid(node));
 	DetachNode(node);
 	// tear down children

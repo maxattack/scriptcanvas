@@ -5,10 +5,10 @@ void game(void* ctxt);
 int main(int argc, char* argv[]) {
     // init systems
     RenderSystem::Initialize();
-    SceneSystem::Initialize();
+    NodeSystem::Initialize();
     MaterialSystem::Initialize();
     CommandSystem::Initialize();
-    NameSystem::Initialize();
+    TagSystem::Initialize();
     CircleSystem::Initialize();
     SplineSystem::Initialize();
     InputSystem::Initialize();
@@ -16,19 +16,19 @@ int main(int argc, char* argv[]) {
     // initialize communication channels
     static CommandBuffer buf0;
     static CommandBuffer buf1;
-    CommandSystem::SubmitToSceneSystem(&buf0);
-    CommandSystem::SubmitToSceneSystem(&buf1);
+    CommandSystem::SubmitToNodeSystem(&buf0);
+    CommandSystem::SubmitToNodeSystem(&buf1);
     GLFWthread hThread = glfwCreateThread(game, 0);
 
     // render loop
     do {
         CommandBuffer *vbuf;
-        CommandSystem::RetrieveFromSceneSystem(&vbuf);
+        CommandSystem::RetrieveFromNodeSystem(&vbuf);
         RenderSystem::Render(vbuf);
         CircleSystem::Render(vbuf);
         SplineSystem::Render(vbuf);
         glfwSwapBuffers();
-        CommandSystem::SubmitToSceneSystem(vbuf);
+        CommandSystem::SubmitToNodeSystem(vbuf);
         InputSystem::Update();
     } while(glfwWaitThread(hThread, GLFW_NOWAIT) == GL_FALSE);
 
@@ -36,10 +36,10 @@ int main(int argc, char* argv[]) {
     InputSystem::Destroy();
     SplineSystem::Destroy();
     CircleSystem::Destroy();
-    NameSystem::Destroy();
+    TagSystem::Destroy();
     CommandSystem::Destroy();
     MaterialSystem::Destroy();
-    SceneSystem::Destroy();
+    NodeSystem::Destroy();
     RenderSystem::Destroy();
     return 0;
 }
@@ -58,7 +58,7 @@ void game(void* ctxt) {
 void ScriptSystem::Yield() {
     CommandBuffer *vbuf;
     CommandSystem::RetrieveFromRenderSystem(&vbuf);
-    SceneSystem::Update(vbuf);
+    NodeSystem::Update(vbuf);
     MaterialSystem::Update(vbuf);
     CircleSystem::Update(vbuf);
     SplineSystem::Update(vbuf);

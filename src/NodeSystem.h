@@ -2,7 +2,7 @@
 #include "Math.h"
 #include "RenderSystem.h"
 
-namespace SceneSystem {
+namespace NodeSystem {
 
 //------------------------------------------------------------------------------
 // SCENE SYSTEM
@@ -13,11 +13,11 @@ namespace SceneSystem {
 // a "NULL" node, for the purpose of conditional testing.
 //
 // Components themselves are completely managed in separate systems.  
-// The SceneSystem only manages the rapid manipulation of the scene
+// The NodeSystem only manages the rapid manipulation of the scene
 // and efficient computation of a worldspace-transform_t buffer for 
 // the RenderSystem.
 //
-// The SceneSystem itself performs no dynamic memory allocation.  All
+// The NodeSystem itself performs no dynamic memory allocation.  All
 // data records are preallocated in self-defragmenting pools, and should
 // be considered cache-friendly and concurrency-friendly.
 //------------------------------------------------------------------------------

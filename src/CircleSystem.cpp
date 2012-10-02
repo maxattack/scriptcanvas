@@ -46,7 +46,7 @@ void CircleSystem::Update(CommandBuffer* vbuf) {
     for(auto p=mSlots.Begin(); p!=mSlots.End(); ++p) {
         CircleCommand cmd = { 
             MaterialSystem::Index(p->component.material),
-            SceneSystem::Index(p->node)
+            NodeSystem::Index(p->node)
         };
         vbuf->circles[vbuf->circleCount++] = cmd;
     }
@@ -78,9 +78,9 @@ void CircleSystem::Render(CommandBuffer *vbuf) {
 }
 
 void CircleSystem::Create(ID node, ID mid) {
-    ASSERT(SceneSystem::NodeValid(node));
+    ASSERT(NodeSystem::NodeValid(node));
     ASSERT(MaterialSystem::MaterialValid(mid));
-    SceneSystem::AddComponent(node, kComponentCircle);
+    NodeSystem::AddComponent(node, kComponentCircle);
     mSlots.Alloc(node);
     mSlots[node].material = mid;
 }
@@ -94,5 +94,5 @@ void CircleSystem::OnNodeDestroyed(ID node) {
 }
 
 void CircleSystem::Destroy(ID node) { 
-    SceneSystem::RemoveComponent(node, kComponentCircle);
+    NodeSystem::RemoveComponent(node, kComponentCircle);
 }

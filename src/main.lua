@@ -1,27 +1,19 @@
-function import(ns)
-	for k,v in pairs(ns) do
-		_G[k] = v
-	end
-end
-
-import(scene)
-
 local tau = 2 * 3.14156
 
-local root = createNode(0, vec(300, 300))
+local root = node.create(0, vec(300, 300))
 
 -- create ring of circles
 
 local num_circles = 50
 local cm = material.create(0x555555, 6)
-local rotor = createNode(root)
+local rotor = node.create(root)
 for i=0,50 do
-	circle.create(createNode(rotor, vec.polar(300, i*tau/50)), cm)
+	circle.create(node.create(rotor, vec.polar(300, i*tau/50)), cm)
 end
 
 -- create blue "arm"
 
-local center = createNode(0, vec(150,150))
+local center = node.create(0, vec(150,150))
 local bm = material.create(0x445588, 16)
 spline.addEccentricSegment(center, root, bm, 0.1)
 local cbm = material.create(0x445588, 48)
@@ -31,9 +23,9 @@ circle.create(center, cbm)
 -- create blobby triangle
 
 local m = material.create(0xCCCC77, 8)
-local p0 = createNode(root, vec.polar(180, 0))
-local p1 = createNode(root, vec.polar(180, tau/3.0))
-local p2 = createNode(root, vec.polar(180, 2.0*tau/3.0))
+local p0 = node.create(root, vec.polar(180, 0))
+local p1 = node.create(root, vec.polar(180, tau/3.0))
+local p2 = node.create(root, vec.polar(180, 2.0*tau/3.0))
 local e0 = spline.addEccentricSegment(p0, p1, m)
 local e1 = spline.addEccentricSegment(p1, p2, m)
 local e2 = spline.addEccentricSegment(p2, p0, m)
@@ -44,10 +36,10 @@ circle.create(p2, m)
 -- create little triangles
 
 function addTriangle(mat, angle)
-	local result = createNode(root, vec.polar(150, angle), vec.polar(1, angle))
-	local p0 = createNode(result, vec.polar(50, 0))
-	local p1 = createNode(result, vec.polar(50, tau/3.0))
-	local p2 = createNode(result, vec.polar(50, 2*tau/3.0))
+	local result = node.create(root, vec.polar(150, angle), vec.polar(1, angle))
+	local p0 = node.create(result, vec.polar(50, 0))
+	local p1 = node.create(result, vec.polar(50, tau/3.0))
+	local p2 = node.create(result, vec.polar(50, 2*tau/3.0))
 	local e0 = spline.addEccentricSegment(p0, p1, mat, 0)
 	local e1 = spline.addEccentricSegment(p1, p2, mat, 0)
 	local e2 = spline.addEccentricSegment(p2, p0, mat, 0)
@@ -69,9 +61,9 @@ function lerp(u, lo, hi)
 end
 
 while not input.quit() do 
-	setPosition(root, 0.25 * input.mousePosition() + 0.75 * position(root))
-	setRotation(root, 0.25 * tau * input.seconds())
-	setRotation(rotor, -0.18 * tau * input.seconds())
+	node.setPosition(root, 0.25 * input.mousePosition() + 0.75 * node.position(root))
+	node.setRotation(root, 0.25 * tau * input.seconds())
+	node.setRotation(rotor, -0.18 * tau * input.seconds())
 	local eccen = lerp(0.5 + 0.5 * math.sin(1.5 * tau * input.seconds()), -0.15, 0.2)
 	spline.setEccentricity(e0, eccen)
 	spline.setEccentricity(e1, eccen)

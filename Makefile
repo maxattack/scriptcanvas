@@ -62,11 +62,11 @@ OBJS = \
 	src/InputSystem.o \
 	src/Math.o \
 	src/MaterialSystem.o \
-	src/NameSystem.o \
+	src/NodeSystem.o \
 	src/RenderSystem.o \
-	src/SceneSystem.o \
 	src/ScriptSystem_Bind.o \
 	src/SplineSystem.o \
+	src/TagSystem.o \
 	src/main.o
 
 TOOLS = \

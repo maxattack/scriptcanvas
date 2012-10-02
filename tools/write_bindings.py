@@ -11,23 +11,23 @@ MODULES = {
 		'yield':				'void ScriptSystem::Yield()'
 	},
 
-	'scene': {
-		'nodeCount': 			'int SceneSystem::NodeCount()',
-		'createNode': 			'ID SceneSystem::CreateNode(ID parent=0, vec2_t position=VZERO, vec2_t attitude=VUNITY, float depth=0.f)',
-		'attachTo': 			'void SceneSystem::AttachNode(ID parent, ID child)',
-		'detach': 				'void SceneSystem::DetachNode(ID child)',
-		'parent': 				'ID SceneSystem::Parent(ID node)',
-		'destroyNode':			'void SceneSystem::DestroyNode(ID node)',
-		'position': 			'vec2_t SceneSystem::Position(ID node)',
-		'rotation': 			'float SceneSystem::Rotation(ID node)',
-		'direction': 			'vec2_t SceneSystem::Direction(ID node)',
-		'setPosition': 			'void SceneSystem::SetPosition(ID node, vec2_t pos)',
-		'setRotation': 			'void SceneSystem::SetRotation(ID node, float radians)',
-		'setDirection': 		'void SceneSystem::SetDirection(ID node, vec2_t dir)',
-		'setName': 				'void NameSystem::SetName(ID node, std::string name)',
-		'clearName':			'void NameSystem::ClearName(ID node)',
-		'name':					'std::string NameSystem::Name(ID node)',
-		'find':					'ID NameSystem::FindNode(std::string name)'
+	'node': {
+		'count': 				'int NodeSystem::NodeCount()',
+		'create': 				'ID NodeSystem::CreateNode(ID parent=0, vec2_t position=VZERO, vec2_t attitude=VUNITY, float depth=0.f)',
+		'attachTo': 			'void NodeSystem::AttachNode(ID parent, ID child)',
+		'detach': 				'void NodeSystem::DetachNode(ID child)',
+		'parent': 				'ID NodeSystem::Parent(ID node)',
+		'destroy':				'void NodeSystem::DestroyNode(ID node)',
+		'position': 			'vec2_t NodeSystem::Position(ID node)',
+		'rotation': 			'float NodeSystem::Rotation(ID node)',
+		'direction': 			'vec2_t NodeSystem::Direction(ID node)',
+		'setPosition': 			'void NodeSystem::SetPosition(ID node, vec2_t pos)',
+		'setRotation': 			'void NodeSystem::SetRotation(ID node, float radians)',
+		'setDirection': 		'void NodeSystem::SetDirection(ID node, vec2_t dir)',
+		'setTag': 				'void TagSystem::SetName(ID node, std::string name)',
+		'clearTag':				'void TagSystem::ClearName(ID node)',
+		'tag':					'std::string TagSystem::Name(ID node)',
+		'find':					'ID TagSystem::FindNode(std::string name)'
 	},
 
 	'material': {

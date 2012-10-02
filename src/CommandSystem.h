@@ -1,7 +1,7 @@
 #pragma once
-#include "SceneSystem.h"
+#include "NodeSystem.h"
 #include "RenderSystem.h"
-#include "NameSystem.h"
+#include "TagSystem.h"
 #include "MaterialSystem.h"
 #include "CircleSystem.h"
 #include "SplineSystem.h"
@@ -31,8 +31,8 @@ void RetrieveFromRenderSystem(CommandBuffer** out);
 void Update(CommandBuffer *buf);
 
 // For RENDERING THREAD
-void RetrieveFromSceneSystem(CommandBuffer** out);
-void SubmitToSceneSystem(CommandBuffer* vbuf);
+void RetrieveFromNodeSystem(CommandBuffer** out);
+void SubmitToNodeSystem(CommandBuffer* vbuf);
 void Render(CommandBuffer *buf);
 
 }

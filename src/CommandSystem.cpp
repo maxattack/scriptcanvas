@@ -39,7 +39,7 @@ void CommandSystem::RetrieveFromRenderSystem(CommandBuffer** out) {
 	}
 }
 
-void CommandSystem::RetrieveFromSceneSystem(CommandBuffer** out) {
+void CommandSystem::RetrieveFromNodeSystem(CommandBuffer** out) {
 	if (!mRenderQueue.read(*out)) {
 		//puts("waiting on scene...");
 		glfwLockMutex(gSceneMutex);
@@ -49,7 +49,7 @@ void CommandSystem::RetrieveFromSceneSystem(CommandBuffer** out) {
 	}
 }
 
-void CommandSystem::SubmitToSceneSystem(CommandBuffer* vbuf) {
+void CommandSystem::SubmitToNodeSystem(CommandBuffer* vbuf) {
 	Clear(vbuf);
 	glfwLockMutex(gRenderMutex);
 	auto result = mSceneQueue.write(vbuf);

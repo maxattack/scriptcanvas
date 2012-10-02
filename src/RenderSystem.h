@@ -1,5 +1,5 @@
 #pragma once
-#include "SceneSystem.h"
+#include "NodeSystem.h"
 
 namespace RenderSystem {
 
