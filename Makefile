@@ -61,6 +61,7 @@ OBJS = \
 	src/CommandSystem.o \
 	src/InputSystem.o \
 	src/Math.o \
+	src/MaterialSystem.o \
 	src/NameSystem.o \
 	src/RenderSystem.o \
 	src/SceneSystem.o \

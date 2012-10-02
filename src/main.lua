@@ -8,23 +8,29 @@ function addVert(angle)
 	return result
 end
 
-local noodle = spline.addMaterial(8, 0xaaaa77)
+function lerp(u, lo, hi)
+	return lo + u * (hi - lo)
+end
+
+local m = material.create(0xCCCC77, 8)
 local tau = 2 * 3.14156
 local p0 = addVert(0)
 local p1 = addVert(tau/3.0)
 local p2 = addVert(2.0*tau/3.0)
-spline.addCubicSegment(p0, p1, noodle)
-spline.addCubicSegment(p1, p2, noodle)
-spline.addCubicSegment(p2, p0, noodle)
-
-circle.create(p0, 0xaaaa77, 4/2)
-circle.create(p1, 0xaaaa77, 4/2)
-circle.create(p2, 0xaaaa77, 4/2)
+local e0 = spline.addEccentricSegment(p0, p1, m)
+local e1 = spline.addEccentricSegment(p1, p2, m)
+local e2 = spline.addEccentricSegment(p2, p0, m)
+circle.create(p0, m)
+circle.create(p1, m)
+circle.create(p2, m)
 
 while not input.quit() do 
-	scene.setPosition(root, input.mousePosition())
-	--scene.setRotation(root, 100.0 * input.seconds())
-	scene.setDirection(root, vec.polar(2, input.seconds()))
+	scene.setPosition(root, 0.1 * input.mousePosition() + 0.9 * scene.position(root))
+	scene.setRotation(root, 30.0 * input.seconds())
+	local eccen = lerp(0.5 + 0.5 * math.sin(0.5 * tau * input.seconds()), -0.25, 0.25)
+	spline.setEccentricity(e0, eccen)
+	spline.setEccentricity(e1, eccen)
+	spline.setEccentricity(e2, eccen)
 	script.yield() 
 end
 

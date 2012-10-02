@@ -6,6 +6,7 @@ int main(int argc, char* argv[]) {
     // init systems
     RenderSystem::Initialize();
     SceneSystem::Initialize();
+    MaterialSystem::Initialize();
     CommandSystem::Initialize();
     NameSystem::Initialize();
     CircleSystem::Initialize();
@@ -37,6 +38,7 @@ int main(int argc, char* argv[]) {
     CircleSystem::Destroy();
     NameSystem::Destroy();
     CommandSystem::Destroy();
+    MaterialSystem::Destroy();
     SceneSystem::Destroy();
     RenderSystem::Destroy();
     return 0;
@@ -57,6 +59,7 @@ void ScriptSystem::Yield() {
     CommandBuffer *vbuf;
     CommandSystem::RetrieveFromRenderSystem(&vbuf);
     SceneSystem::Update(vbuf);
+    MaterialSystem::Update(vbuf);
     CircleSystem::Update(vbuf);
     SplineSystem::Update(vbuf);
     CommandSystem::SubmitToRenderSystem(vbuf);

@@ -5,18 +5,13 @@
 
 // TYPES
 
-struct MaterialSlot {
-	Material mat;
-	int refCount;
-};
-
 struct vertex_t {
     float uuu;
     float uu;
     float u;
     float s;
 
-    void SetValue(float param, float side) {
+    inline void SetValue(float param, float side) {
     	u = param;
     	uu = u * u;
     	uuu = uu * u;
@@ -37,8 +32,8 @@ static GLuint mUniformTaperDelta;
 static GLuint mVertexBuffer;
 
 static CompactComponentPool<ControlVertex> mComponents;
-static CompactPool<MaterialSlot, kMaxMaterials> mMaterials;
-static CompactPool<CubicSegment, kMaxSegments> mSegments;
+static CompactPool<Segment, kMaxSegments> mCubicSegments;
+static CompactPool<EccentricSegment, kMaxSegments> mEccentricSegments;
 
 // FUNCTIONS
 
@@ -54,12 +49,11 @@ void SplineSystem::Initialize() {
     mUniformTaperDelta = glGetUniformLocation(mProgram, "taperDelta");
     {
         vertex_t buf[kSegmentResolution];
-        float sideBuffer[kSegmentResolution];
         float du = 1.f / 127.f;
         float u = 0;
         for(int i=0; i<kSegmentResolution>>1; ++i) {
-            buf[i+i].SetValue(u, 0.5f);
-            buf[i+i+1].SetValue(u, -0.5f);
+            buf[i+i].SetValue(u, 1.f);
+            buf[i+i+1].SetValue(u, -1.f);
             u += du;
         }
         glGenBuffers(1, &mVertexBuffer);
@@ -75,27 +69,33 @@ void SplineSystem::Destroy() {
 
 void SplineSystem::Update(CommandBuffer *vbuf) {
 	// TODO: Culling
-	for(auto p=mMaterials.Begin(); p!=mMaterials.End(); ++p) {
-		vbuf->materials[vbuf->materialCount] = p->mat;
-		vbuf->materialCount++;
-	}
-	for(auto p=mSegments.Begin(); p!=mSegments.End(); ++p) {
+	auto cmd = &(vbuf->cubicSegments[vbuf->cubicSegmentCount]);
+	for(auto p=mCubicSegments.Begin(); p!=mCubicSegments.End(); ++p) {
 		float taperStart = Taper(p->start);
-		CubicSegmentCommand cmd = { 
-			0, 
-			mMaterials.Index(p->material), 
-			SceneSystem::Index(p->start), 
-			SceneSystem::Index(p->end),
-			taperStart,
-			Taper(p->end)-taperStart
-		 };
-		vbuf->cubicSegments[vbuf->cubicSegmentCount] = cmd;
+		cmd->mid = MaterialSystem::Index(p->material);
+		cmd->start = SceneSystem::Index(p->start);
+		cmd->end = SceneSystem::Index(p->end);
+		cmd->taperStart = taperStart;
+		cmd->taperDelta = Taper(p->end)-taperStart;
 		vbuf->cubicSegmentCount++;
+		cmd++;
+	}
+	auto ecmd = &(vbuf->eccentricSegments[vbuf->eccentricSegmentCount]);
+	for(auto p=mEccentricSegments.Begin(); p!=mEccentricSegments.End(); ++p) {
+		float taperStart = Taper(p->start);
+		ecmd->mid = MaterialSystem::Index(p->material);
+		ecmd->start = SceneSystem::Index(p->start);
+		ecmd->end = SceneSystem::Index(p->end);
+		ecmd->taperStart = taperStart;
+		ecmd->taperDelta = Taper(p->end)-taperStart;
+		ecmd->eccentricity = p->eccentricity;
+		vbuf->eccentricSegmentCount++;
+		ecmd++;
 	}
 }
 
 void SplineSystem::Render(CommandBuffer *vbuf) {
-	if (vbuf->cubicSegmentCount) {
+	if (vbuf->cubicSegmentCount || vbuf->eccentricSegmentCount) {
 	    glUseProgram(mProgram);
 	    glEnableClientState(GL_VERTEX_ARRAY);
 	    glEnableVertexAttribArray(mAttribParameterAndSide);
@@ -104,27 +104,17 @@ void SplineSystem::Render(CommandBuffer *vbuf) {
 	    // TODO: sort by material?
 	    for(int i=0; i<vbuf->cubicSegmentCount; ++i) {
 	    	auto& segment = vbuf->cubicSegments[i];
-	    	auto& mat = vbuf->materials[segment.material];
-	    	auto& start = vbuf->transform_ts[segment.start].t;
-	    	auto& end = vbuf->transform_ts[segment.end].t;
+	    	auto& mat = vbuf->materials[segment.mid];
+	    	auto& start = vbuf->transforms[segment.start].t;
+	    	auto& end = vbuf->transforms[segment.end].t;
 
 	    	auto p0 = Vec4(start.t);
 	    	auto p1 = Vec4(end.t);
 	    	auto t0 = Vec4(start.q);
 	    	auto t1 = Vec4(end.q);
 
-	    	//auto posMatrix = HermiteMatrix(p0, p1, t0, t1);
-	    	//auto normMatrix = HermiteNormMatrix(p0, p1, t0, t1);
-
-	    	auto d = Vec4((end.t - start.t).Clockwise());
-
-	    	float e = Lerp(-0.2f, 0.2f, 0.5f + 0.5f * sinf(4.f * 3.14159f * glfwGetTime()));
-	    	auto m = p0 + 0.5f * (p1 - p0) + e * d;
-
-	    	auto posMatrix = QuadraticBezierMatrix(p0, m, p1);
-	    	auto normMatrix = QuadraticBezierNormMatrix(p0, m, p1);
-
-	    	//LOG_FLOAT(mat.weight);
+	    	auto posMatrix = HermiteMatrix(p0, p1, t0, t1);
+	    	auto normMatrix = HermiteNormMatrix(p0, p1, t0, t1);
 
 		    glUniform1f(mUniformThickness, mat.weight);
 		    glUniform1f(mUniformTaperStart, segment.taperStart);
@@ -141,6 +131,36 @@ void SplineSystem::Render(CommandBuffer *vbuf) {
 		    glDrawArrays(GL_TRIANGLE_STRIP, 0, kSegmentResolution);
 	    }
 
+	    for(int i=0; i<vbuf->eccentricSegmentCount; ++i) {
+	    	auto& segment = vbuf->eccentricSegments[i];
+	    	auto& mat = vbuf->materials[segment.mid];
+	    	auto& start = vbuf->transforms[segment.start].t;
+	    	auto& end = vbuf->transforms[segment.end].t;
+
+	    	auto p0 = Vec4(start.t);
+	    	auto p1 = Vec4(end.t);
+
+	    	auto offset = end.t - start.t;
+	    	auto m = Vec4( start.t + 0.5f * offset + segment.eccentricity * offset.Clockwise() );
+
+	    	auto posMatrix = QuadraticBezierMatrix(p0, m, p1);
+	    	auto normMatrix = QuadraticBezierNormMatrix(p0, m, p1);
+
+		    glUniform1f(mUniformThickness, mat.weight);
+		    glUniform1f(mUniformTaperStart, segment.taperStart);
+		    glUniform1f(mUniformTaperDelta, segment.taperDelta);
+		    glUniformMatrix4fv(mUniformPositionMatrix, 1, GL_FALSE, posMatrix.m);
+		    glUniformMatrix4fv(mUniformNormalMatrix, 1, GL_FALSE, normMatrix.m);
+			
+			float r,g,b;
+			mat.color.ToFloatRGB(&r, &g, &b);
+			glUniform4f(mUniformColor, r, g, b, 1.f);
+
+		    glVertexAttribPointer(mAttribParameterAndSide, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+		    glDrawArrays(GL_TRIANGLE_STRIP, 0, kSegmentResolution);	    	
+	    }
+
 	    glDisableClientState(GL_VERTEX_ARRAY);
 	    glDisableVertexAttribArray(mAttribParameterAndSide);
 	    glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -149,31 +169,8 @@ void SplineSystem::Render(CommandBuffer *vbuf) {
 }
 
 
-ID SplineSystem::CreateMaterial(float weight, color_t color) {
-	auto result = mMaterials.TakeOut();
-	mMaterials[result].refCount = 0;
-	mMaterials[result].mat.weight = weight;
-	mMaterials[result].mat.color = color;
-	return result;
-}
-
-Material& SplineSystem::GetMaterial(ID mid) {
-	return mMaterials[mid].mat;
-}
-
-void SplineSystem::DestroyMaterial(ID mid) {
-	// remove references from segments using this material
-	if (mMaterials[mid].refCount > 0) {
-		for(auto p=mSegments.Begin(); p!=mSegments.End(); ++p) {
-			if (p->material == mid) {
-				p->material = 0;
-			}
-		}
-	}
-	mMaterials.PutBack(mid);
-}
-
 static void CreateControlVertex(ID node) {
+	SceneSystem::AddComponent(node, kComponentSpline);
 	mComponents.Alloc(node);
 	mComponents[node].refCount = 0;
 	mComponents[node].taper = 1.f;
@@ -183,73 +180,111 @@ ControlVertex& SplineSystem::GetControlVertex(ID node) {
 	return mComponents[node];
 }
 
-ID SplineSystem::CreateCubicSegment(ID start, ID end, ID mat) {
-	using namespace SceneSystem;
-	ASSERT(start != end);
-	if (!HasComponent(start, kComponentSpline)) {
-		AddComponent(start, kComponentSpline);
-		CreateControlVertex(start);
-	}
-	if (!HasComponent(end, kComponentSpline)) {
-		AddComponent(end, kComponentSpline);
-		CreateControlVertex(end);
-	}
-	mComponents[start].refCount++;
-	mComponents[end].refCount--;
-
-	auto result = mSegments.TakeOut();
-	mSegments[result].start = start;
-	mSegments[result].end = end;
-	mSegments[result].material = mat;
-	return result;
-}
-
-void SplineSystem::SetCubicSegmentMaterial(ID sid, ID mid) {
-	ASSERT(mSegments.IsActive(sid));
-	ASSERT(mMaterials.IsActive(mid));
-	auto& seg = mSegments[sid];
-	if (!seg.material || seg.material != mid) {
-		ASSERT(mMaterials[seg.material].refCount > 0);
-		mMaterials[seg.material].refCount--;
-		mSegments[sid].material = mid;
-		mMaterials[mid].refCount++;
-	}
-}
-
-CubicSegment SplineSystem::GetCubicSegment(ID sid) {
-	return mSegments[sid];
-}
-
-void SplineSystem::DestroyCubicSegment(ID sid) {
-	using namespace SceneSystem;
-	auto& seg = mSegments[sid];
-	if (seg.material) {
-		mMaterials[seg.material].refCount--;
-	}
-	mComponents[seg.start].refCount--;
-	if (mComponents[seg.start].refCount == 0) {
-		RemoveComponent(seg.start, kComponentSpline);
-	}
-	mComponents[seg.end].refCount--;
-	if (mComponents[seg.end].refCount == 0) {
-		RemoveComponent(seg.end, kComponentSpline);
-	}
-	mSegments.PutBack(sid);
-}
 
 void SplineSystem::OnNodeDestroyed(ID node) {
 	// remove any segments using this node
 	if (mComponents[node].refCount > 0) {
-		auto p = mSegments.Begin();
-		while(p != mSegments.End()) {
+		mComponents[node].refCount++; // back to make sure we don't get recursively called
+		auto p = mCubicSegments.Begin();
+		while(p != mCubicSegments.End()) {
 			if (p->start == node || p->end == node) {
-				DestroyCubicSegment(mSegments.GetID(p));
+				DestroyCubicSegment(mCubicSegments.GetID(p));
 			} else {
 				++p;
 			}
 		}
+		auto i = mEccentricSegments.Begin();
+		while(i != mEccentricSegments.End()) {
+			if (i->start == node || i->end == node) {
+				DestroyEccentricSegment(mEccentricSegments.GetID(i));
+			} else {
+				++i;
+			}
+		}
 	}
 	mComponents.Free(node);
+}
+
+ID SplineSystem::CreateCubicSegment(ID start, ID end, ID mat) {
+	ASSERT(start != end);
+	if (!SceneSystem::HasComponent(start, kComponentSpline)) { CreateControlVertex(start); }
+	if (!SceneSystem::HasComponent(end, kComponentSpline)) { CreateControlVertex(end); }
+	mComponents[start].refCount++;
+	mComponents[end].refCount--;
+	auto result = mCubicSegments.TakeOut();
+	mCubicSegments[result].start = start;
+	mCubicSegments[result].end = end;
+	mCubicSegments[result].material = mat;
+	return result;
+}
+
+void SplineSystem::SetCubicSegmentMaterial(ID csid, ID mid) {
+	ASSERT(mCubicSegments.IsActive(csid));
+	ASSERT(MaterialSystem::MaterialValid(mid));
+	auto& seg = mCubicSegments[csid].material = mid;
+}
+
+Segment SplineSystem::GetCubicSegment(ID csid) {
+	return mCubicSegments[csid];
+}
+
+void SplineSystem::DestroyCubicSegment(ID csid) {
+	auto& seg = mCubicSegments[csid];
+	mComponents[seg.start].refCount--;
+	if (mComponents[seg.start].refCount == 0) {
+		SceneSystem::RemoveComponent(seg.start, kComponentSpline);
+	}
+	mComponents[seg.end].refCount--;
+	if (mComponents[seg.end].refCount == 0) {
+		SceneSystem::RemoveComponent(seg.end, kComponentSpline);
+	}
+	mCubicSegments.PutBack(csid);
+}
+
+
+ID SplineSystem::CreateEccentricSegment(ID start, ID end, ID mat, float eccentricity) {
+	ASSERT(start != end);
+	if (!SceneSystem::HasComponent(start, kComponentSpline)) { CreateControlVertex(start); }
+	if (!SceneSystem::HasComponent(end, kComponentSpline)) { CreateControlVertex(end); }
+	mComponents[start].refCount++;
+	mComponents[end].refCount--;
+	auto result = mEccentricSegments.TakeOut();
+	mEccentricSegments[result].start = start;
+	mEccentricSegments[result].end = end;
+	mEccentricSegments[result].material = mat;
+	mEccentricSegments[result].eccentricity = eccentricity;
+	return result;
+}
+
+void SplineSystem::SetEccentricSegmentMaterial(ID esid, ID mid) {
+	ASSERT(mEccentricSegments.IsActive(esid));
+	ASSERT(MaterialSystem::MaterialValid(mid));
+	auto& seg = mCubicSegments[esid].material = mid;
+}
+
+float SplineSystem::Eccentricity(ID esid) {
+	return mEccentricSegments[esid].eccentricity;
+}
+
+void SplineSystem::SetEccentricity(ID esid, float e) {
+	mEccentricSegments[esid].eccentricity = e;
+}
+
+void SplineSystem::DestroyEccentricSegment(ID esid) {
+	auto& seg = mEccentricSegments[esid];
+	mComponents[seg.start].refCount--;
+	if (mComponents[seg.start].refCount == 0) {
+		SceneSystem::RemoveComponent(seg.start, kComponentSpline);
+	}
+	mComponents[seg.end].refCount--;
+	if (mComponents[seg.end].refCount == 0) {
+		SceneSystem::RemoveComponent(seg.end, kComponentSpline);
+	}
+	mCubicSegments.PutBack(esid);
+}
+
+EccentricSegment SplineSystem::GetEccentricSegment(ID esid) {
+	return mEccentricSegments[esid];
 }
 
 

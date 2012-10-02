@@ -211,7 +211,7 @@ ztransform_t SceneSystem::LocalToWorld(ID node) {
 
 static void Update(CommandBuffer *vbuf, uint16_t i) {
 	auto& pose = sNodePoses[i];
-	vbuf->transform_ts[i] = pose.localToParent * vbuf->transform_ts[pose.parentIndex];
+	vbuf->transforms[i] = pose.localToParent * vbuf->transforms[pose.parentIndex];
 	for(ID cid=Slot(pose.slotIndex).firstChild; cid; cid=Slot(cid).nextSibling) {
 		Update(vbuf, Slot(cid).poseIndex);
 	}
@@ -226,7 +226,7 @@ void SceneSystem::Update(CommandBuffer *vbuf) {
 	for(int i=0; i<sNodeCount; ++i) {
 		auto& pose = sNodePoses[i];
 		if (pose.parentIndex == USHRT_MAX) {
-			vbuf->transform_ts[i] = pose.localToParent;
+			vbuf->transforms[i] = pose.localToParent;
 			for(ID cid=Slot(pose.slotIndex).firstChild; cid; cid=Slot(cid).nextSibling) {
 				Update(vbuf, Slot(cid).poseIndex);
 			}
@@ -308,9 +308,9 @@ void SceneSystem::Update(CommandBuffer *vbuf) {
 	// fast-compute local-to-world buffer
 	for(int i=0; i<sNodeCount; ++i) {
 		if (sNodePoses[i].parentIndex == USHRT_MAX) {
-			vbuf->transform_ts[i] = sNodePoses[i].localToParent;
+			vbuf->transforms[i] = sNodePoses[i].localToParent;
 		} else {
-			vbuf->transform_ts[i] = sNodePoses[i].localToParent * vbuf->transform_ts[sNodePoses[i].parentIndex];
+			vbuf->transforms[i] = sNodePoses[i].localToParent * vbuf->transforms[sNodePoses[i].parentIndex];
 		}
 	}
 

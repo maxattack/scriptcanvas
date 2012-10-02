@@ -10,7 +10,7 @@ GLuint mAttribUnit;
 GLuint mUniformRadius;
 GLuint mUniformColor;
 GLuint mVertexBuffer;
-CompactComponentPool<circle_t> mSlots;
+CompactComponentPool<Circle> mSlots;
 
 void CircleSystem::Initialize() {
     mProgram = RenderSystem::LoadShaderProgram("src/circle.glsl");
@@ -38,9 +38,16 @@ void CircleSystem::Destroy() {
     // todo: cleanup
 }
 
+Circle& CircleSystem::GetCircle(ID node) {
+    return mSlots[node];
+}
+
 void CircleSystem::Update(CommandBuffer* vbuf) {
     for(auto p=mSlots.Begin(); p!=mSlots.End(); ++p) {
-        CircleCommand cmd = { 0, SceneSystem::Index(p->node), p->component.radius, p->component.fill };
+        CircleCommand cmd = { 
+            MaterialSystem::Index(p->component.material),
+            SceneSystem::Index(p->node)
+        };
         vbuf->circles[vbuf->circleCount++] = cmd;
     }
 }
@@ -53,10 +60,11 @@ void CircleSystem::Render(CommandBuffer *vbuf) {
         glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
         for(int i=0; i<vbuf->circleCount; ++i) {
             auto cmd = vbuf->circles[i];
-            glLoadMatrixf(Mat4(vbuf->transform_ts[cmd.transform_t]).m);
-            glUniform1f(mUniformRadius, cmd.radius);
+            auto mat = vbuf->materials[cmd.mid];
+            glLoadMatrixf(Mat4(vbuf->transforms[cmd.tid]).m);
+            glUniform1f(mUniformRadius, mat.weight);
             float r,g,b;
-            cmd.fill.ToFloatRGB(&r, &g, &b);
+            mat.color.ToFloatRGB(&r, &g, &b);
             glUniform4f(mUniformColor, r, g, b, 1.f);
             glVertexAttribPointer(mAttribUnit, 2, GL_FLOAT, GL_FALSE, 0, 0);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 64);
@@ -69,15 +77,16 @@ void CircleSystem::Render(CommandBuffer *vbuf) {
     }
 }
 
-void CircleSystem::Create(ID node, color_t color, float radius) {
+void CircleSystem::Create(ID node, ID mid) {
+    ASSERT(SceneSystem::NodeValid(node));
+    ASSERT(MaterialSystem::MaterialValid(mid));
     SceneSystem::AddComponent(node, kComponentCircle);
     mSlots.Alloc(node);
-    mSlots[node].fill = color;
-    mSlots[node].radius = radius;
+    mSlots[node].material = mid;
 }
 
-circle_t& CircleSystem::GetCircle(ID node) {
-    return mSlots[node];
+Material& GetMaterial(ID node) {
+    return MaterialSystem::GetMaterial(mSlots[node].material);
 }
 
 void CircleSystem::OnNodeDestroyed(ID node) {

@@ -3,6 +3,7 @@ import os, os.path, sys, traceback
 # GIFT IDEAS
 #	- support multiple return values (expressed in C++ as pointer "out" arguments)
 #	- precompile "bootstrap" script and plunk opcode binary into source file
+#	- check ID types in DEBUG builds
 
 MODULES = {
 
@@ -29,8 +30,17 @@ MODULES = {
 		'find':					'ID NameSystem::FindNode(std::string name)'
 	},
 
+	'material': {
+		'create':				'ID MaterialSystem::CreateMaterial(color_t color, float weight)',
+		'destroy':				'void MaterialSystem::DestroyMaterial(ID mid)',
+		'weight':				'float MaterialSystem::Weight(ID mid)',
+		'color':				'color_t MaterialSystem::Color(ID mid)',
+		'setWeight':			'void MaterialSystem::SetWeight(ID mid, float weight)',
+		'setColor':				'void MaterialSystem::SetColor(ID mid, color_t c)'
+	},
+
 	'circle': {
-		'create':				'void CircleSystem::Create(ID node, color_t color, float radius)',
+		'create':				'void CircleSystem::Create(ID node, ID mid)',
 		'destroy': 				'void CircleSystem::Destroy(ID node)',
 		'fill': 				'color_t CircleSystem::Fill(ID node)',
 		'radius': 				'float CircleSystem::Radius(float radius)',
@@ -45,12 +55,12 @@ MODULES = {
 	},
 
 	'spline': {
-		'addMaterial':			'ID SplineSystem::CreateMaterial(float weight, color_t color)',
-		'weight':				'float SplineSystem::Weight(ID node)',
-		'color':				'color_t SplineSystem::Color(ID mat)',
-		'setWeight':			'void SplineSystem::SetWeight(ID mat, float weight)',
-		'setColor':				'void SplineSystem::SetColor(ID mat, color_t color)',
 		'addCubicSegment':		'ID SplineSystem::CreateCubicSegment(ID start, ID end, ID mat)',
+
+		'addEccentricSegment':	'ID SplineSystem::CreateEccentricSegment(ID start, ID end, ID mat, float eccentricity=0.f)',
+		'eccentricity':			'float SplineSystem::Eccentricity(ID esid)',
+		'setEccentricity':		'void SplineSystem::SetEccentricity(ID esid, float e)',
+		
 		'taper':				'float SplineSystem::Taper(ID node)',
 		'setTaper':				'void SplineSystem::SetTaper(ID node, float taper)'
 

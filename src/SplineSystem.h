@@ -1,31 +1,31 @@
 #pragma once
 #include "Foundation.h"
-#include "Color.h"
+#include "MaterialSystem.h"
 
-struct CubicSegmentCommand {
+// Does it make sense to have a concept of a generic segment,
+// and then to endow it with linear, cubic, or eccentric nature?
+// It would reduce the number of syscalls...
+
+struct SegmentCommand {
 	uint16_t queue;
-	uint16_t material;
+	uint16_t mid;
 	uint16_t start;
 	uint16_t end;
 	float taperStart;
 	float taperDelta;
 };
 
-struct Material {
-	float weight;
-	color_t color;
+struct EccentricSegmentCommand : SegmentCommand {
+	float eccentricity;
 };
 
-struct CubicSegment {
+struct Segment {
 	ID start;
 	ID end;
 	ID material;
 };
 
-struct QBezSegment {
-	ID start;
-	ID end;
-	ID material;
+struct EccentricSegment : Segment {
 	float eccentricity;
 };
 
@@ -42,34 +42,36 @@ void Destroy();
 void Update(CommandBuffer *vbuf);
 void Render(CommandBuffer *vbuf);
 
-
-ID CreateMaterial(float weight=1.f, color_t color=Color());
-Material& GetMaterial(ID mid);
-void DestroyMaterial(ID mid);
-
-ID CreateCubicSegment(ID start, ID end, ID mat);
-void SetCubicSegmentMaterial(ID sid, ID mid);
-CubicSegment GetCubicSegment(ID sid);
-void DestroyCubicSegment(ID sid);
-
-void OnNodeDestroyed(ID node);
-
-// Helper Functions
-
 ControlVertex& GetControlVertex(ID node);
-
-inline float Weight(ID mat) { return GetMaterial(mat).weight; }
-inline color_t Color(ID mat) { return GetMaterial(mat).color; }
-
-inline void SetWeight(ID mat, float weight) { GetMaterial(mat).weight = weight; }
-inline void SetColor(ID mat, color_t color) { GetMaterial(mat).color = color; }
-
-inline ID CubicSegmentStart(ID sid) { return GetCubicSegment(sid).start; }
-inline ID CubicSegmentEnd(ID sid) { return GetCubicSegment(sid).end; }
-inline ID CubicSegmentMaterialID(ID sid) { return GetCubicSegment(sid).material; }
-inline Material& CubicSegmentMaterial(ID sid) { return GetMaterial(GetCubicSegment(sid).material); }
+void OnNodeDestroyed(ID node);
 
 inline float Taper(ID node) { return GetControlVertex(node).taper; }
 inline void SetTaper(ID node, float taper) { GetControlVertex(node).taper = taper; }
+
+ID CreateCubicSegment(ID start, ID end, ID mat);
+void SetCubicSegmentMaterial(ID csid, ID mid);
+Segment GetCubicSegment(ID csid);
+void DestroyCubicSegment(ID csid);
+
+inline ID CubicSegmentStart(ID csid) { return GetCubicSegment(csid).start; }
+inline ID CubicSegmentEnd(ID csid) { return GetCubicSegment(csid).end; }
+inline ID CubicSegmentMaterialID(ID csid) { return GetCubicSegment(csid).material; }
+inline Material& CubicSegmentMaterial(ID csid) { return MaterialSystem::GetMaterial(GetCubicSegment(csid).material); }
+
+ID CreateEccentricSegment(ID start, ID end, ID mat, float eccentricity=0.f);
+void SetEccentricSegmentMaterial(ID esid, ID mid);
+float Eccentricity(ID esid);
+void SetEccentricity(ID esid, float e);
+void DestroyEccentricSegment(ID esid);
+
+EccentricSegment GetEccentricSegment(ID esid);
+
+inline ID EccentricSegmentStart(ID esid) { return GetEccentricSegment(esid).start; }
+inline ID EccentricSegmentEnd(ID esid) { return GetEccentricSegment(esid).end; }
+inline ID EccentricSegmentMaterialID(ID esid) { return GetEccentricSegment(esid).material; }
+inline Material& EccentricSegmentMaterial(ID esid) { return MaterialSystem::GetMaterial(GetEccentricSegment(esid).material); }
+
+
+
 
 }
