@@ -91,7 +91,7 @@ inline float2_t Position(ID node) {
 }
 
 inline float Rotation(ID node) { 
-	return LocalToParent(node).t.q.Radians() * (180.0f/M_PI); 
+	return LocalToParent(node).t.q.Radians(); 
 }
 
 inline float2_t Direction(ID node) { 
@@ -102,8 +102,8 @@ inline void SetPosition(ID node, float2_t p) {
 	LocalToParent(node).t.t = p; 
 }
 
-inline void SetRotation(ID node, float degrees) { 
-	LocalToParent(node).t.q = Polar(1.f, degrees * (M_PI/180.0f)); 
+inline void SetRotation(ID node, float angle) { 
+	LocalToParent(node).t.q = Polar(1.f, angle); 
 }
 
 inline void SetDirection(ID node, float2_t d) { 

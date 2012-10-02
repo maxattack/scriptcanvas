@@ -22,7 +22,7 @@ MODULES = {
 		'rotation': 			'float SceneSystem::Rotation(ID node)',
 		'direction': 			'float2_t SceneSystem::Direction(ID node)',
 		'setPosition': 			'void SceneSystem::SetPosition(ID node, float2_t pos)',
-		'setRotation': 			'void SceneSystem::SetRotation(ID node, float degrees)',
+		'setRotation': 			'void SceneSystem::SetRotation(ID node, float radians)',
 		'setDirection': 		'void SceneSystem::SetDirection(ID node, float2_t dir)',
 		'setName': 				'void NameSystem::SetName(ID node, std::string name)',
 		'clearName':			'void NameSystem::ClearName(ID node)',
