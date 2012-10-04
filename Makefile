@@ -66,6 +66,7 @@ OBJS = \
 	src/RenderSystem.o \
 	src/ScriptSystem_Bind.o \
 	src/SplineSystem.o \
+	src/StrokeSystem.o \
 	src/TagSystem.o \
 	src/main.o
 

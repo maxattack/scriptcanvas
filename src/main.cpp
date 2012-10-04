@@ -7,6 +7,7 @@ int main(int argc, char* argv[]) {
     RenderSystem::Initialize();
     NodeSystem::Initialize();
     MaterialSystem::Initialize();
+    StrokeSystem::Initialize();
     CommandSystem::Initialize();
     TagSystem::Initialize();
     CircleSystem::Initialize();
@@ -38,6 +39,7 @@ int main(int argc, char* argv[]) {
     CircleSystem::Destroy();
     TagSystem::Destroy();
     CommandSystem::Destroy();
+    StrokeSystem::Destroy();
     MaterialSystem::Destroy();
     NodeSystem::Destroy();
     RenderSystem::Destroy();
@@ -60,6 +62,7 @@ void ScriptSystem::Yield() {
     CommandSystem::RetrieveFromRenderSystem(&vbuf);
     NodeSystem::Update(vbuf);
     MaterialSystem::Update(vbuf);
+    StrokeSystem::Update(vbuf);
     CircleSystem::Update(vbuf);
     SplineSystem::Update(vbuf);
     CommandSystem::SubmitToRenderSystem(vbuf);

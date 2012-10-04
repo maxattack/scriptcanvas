@@ -10,8 +10,7 @@ static GLFWmutex gSceneMutex;
 
 static void Clear(CommandBuffer *buf) {
 	buf->circleCount = 0;
-	buf->cubicSegmentCount = 0;
-	buf->eccentricSegmentCount = 0;
+	buf->segmentCount = 0;
 }
 
 void CommandSystem::Initialize() {

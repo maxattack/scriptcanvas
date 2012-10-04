@@ -3,21 +3,20 @@
 #include "RenderSystem.h"
 #include "TagSystem.h"
 #include "MaterialSystem.h"
+#include "StrokeSystem.h"
 #include "CircleSystem.h"
 #include "SplineSystem.h"
 
 struct CommandBuffer {
 	ztransform_t transforms[kMaxNodes];
 	Material materials[kMaxMaterials];
+	Stroke strokes[kMaxSegments];
 
 	int circleCount;
 	CircleCommand circles[kMaxNodes];
 
-	int cubicSegmentCount;
-	SegmentCommand cubicSegments[kMaxSegments];	
-
-	int eccentricSegmentCount;
-	EccentricSegmentCommand eccentricSegments[kMaxSegments];
+	int segmentCount;
+	SegmentCommand segments[kMaxSegments];	
 };
 
 namespace CommandSystem {

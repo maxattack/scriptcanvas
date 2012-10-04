@@ -2,11 +2,13 @@
 #include "util/CompactPool.h"
 
 struct MaterialSlot {
+	int refCount;
 	Material mat;
-//	int refCount;
 };
 
 static CompactPool<MaterialSlot, kMaxMaterials> mMaterials;
+
+// TODO: Handle RefCounts
 
 void MaterialSystem::Initialize() {
 	// NOOP
@@ -25,7 +27,7 @@ void MaterialSystem::Update(CommandBuffer *vbuf) {
 
 ID MaterialSystem::CreateMaterial(color_t color, float weight) {
 	ID result = mMaterials.TakeOut();
-	//mMaterials[result].refCount = 0;
+	mMaterials[result].refCount = 0;
 	mMaterials[result].mat.weight = weight;
 	mMaterials[result].mat.color = color;
 	return result;
@@ -45,7 +47,7 @@ uint16_t MaterialSystem::Index(ID mid) {
 }
 
 void MaterialSystem::DestroyMaterial(ID mid) {
-	//ASSERT(mMaterials[mid].refCount == 0);
+	ASSERT(mMaterials[mid].refCount == 0);
 	mMaterials.PutBack(mid);
 }
 

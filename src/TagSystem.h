@@ -4,7 +4,7 @@
 
 #define kMaxNameLength	32
 
-// replace w/ a "tag" system that can be one-to-many (linked list?)
+// Needs some love or needs to die
 
 namespace TagSystem {
 

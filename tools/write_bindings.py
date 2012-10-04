@@ -39,6 +39,12 @@ MODULES = {
 		'setColor':				'void MaterialSystem::SetColor(ID mid, color_t c)'
 	},
 
+	'stroke': {
+		'create':				'ID StrokeSystem::CreateStroke(float start, float end, float eccen=0.0f)',
+		'createUniform':		'ID StrokeSystem::CreateUniformStroke(float uniform)',
+		'destroy':				'void StrokeSystem::DestroyStroke(ID sid)'
+	},
+
 	'circle': {
 		'create':				'void CircleSystem::Create(ID node, ID mid)',
 		'destroy': 				'void CircleSystem::Destroy(ID node)',
@@ -55,15 +61,9 @@ MODULES = {
 	},
 
 	'spline': {
-		'addCubicSegment':		'ID SplineSystem::CreateCubicSegment(ID start, ID end, ID mat)',
-
-		'addEccentricSegment':	'ID SplineSystem::CreateEccentricSegment(ID start, ID end, ID mat, float eccentricity=0.f)',
-		'eccentricity':			'float SplineSystem::Eccentricity(ID esid)',
-		'setEccentricity':		'void SplineSystem::SetEccentricity(ID esid, float e)',
-		
-		'taper':				'float SplineSystem::Taper(ID node)',
-		'setTaper':				'void SplineSystem::SetTaper(ID node, float taper)'
-
+		'create':				'ID SplineSystem::CreateSegment(ID start, ID end, ID mat, ID stroke=0, float eccentricity=INFINITY)',
+		'destroy':				'void SplineSystem::DestroySegment(ID sid)',
+		'setEccentricity':		'void SplineSystem::SetEccentricity(ID sid, float eccen)'
 	},
 
 }
