@@ -20,6 +20,7 @@ void RenderSystem::Initialize() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void RenderSystem::Render(CommandBuffer *vbuf) {

@@ -28,7 +28,6 @@ struct ControlVertex {
 // U = < u^3, u^2, u, 1 >,
 
 #define ORTH_ROTATION_MAT  (Mat4(0, 1, 0, 0, -1, 0, 0, 0))
-//#define IDENTITY_MAT  (Mat4())
 
 inline mat4 HermiteMatrix(vec4 p0, vec4 p1, vec4 t0, vec4 t1) {
 	return Mat4(p0, p1, t0, t1) * Mat4(
@@ -183,22 +182,22 @@ void SplineSystem::Render(CommandBuffer *vbuf) {
 	    for(int i=0; i<vbuf->segmentCount; ++i) {
 	    	auto& segment = vbuf->segments[i];
 	    	auto& mat = vbuf->materials[segment.mid];
-	    	auto& start = vbuf->transforms[segment.start].t;
-	    	auto& end = vbuf->transforms[segment.end].t;
+	    	auto& start = vbuf->transforms[segment.start];
+	    	auto& end = vbuf->transforms[segment.end];
 	    	if (isfinite(segment.eccentricity)) {
-		    	auto p0 = Vec4(start.translation);
-		    	auto p1 = Vec4(end.translation);
-		    	auto offset = end.translation - start.translation;
-		    	auto m = Vec4( start.translation + 0.5f * offset + segment.eccentricity * offset.Clockwise() );
+		    	auto p0 = Vec4(start.t.translation.x, start.t.translation.y, start.depth);
+		    	auto p1 = Vec4(end.t.translation.x, end.t.translation.y, end.depth);
+		    	auto offset = end.t.translation - start.t.translation;
+		    	auto m = Vec4( start.t.translation + 0.5f * offset + segment.eccentricity * offset.Clockwise() );
 		    	auto posMatrix = QuadraticBezierMatrix(p0, m, p1);
 		    	auto normMatrix = QuadraticBezierNormMatrix(p0, m, p1);
 			    glUniformMatrix4fv(mUniformPositionMatrix, 1, GL_FALSE, posMatrix.m);
 			    glUniformMatrix4fv(mUniformNormalMatrix, 1, GL_FALSE, normMatrix.m);
 	    	} else {
-		    	auto p0 = Vec4(start.translation);
-		    	auto p1 = Vec4(end.translation);
-		    	auto t0 = Vec4(start.attitude);
-		    	auto t1 = Vec4(end.attitude);
+		    	auto p0 = Vec4(start.t.translation.x, start.t.translation.y, start.depth, 1);
+		    	auto p1 = Vec4(end.t.translation.x, end.t.translation.y, end.depth, 1);
+		    	auto t0 = Vec4(start.t.attitude);
+		    	auto t1 = Vec4(end.t.attitude);
 		    	auto posMatrix = HermiteMatrix(p0, p1, t0, t1);
 		    	auto normMatrix = HermiteNormMatrix(p0, p1, t0, t1);
 			    glUniformMatrix4fv(mUniformPositionMatrix, 1, GL_FALSE, posMatrix.m);

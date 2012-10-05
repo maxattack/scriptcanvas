@@ -6,6 +6,7 @@ local root = node.create(0, vec(300, 300))
 local num_circles = 50
 local cm = material.create(0x555555, 6)
 local rotor = node.create(root)
+node.setDepth(rotor, -0.9)
 for i=0,50 do
 	circle.create(node.create(rotor, vec.polar(300, i*tau/50)), cm)
 end
@@ -18,6 +19,7 @@ spline.create(center, root, bm, stroke.create(0.2, 1), 0.1)
 local cbm = material.create(0x445588, 48)
 circle.create(root, cbm)
 circle.create(center, cbm)
+node.setDepth(center, -0.8)
 
 -- create blobby triangle
 
