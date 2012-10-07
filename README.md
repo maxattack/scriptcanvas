@@ -1,10 +1,12 @@
 ScriptCanvas
 ============
-max.kaufmann@gmail.com
-----------------------
 
 The Beginning of a fast/quirky little game engine for making delightful/weird tablet apps that have a 2D curvilinear vector style.  I am interested in collaborators!  E-mail me if you'd like to become involved!
 
+max.kaufmann@gmail.com
+
+> Copyright (C) 2012 max.kaufmann@gmail.com
+>
 > This program is free software: you can redistribute it and/or modify
 > it under the terms of the GNU General Public License as published by
 > the Free Software Foundation, either version 3 of the License, or
