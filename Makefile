@@ -17,8 +17,8 @@ LFLAGS += -O4
 else
 CFLAGS += -DDEBUG
 CFLAGS += -g
-CFLAGS += -Os
-LFLAGS += -Os
+CFLAGS += -O3
+LFLAGS += -O3
 endif
 
 LUA_OBJS = \
