@@ -1,5 +1,5 @@
 // ScriptCanvas: An Artful, Interactive Canvas
-// Copyright (C) 2011 max.kaufmann@gmail.com
+// Copyright (C) 2012 max.kaufmann@gmail.com
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
