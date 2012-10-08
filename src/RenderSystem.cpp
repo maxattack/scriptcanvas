@@ -21,7 +21,7 @@
 void RenderSystem::Initialize() {
     // Initialize Display
     glfwInit();
-    //glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 4);
+    glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 4);
     if (glfwOpenWindow(800, 800,8, 8, 8, 8, 8, 0, GLFW_WINDOW) != GL_TRUE) {
         printf("[ERROR] Window Failed to Open.\n");
         // TODO: return error code

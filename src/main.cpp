@@ -44,8 +44,8 @@ int main(int argc, char* argv[]) {
         RenderSystem::Render(vbuf);
         CircleSystem::Render(vbuf);
         SplineSystem::Render(vbuf);
-        glfwSwapBuffers();
         CommandSystem::SubmitToNodeSystem(vbuf);
+        glfwSwapBuffers();
         InputSystem::Update();
     } while(glfwWaitThread(hThread, GLFW_NOWAIT) == GL_FALSE);
 
