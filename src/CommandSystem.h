@@ -24,7 +24,7 @@
 #include "SplineSystem.h"
 
 struct CommandBuffer {
-	ztransform_t transforms[kMaxNodes];
+	transform_t transforms[kMaxNodes];
 	Material materials[kMaxMaterials];
 	Stroke strokes[kMaxSegments];
 

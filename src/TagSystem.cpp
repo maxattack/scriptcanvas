@@ -19,11 +19,13 @@
 #include <map>
 #include <string>
 
-struct Name {
+struct TagSlot {
 	char name[kMaxNameLength];
+	//ID next;
+	//ID prev;
 };
 
-CompactComponentPool<Name> mNames;
+CompactComponentPool<TagSlot> mTags;
 std::map<std::string, ID> mDict; 	// TODO: Replace with something ninja?
 
 void TagSystem::Initialize() {
@@ -36,8 +38,8 @@ void TagSystem::Destroy() {
 void TagSystem::SetName(ID node, std::string name) {
 	ASSERT(name.size() < kMaxNameLength);
 	NodeSystem::AddComponent(node, kComponentName);
-	mNames.Alloc(node);
-	strcpy(mNames[node].name,  name.c_str());
+	mTags.Alloc(node);
+	strcpy(mTags[node].name,  name.c_str());
 	mDict[name] = node;
 }
 
@@ -46,12 +48,12 @@ void TagSystem::ClearName(ID node) {
 }
 
 void TagSystem::OnNodeDestroyed(ID node) {
-	mDict.erase(mNames[node].name);
-	mNames.Free(node);
+	mDict.erase(mTags[node].name);
+	mTags.Free(node);
 }
 
 std::string TagSystem::Name(ID node) {
-	return mNames[node].name;
+	return mTags[node].name;
 }
 
 ID TagSystem::FindNode(std::string name) {

@@ -99,12 +99,13 @@ vec2_t CubicHermiteDeriv(vec2_t p0, vec2_t m0, vec2_t p1, vec2_t m1, float u);
 // 2D COMPLEX TRANSFORMS OF THE FORM: q*v + t
 
 struct transform_t;
-inline transform_t Transform(vec2_t q=Vec2(1,0), vec2_t t=Vec2(0,0));
+inline transform_t Transform(vec2_t q=Vec2(1,0), vec2_t t=Vec2(0,0), float depth=0);
 
 struct transform_t {
 
   vec2_t attitude;
   vec2_t translation;
+  float depth;
 
   vec2_t TransformPoint(vec2_t p) const { return attitude*p + translation; }
   vec2_t TransformVector(vec2_t v) const { return attitude*v; }
@@ -117,16 +118,16 @@ struct transform_t {
   
   transform_t Inverse() const { 
     vec2_t qInv = Vec2(1,0)/attitude;
-    return Transform(qInv, -translation*qInv);
+    return Transform(qInv, -translation*qInv, -depth);
   }
 
   transform_t operator*(transform_t u) const { 
-    return Transform(attitude*u.attitude, u.attitude*translation + u.translation);
+    return Transform(attitude*u.attitude, u.attitude*translation + u.translation, depth + u.depth);
   }
 };
 
-inline transform_t Transform(vec2_t q, vec2_t t) {
-  transform_t result = { q, t };
+inline transform_t Transform(vec2_t q, vec2_t t, float depth) {
+  transform_t result = { q, t, depth };
   return result;
 }
 
@@ -144,21 +145,4 @@ inline transform_t Scale(float k) {
 
 inline transform_t TRS(vec2_t t, float radians, float scale) {
   return Transform(Polar(scale, radians), t);
-}
-
-struct ztransform_t {
-  transform_t t;
-  float depth;
-  ztransform_t operator*(const ztransform_t& rhs) const {
-    ztransform_t result = {
-      t * rhs.t,
-      depth + rhs.depth
-    };
-    return result;
-  }
-};
-
-inline ztransform_t ZTransform(vec2_t q=Vec2(1,0), vec2_t t=Vec2(0,0), float depth=0) {
-  ztransform_t result = { Transform(q, t), depth };
-  return result;
 }

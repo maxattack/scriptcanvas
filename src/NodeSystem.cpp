@@ -47,7 +47,7 @@ struct NodeSlot {
 struct PoseData {
 	uint16_t parentIndex;
 	uint16_t slotIndex;
-	ztransform_t localToParent;
+	transform_t localToParent;
 };
 
 //------------------------------------------------------
@@ -124,7 +124,7 @@ ID NodeSystem::CreateNode(ID parent, vec2_t position, vec2_t attitude, float dep
 	// Allocate a new buffer location
 	slot.poseIndex = sNodeCount++;
 	// initialize records
-	sNodePoses[slot.poseIndex] = { USHRT_MAX, uint16_t(0xffff&slot.id), ZTransform(attitude, position, depth) };
+	sNodePoses[slot.poseIndex] = { USHRT_MAX, uint16_t(0xffff&slot.id), Transform(attitude, position, depth) };
 	slot.componentMask = 0;
 	slot.parent = 0;
 	slot.firstChild = 0;
@@ -207,11 +207,11 @@ uint16_t NodeSystem::Index(ID node) {
 	return Slot(node).poseIndex;
 }
 
-ztransform_t& NodeSystem::LocalToParent(ID node) {
+transform_t& NodeSystem::LocalToParent(ID node) {
 	return Pose(node).localToParent;
 }
 
-static ztransform_t ComputeLocalToWorld(const PoseData& pose) {
+static transform_t ComputeLocalToWorld(const PoseData& pose) {
 	if (pose.parentIndex == USHRT_MAX) {
 		return pose.localToParent;
 	} else {
@@ -219,7 +219,7 @@ static ztransform_t ComputeLocalToWorld(const PoseData& pose) {
 	}
 }
 
-ztransform_t NodeSystem::LocalToWorld(ID node) {
+transform_t NodeSystem::LocalToWorld(ID node) {
 	return ComputeLocalToWorld(Pose(node));
 }
 

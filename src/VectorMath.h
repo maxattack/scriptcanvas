@@ -459,22 +459,12 @@ inline mat4 Mat4(
   return result;
 }
 
-inline mat4 Mat4(transform_t t, float z=0.f) {
+inline mat4 Mat4(transform_t t) {
   mat4 result = {{
     t.attitude.x, t.attitude.y, 0.f, 0.f,
     -t.attitude.y, t.attitude.x, 0.f, 0.f,
     0.f, 0.f, 1.f, 0.f,
-    t.translation.x, t.translation.y, z, 1.f
-  }};
-  return result;
-}
-
-inline mat4 Mat4(ztransform_t t) {
-  mat4 result = {{
-    t.t.attitude.x, t.t.attitude.y, 0.f, 0.f,
-    -t.t.attitude.y, t.t.attitude.x, 0.f, 0.f,
-    0.f, 0.f, 1.f, 0.f,
-    t.t.translation.x, t.t.translation.y, t.depth, 1.f
+    t.translation.x, t.translation.y, t.depth, 1.f
   }};
   return result;
 }

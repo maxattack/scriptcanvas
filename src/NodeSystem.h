@@ -69,12 +69,12 @@ struct ChildIterator {
 };
 
 // Lookup a node's local-to-parent transform_t
-ztransform_t& LocalToParent(ID node);
+transform_t& LocalToParent(ID node);
 
 uint16_t Index(ID node);
 
 // For mid-frame one-shots -- the RenderQueue will get this batched.
-ztransform_t LocalToWorld(ID node);
+transform_t LocalToWorld(ID node);
 
 // write render state to vbuf
 void Update(CommandBuffer *buf);
@@ -103,11 +103,11 @@ void DestroyNode(ID node);
 
 // Helper Methods
 inline vec2_t Position(ID node) { 
-	return LocalToParent(node).t.translation; 
+	return LocalToParent(node).translation; 
 }
 
 inline float Rotation(ID node) { 
-	return LocalToParent(node).t.attitude.Radians(); 
+	return LocalToParent(node).attitude.Radians(); 
 }
 
 inline float Depth(ID node) {
@@ -115,19 +115,19 @@ inline float Depth(ID node) {
 }
 
 inline vec2_t Direction(ID node) { 
-	return LocalToParent(node).t.attitude; 
+	return LocalToParent(node).attitude; 
 }
 
 inline void SetPosition(ID node, vec2_t p) { 
-	LocalToParent(node).t.translation = p; 
+	LocalToParent(node).translation = p; 
 }
 
 inline void SetRotation(ID node, float angle) { 
-	LocalToParent(node).t.attitude = Polar(1.f, angle); 
+	LocalToParent(node).attitude = Polar(1.f, angle); 
 }
 
 inline void SetDirection(ID node, vec2_t d) { 
-	LocalToParent(node).t.attitude = d; 
+	LocalToParent(node).attitude = d; 
 }
 
 inline void SetDepth(ID node, float d) {
