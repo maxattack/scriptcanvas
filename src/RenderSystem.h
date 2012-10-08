@@ -24,6 +24,7 @@ void Destroy();
 
 void Render(CommandBuffer *buf);
 
-GLuint LoadShaderProgram(const char* filename);
+GLuint LoadShaderProgramFromFile(const char* filename);
+GLuint LoadShaderProgramFromLiteral(const char* literal, int cnt=0);
 
 }

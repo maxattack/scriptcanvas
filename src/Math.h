@@ -113,7 +113,7 @@ struct transform_t {
   vec2_t InvTransformVector(vec2_t v) const { return v/attitude; }
 
   bool Identity() const { 
-    return translation.Norm() < 0.001f && (attitude-Vec2(1,0)).Norm() < 0.001f; 
+    return translation.Norm() < 0.0001f && (attitude-Vec2(1,0)).Norm() < 0.0001f && abs(depth)<0.01f; 
   }
   
   transform_t Inverse() const { 

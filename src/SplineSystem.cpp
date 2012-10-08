@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "CommandSystem.h"
+#include "Shaders.h"
 #include "util/CompactPool.h"
 #include "util/CompactComponentPool.h"
 #include "VectorMath.h"
@@ -22,16 +23,16 @@
 // TYPES
 
 struct vertex_t {
-    float uuu;
-    float uu;
-    float u;
-    float s;
+    float x;
+    float y;
+    float z;
+    float w;
 
-    inline void SetValue(float param, float side) {
-    	u = param;
-    	uu = u * u;
-    	uuu = uu * u;
-    	s = side;
+    inline void SetValue(float u) {
+    	x = u*u*u;
+    	y = u*u;
+    	z = u;
+    	w = 1.f;
     }
 };
 
@@ -130,13 +131,9 @@ inline vec4 EccentricStrokeVector(float t0, float e, float t1) {
 
 // GLOBALS
 
-static GLuint mProgram;
-static GLuint mAttribParameterAndSide;
-static GLuint mUniformPositionMatrix;
-static GLuint mUniformNormalMatrix;
-static GLuint mUniformColor;
-static GLuint mUniformStrokeVector;
-static GLuint mVertexBuffer;
+static Shader::cubic_t mShader;
+static GLuint mParameterBuffer;
+static GLuint mSideBuffer;
 
 static CompactComponentPool<ControlVertex> mVertices;
 static CompactPool<Segment, kMaxSegments> mSegments;
@@ -144,29 +141,32 @@ static CompactPool<Segment, kMaxSegments> mSegments;
 // FUNCTIONS
 
 void SplineSystem::Initialize() {
-    mProgram = RenderSystem::LoadShaderProgram("src/cubic.glsl");
-    glUseProgram(mProgram);
-    mAttribParameterAndSide = glGetAttribLocation(mProgram, "parameterAndSide");
-    mUniformPositionMatrix = glGetUniformLocation(mProgram, "positionMatrix");
-    mUniformNormalMatrix = glGetUniformLocation(mProgram, "normalMatrix");
-    mUniformColor = glGetUniformLocation(mProgram, "color");
-    mUniformStrokeVector = glGetUniformLocation(mProgram, "strokeVector");
+	mShader.Initialize();
+    
     vertex_t buf[kSegmentResolution];
-    float du = 1.f / 127.f;
+    float sbuf[kSegmentResolution];
+    float du = 1.f / (kSegmentResolution/2.f-1.f);
     float u = 0;
     for(int i=0; i<kSegmentResolution>>1; ++i) {
-        buf[i+i].SetValue(u, 1.f);
-        buf[i+i+1].SetValue(u, -1.f);
+        buf[i+i].SetValue(u);
+        buf[i+i+1].SetValue(u);
+        sbuf[i+i] = 1.f;
+        sbuf[i+i+1] = -1.f;
         u += du;
     }
-    glGenBuffers(1, &mVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
+
+    glGenBuffers(1, &mParameterBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, mParameterBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_t) * kSegmentResolution, buf, GL_STATIC_DRAW);
-    glUseProgram(0);
+
+    glGenBuffers(1, &mSideBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, mSideBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * kSegmentResolution, sbuf, GL_STATIC_DRAW);
 }
 
 void SplineSystem::Destroy() {
-	// TODO: Teardown
+	mShader.Destroy();
+	// TODO: Teardown VB
 }
 
 void SplineSystem::Update(CommandBuffer *vbuf) {
@@ -187,11 +187,17 @@ void SplineSystem::Update(CommandBuffer *vbuf) {
 
 void SplineSystem::Render(CommandBuffer *vbuf) {
 	if (vbuf->segmentCount) {
-	    glUseProgram(mProgram);
+	    glUseProgram(mShader.handle);
 	    glEnableClientState(GL_VERTEX_ARRAY);
-	    glEnableVertexAttribArray(mAttribParameterAndSide);
-	    glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
+	    glEnableVertexAttribArray(mShader.parameter);
+	    glEnableVertexAttribArray(mShader.side);
 	    glLoadIdentity();
+	    
+	    glBindBuffer(GL_ARRAY_BUFFER, mParameterBuffer);
+	    glVertexAttribPointer(mShader.parameter, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	    glBindBuffer(GL_ARRAY_BUFFER, mSideBuffer);
+	    glVertexAttribPointer(mShader.side, 1, GL_FLOAT, GL_FALSE, 0, 0);
+
 	    
 	    // TODO: sort by material?
 
@@ -207,8 +213,8 @@ void SplineSystem::Render(CommandBuffer *vbuf) {
 		    	auto m = Vec4( start.translation + 0.5f * offset + segment.eccentricity * offset.Clockwise() );
 		    	auto posMatrix = QuadraticBezierMatrix(p0, m, p1);
 		    	auto normMatrix = QuadraticBezierNormMatrix(p0, m, p1);
-			    glUniformMatrix4fv(mUniformPositionMatrix, 1, GL_FALSE, posMatrix.m);
-			    glUniformMatrix4fv(mUniformNormalMatrix, 1, GL_FALSE, normMatrix.m);
+			    glUniformMatrix4fv(mShader.positionMatrix, 1, GL_FALSE, posMatrix.m);
+			    glUniformMatrix4fv(mShader.normalMatrix, 1, GL_FALSE, normMatrix.m);
 	    	} else {
 		    	auto p0 = Vec4(start.translation.x, start.translation.y, start.depth, 1);
 		    	auto p1 = Vec4(end.translation.x, end.translation.y, end.depth, 1);
@@ -216,28 +222,27 @@ void SplineSystem::Render(CommandBuffer *vbuf) {
 		    	auto t1 = Vec4(end.attitude);
 		    	auto posMatrix = HermiteMatrix(p0, p1, t0, t1);
 		    	auto normMatrix = HermiteNormMatrix(p0, p1, t0, t1);
-			    glUniformMatrix4fv(mUniformPositionMatrix, 1, GL_FALSE, posMatrix.m);
-			    glUniformMatrix4fv(mUniformNormalMatrix, 1, GL_FALSE, normMatrix.m);
+			    glUniformMatrix4fv(mShader.positionMatrix, 1, GL_FALSE, posMatrix.m);
+			    glUniformMatrix4fv(mShader.normalMatrix, 1, GL_FALSE, normMatrix.m);
 	    	}
 	    	if (segment.stroke != 0xffff) {
 		    	auto& stroke = vbuf->strokes[segment.stroke];
 		    	auto strokeVector = mat.weight * EccentricStrokeVector(stroke.start, stroke.eccentricity, stroke.end);
-		    	glUniform4f(mUniformStrokeVector, strokeVector.x, strokeVector.y, strokeVector.z, strokeVector.w);
+		    	glUniform4f(mShader.strokeVector, strokeVector.x, strokeVector.y, strokeVector.z, strokeVector.w);
 	    	} else {
-	    		glUniform4f(mUniformStrokeVector, 0, 0, 0, mat.weight);
+	    		glUniform4f(mShader.strokeVector, 0, 0, 0, mat.weight);
 	    	}
 
 			float r,g,b;
 			mat.color.ToFloatRGB(&r, &g, &b);
-			glUniform4f(mUniformColor, r, g, b, 1.f);
-
-		    glVertexAttribPointer(mAttribParameterAndSide, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			glUniform4f(mShader.color, r, g, b, 1.f);
 
 		    glDrawArrays(GL_TRIANGLE_STRIP, 0, kSegmentResolution);
 	    }
 
 	    glDisableClientState(GL_VERTEX_ARRAY);
-	    glDisableVertexAttribArray(mAttribParameterAndSide);
+	    glDisableVertexAttribArray(mShader.parameter);
+	    glDisableVertexAttribArray(mShader.side);
 	    glBindBuffer(GL_ARRAY_BUFFER, 0);
 	    glUseProgram(0);
 	}

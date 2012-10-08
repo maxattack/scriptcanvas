@@ -315,7 +315,7 @@ def fail(msg):
 
 if __name__ == '__main__':
 	if len(sys.argv) < 2:
-		print "usage: write_bindings [output.cpp]"
+		print "usage: write_lua_bindings [output.cpp]"
 		exit(-1)
 	main()
 

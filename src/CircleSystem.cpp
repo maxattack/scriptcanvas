@@ -17,24 +17,17 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include "Shaders.h"
 #include "CommandSystem.h"
 #include "VectorMath.h"
 #include "util/CompactComponentPool.h"
 
-GLuint mProgram;
-GLuint mAttribUnit;
-GLuint mUniformRadius;
-GLuint mUniformColor;
+Shader::circle_t mShader;
 GLuint mVertexBuffer;
 CompactComponentPool<Circle> mSlots;
 
 void CircleSystem::Initialize() {
-    mProgram = RenderSystem::LoadShaderProgram("src/circle.glsl");
-    // lookup shader storage locations
-    glUseProgram(mProgram);
-    mAttribUnit = glGetAttribLocation(mProgram, "unit");
-    mUniformRadius = glGetUniformLocation(mProgram, "radius");
-    mUniformColor = glGetUniformLocation(mProgram, "color");
+    mShader.Initialize();
     // create circle vertex buffer
     vec2_t unit = Vec2(1,0);
     vec2_t rotor = Polar(1.f, kTau / (64-2.f));
@@ -47,11 +40,11 @@ void CircleSystem::Initialize() {
     glGenBuffers(1, &mVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vec2_t)*64, buffer, GL_STATIC_DRAW);
-    glUseProgram(0);
 }
 
 void CircleSystem::Destroy() {
-    // todo: cleanup
+    mShader.Destroy();
+    // TODO: Teardown VB
 }
 
 Circle& CircleSystem::GetCircle(ID node) {
@@ -70,24 +63,25 @@ void CircleSystem::Update(CommandBuffer* vbuf) {
 
 void CircleSystem::Render(CommandBuffer *vbuf) {
     if (vbuf->circleCount) {
-        glUseProgram(mProgram);
+        glUseProgram(mShader.handle);
         glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableVertexAttribArray(mAttribUnit);
+        glEnableVertexAttribArray(mShader.unit);
         glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
+        
         for(int i=0; i<vbuf->circleCount; ++i) {
             auto cmd = vbuf->circles[i];
             auto mat = vbuf->materials[cmd.mid];
             glLoadMatrixf(Mat4(vbuf->transforms[cmd.tid]).m);
-            glUniform1f(mUniformRadius, mat.weight);
+            glUniform1f(mShader.radius, mat.weight);
             float r,g,b;
             mat.color.ToFloatRGB(&r, &g, &b);
-            glUniform4f(mUniformColor, r, g, b, 1.f);
-            glVertexAttribPointer(mAttribUnit, 2, GL_FLOAT, GL_FALSE, 0, 0);
+            glUniform4f(mShader.color, r, g, b, 1.f);
+            glVertexAttribPointer(mShader.unit, 2, GL_FLOAT, GL_FALSE, 0, 0);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 64);
         }
         // clean up opengl state
         glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableVertexAttribArray(mAttribUnit);
+        glDisableVertexAttribArray(mShader.unit);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glUseProgram(0);
     }

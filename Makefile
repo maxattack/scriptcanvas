@@ -37,6 +37,9 @@ CFLAGS += -O3
 LFLAGS += -O3
 endif
 
+GENERATED_HEADERS = \
+	src/Shaders.h
+
 LUA_OBJS = \
 	src/lua/lapi.o \
 	src/lua/lauxlib.o \
@@ -71,7 +74,7 @@ LUA_OBJS = \
 	src/lua/lvec.o \
 	src/lua/lvm.o \
 	src/lua/lzio.o
-	
+
 OBJS = \
 	src/CircleSystem.o \
 	src/CommandSystem.o \
@@ -101,17 +104,20 @@ tools/lua: $(LUA_OBJS) src/lua/lua.o
 tools/luac: $(LUA_OBJS) src/lua/luac.o
 	$(CC) $(LUA_OBJS) src/lua/luac.o $(LFLAGS) -o tools/luac
 
-src/ScriptSystem_Bind.cpp: tools/write_bindings.py
-	python tools/write_bindings.py src/ScriptSystem_Bind.cpp
+src/ScriptSystem_Bind.cpp: tools/write_lua_bindings.py
+	python tools/write_lua_bindings.py src/ScriptSystem_Bind.cpp
 
-%.o : %.cpp src/**.h
+src/Shaders.h: tools/write_glsl_bindings.py
+	python tools/write_glsl_bindings.py $@
+
+%.o : %.cpp $(GENERATED_HEADERS)
 	$(CXXC) $(CFLAGS) $(CXXFLAGS) -c $< -o $@
 
-%.o : %.c src/**.h
+%.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 run: $(BIN)
 	./bubble main.lua
 
 clean:
-	rm -f $(OBJS) $(LUA_OBJS) $(BIN) $(TOOLS) src/ScriptSystem_Bind.cpp
+	rm -f $(OBJS) $(LUA_OBJS) $(BIN) $(TOOLS) src/ScriptSystem_Bind.cpp $(GENERATED_HEADERS)

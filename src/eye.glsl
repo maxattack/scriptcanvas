@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+varying vec2 uv;
+
 #ifdef VERTEX
 
 attribute vec2 unit;
@@ -21,15 +23,22 @@ uniform float radius;
 
 void main() {
 	gl_Position = gl_ModelViewProjectionMatrix * vec4(radius * unit, 0, 1);
+	uv = unit;
 }
 
 
 #else
 
 uniform vec4 color;
+uniform vec4 irisColor;
+uniform float irisRadiusSq;
 
 void main() {
-	gl_FragColor = color;
+	gl_FragColor = mix(
+		color, 
+		irisColor, 
+		step(irisRadiusSq, dot(uv, uv))
+	);
 }
 
 #endif

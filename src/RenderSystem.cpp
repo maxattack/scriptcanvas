@@ -47,8 +47,7 @@ void RenderSystem::Destroy() {
     glfwTerminate();
 }
 
-GLuint RenderSystem::LoadShaderProgram(const char* filename) {
-    GLuint prog, vert, frag;
+GLuint RenderSystem::LoadShaderProgramFromFile(const char* filename) {
     GLint cnt = 0;
     GLchar* buf = 0;
     {
@@ -71,45 +70,50 @@ GLuint RenderSystem::LoadShaderProgram(const char* filename) {
           }
         }
     }
-     // initialize shader program
-    prog = glCreateProgram();
-    vert = glCreateShader(GL_VERTEX_SHADER);
-    frag = glCreateShader(GL_FRAGMENT_SHADER);
-    {
-        const GLchar sCondVert[] = "#define VERTEX\n";
-        const GLchar sCondFrag[] = "#define FRAGMENT\n";
-        const GLchar *vsrc[] = { sCondVert, buf };
-        const GLchar *fsrc[] = { sCondFrag, buf };
-        GLint vcnt[] = { static_cast<GLint>(strlen(sCondVert)), cnt };
-        GLint fcnt[] = { static_cast<GLint>(strlen(sCondFrag)), cnt };
-        glShaderSource(vert, 2, vsrc, vcnt);
-        glShaderSource(frag, 2, fsrc, fcnt);
-        glCompileShader(vert);
-        glCompileShader(frag);
-        delete[] buf;
+    GLuint result = LoadShaderProgramFromLiteral(buf);
+    delete[] buf;
+    return result;
 
-        GLint result;
-        glGetShaderiv(vert, GL_COMPILE_STATUS, &result);
-        if (result != GL_TRUE) {
-            GLchar buf[256];
-            int len;
-            glGetShaderInfoLog(vert, 256, &len, buf);
-            printf("%s\n", buf);
-            return 0;
-        }
+}
 
-        glGetShaderiv(frag, GL_COMPILE_STATUS, &result);
-        if (result != GL_TRUE) {
-            GLchar buf[256];
-            int len;
-            glGetShaderInfoLog(frag, 256, &len, buf);
-            printf("%s\n", buf);
-            return 0;
-        }
-
-        glAttachShader(prog, vert);
-        glAttachShader(prog, frag);
-        glLinkProgram(prog);
+GLuint RenderSystem::LoadShaderProgramFromLiteral(const char* buf, int cnt) {
+    if (cnt == 0) {
+        cnt = strlen(buf);
+    }  
+    GLuint prog = glCreateProgram();
+    GLuint vert = glCreateShader(GL_VERTEX_SHADER);
+    GLuint frag = glCreateShader(GL_FRAGMENT_SHADER);
+    const GLchar sCondVert[] = "#define VERTEX\n";
+    const GLchar sCondFrag[] = "#define FRAGMENT\n";
+    const GLchar *vsrc[] = { sCondVert, buf };
+    const GLchar *fsrc[] = { sCondFrag, buf };
+    GLint vcnt[] = { static_cast<GLint>(strlen(sCondVert)), cnt };
+    GLint fcnt[] = { static_cast<GLint>(strlen(sCondFrag)), cnt };
+    glShaderSource(vert, 2, vsrc, vcnt);
+    glShaderSource(frag, 2, fsrc, fcnt);
+    glCompileShader(vert);
+    glCompileShader(frag);
+    GLint result;
+    glGetShaderiv(vert, GL_COMPILE_STATUS, &result);
+    if (result != GL_TRUE) {
+        GLchar buf[256];
+        int len;
+        glGetShaderInfoLog(vert, 256, &len, buf);
+        printf("%s\n", buf);
+        return 0;
     }
+
+    glGetShaderiv(frag, GL_COMPILE_STATUS, &result);
+    if (result != GL_TRUE) {
+        GLchar buf[256];
+        int len;
+        glGetShaderInfoLog(frag, 256, &len, buf);
+        printf("%s\n", buf);
+        return 0;
+    }
+
+    glAttachShader(prog, vert);
+    glAttachShader(prog, frag);
+    glLinkProgram(prog);
     return prog;
 }

@@ -2,6 +2,7 @@ src/*.o
 src/lua/*.o
 src/math/*.o
 src/ScriptSystem_Bind.cpp
+src/Shaders.h
 tools/lua
 tools/luac
 **dSYM**
