@@ -32,12 +32,13 @@ void main() {
 uniform vec4 color;
 uniform vec4 irisColor;
 uniform float irisRadiusSq;
+uniform vec2 irisPosition;
 
 void main() {
+	vec2 offset = irisPosition - uv;
 	gl_FragColor = mix(
-		color, 
-		irisColor, 
-		step(irisRadiusSq, dot(uv, uv))
+		irisColor, color, 
+		step(irisRadiusSq, dot(offset, offset))
 	);
 }
 

@@ -63,7 +63,10 @@ def main():
 			writeln(output, 'handle = RenderSystem::LoadShaderProgramFromLiteral(')
 			write_depth += 1
 			for line in src_lines:
-				writeln(output, '"%s\\n"' % line)
+				if line.startswith('#'):
+					writeln(output, '"\\n%s\\n"' % line)
+				else:
+					writeln(output, '"%s"' % line)
 			write_depth -= 1
 			writeln(output, ');')
 			writeln(output, 'glUseProgram(handle);')
@@ -76,7 +79,7 @@ def main():
 			writelb(output)
 			writeln(output, 'void Destroy() {')
 			write_depth += 1
-			# TODO!  Do we need to save vert/frag handles, too?
+			# TODO!  Do we need to save vert/frag handles, too?  for teardown?
 			writeln(output, '// TODO')
 			write_depth -= 1
 			writeln(output, '}')

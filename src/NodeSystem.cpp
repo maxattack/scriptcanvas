@@ -258,8 +258,7 @@ void NodeSystem::Update(CommandBuffer *vbuf) {
 		//	- write all parents that are in the invalid DAG slice first in DAG-order
 		//	- write the current readPos
 		//	- increment read pos passed all entires that have already been written
-		
-		// could stack-alloc just enough for the slice?
+
 		static int scratchpad[kMaxNodes];
 		static uint8_t scratchpadMarks[kMaxNodes];
 		memset(scratchpadMarks+mFirstInvalidDagIndex, 0, mLastInvalidDagIndex-mFirstInvalidDagIndex+1);
@@ -286,9 +285,7 @@ void NodeSystem::Update(CommandBuffer *vbuf) {
 			scratchpad[writePos++] = readPos;
 			scratchpadMarks[readPos] = 1;
 			// skip past elements that have already been written
-			while(readPos <= mLastInvalidDagIndex && scratchpadMarks[readPos]) {
-				readPos++;
-			}
+			while(readPos <= mLastInvalidDagIndex && scratchpadMarks[readPos]) { readPos++; }
 		} while(readPos <= mLastInvalidDagIndex);
 		// move records to reflect scratchpad
 		//	- first update pose parents
@@ -302,19 +299,13 @@ void NodeSystem::Update(CommandBuffer *vbuf) {
 				);
 				std::swap(sNodePoses[i], sNodePoses[scratchpad[i]]);
 				int j=i+1;
-				while(scratchpad[j] != i && j <= mLastInvalidDagIndex) {
-					++j;
-				}
-				if (j <= mLastInvalidDagIndex) {
-					scratchpad[j] = scratchpad[i];
-				}
+				while(scratchpad[j] != i && j <= mLastInvalidDagIndex) { ++j; }
+				if (j <= mLastInvalidDagIndex) { scratchpad[j] = scratchpad[i]; }
 			}
 		}
 		for(int i=mFirstInvalidDagIndex; i<=mLastInvalidDagIndex; ++i) {
 			ID parent = Slot(sNodePoses[i].slotIndex).parent;
-			if (parent) {
-				sNodePoses[i].parentIndex = Slot(parent).poseIndex;
-			}
+			if (parent) { sNodePoses[i].parentIndex = Slot(parent).poseIndex; }
 			
 		}
 		mFirstInvalidDagIndex = -1;

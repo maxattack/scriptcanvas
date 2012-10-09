@@ -198,8 +198,10 @@ void SplineSystem::Render(CommandBuffer *vbuf) {
 	    glBindBuffer(GL_ARRAY_BUFFER, mSideBuffer);
 	    glVertexAttribPointer(mShader.side, 1, GL_FLOAT, GL_FALSE, 0, 0);
 
-	    
+
 	    // TODO: sort by material?
+	    // --> if we sort by 'eccentricity' we can avoid the isfinite() branch
+	    // --> if we store the stroke differently (standard default?)
 
 	    for(int i=0; i<vbuf->segmentCount; ++i) {
 	    	auto& segment = vbuf->segments[i];
@@ -236,13 +238,12 @@ void SplineSystem::Render(CommandBuffer *vbuf) {
 			float r,g,b;
 			mat.color.ToFloatRGB(&r, &g, &b);
 			glUniform4f(mShader.color, r, g, b, 1.f);
-
 		    glDrawArrays(GL_TRIANGLE_STRIP, 0, kSegmentResolution);
 	    }
 
-	    glDisableClientState(GL_VERTEX_ARRAY);
 	    glDisableVertexAttribArray(mShader.parameter);
 	    glDisableVertexAttribArray(mShader.side);
+	    glDisableClientState(GL_VERTEX_ARRAY);
 	    glBindBuffer(GL_ARRAY_BUFFER, 0);
 	    glUseProgram(0);
 	}

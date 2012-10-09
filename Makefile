@@ -107,7 +107,7 @@ tools/luac: $(LUA_OBJS) src/lua/luac.o
 src/ScriptSystem_Bind.cpp: tools/write_lua_bindings.py
 	python tools/write_lua_bindings.py src/ScriptSystem_Bind.cpp
 
-src/Shaders.h: tools/write_glsl_bindings.py
+src/Shaders.h: tools/write_glsl_bindings.py src/*.glsl
 	python tools/write_glsl_bindings.py $@
 
 %.o : %.cpp $(GENERATED_HEADERS)

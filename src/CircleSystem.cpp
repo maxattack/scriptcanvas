@@ -22,12 +22,14 @@
 #include "VectorMath.h"
 #include "util/CompactComponentPool.h"
 
-Shader::circle_t mShader;
-GLuint mVertexBuffer;
-CompactComponentPool<Circle> mSlots;
+static Shader::circle_t shader;
+static GLuint unitVertexBuffer;
+static CompactComponentPool<Circle> circles;
+
+static Shader::eye_t eye;
 
 void CircleSystem::Initialize() {
-    mShader.Initialize();
+    shader.Initialize();
     // create circle vertex buffer
     vec2_t unit = Vec2(1,0);
     vec2_t rotor = Polar(1.f, kTau / (64-2.f));
@@ -37,22 +39,24 @@ void CircleSystem::Initialize() {
         buffer[i] = unit;
         unit *= rotor;
     }
-    glGenBuffers(1, &mVertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
+    glGenBuffers(1, &unitVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, unitVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vec2_t)*64, buffer, GL_STATIC_DRAW);
+
+    eye.Initialize();
 }
 
 void CircleSystem::Destroy() {
-    mShader.Destroy();
+    shader.Destroy();
     // TODO: Teardown VB
 }
 
 Circle& CircleSystem::GetCircle(ID node) {
-    return mSlots[node];
+    return circles[node];
 }
 
 void CircleSystem::Update(CommandBuffer* vbuf) {
-    for(auto p=mSlots.Begin(); p!=mSlots.End(); ++p) {
+    for(auto p=circles.Begin(); p!=circles.End(); ++p) {
         CircleCommand cmd = { 
             MaterialSystem::Index(p->component.material),
             NodeSystem::Index(p->node)
@@ -61,46 +65,75 @@ void CircleSystem::Update(CommandBuffer* vbuf) {
     }
 }
 
+#include "InputSystem.h"
+
 void CircleSystem::Render(CommandBuffer *vbuf) {
     if (vbuf->circleCount) {
-        glUseProgram(mShader.handle);
+        glUseProgram(shader.handle);
         glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableVertexAttribArray(mShader.unit);
-        glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-        
+        glEnableVertexAttribArray(shader.unit);
+        glBindBuffer(GL_ARRAY_BUFFER, unitVertexBuffer);
+        glVertexAttribPointer(shader.unit, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
         for(int i=0; i<vbuf->circleCount; ++i) {
             auto cmd = vbuf->circles[i];
             auto mat = vbuf->materials[cmd.mid];
             glLoadMatrixf(Mat4(vbuf->transforms[cmd.tid]).m);
-            glUniform1f(mShader.radius, mat.weight);
+            glUniform1f(shader.radius, mat.weight);
             float r,g,b;
             mat.color.ToFloatRGB(&r, &g, &b);
-            glUniform4f(mShader.color, r, g, b, 1.f);
-            glVertexAttribPointer(mShader.unit, 2, GL_FLOAT, GL_FALSE, 0, 0);
+            glUniform4f(shader.color, r, g, b, 1.f);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 64);
         }
         // clean up opengl state
         glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableVertexAttribArray(mShader.unit);
+        glDisableVertexAttribArray(shader.unit);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glUseProgram(0);
     }
+
+    // test: eye
+    glUseProgram(eye.handle);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableVertexAttribArray(shader.unit);
+    glBindBuffer(GL_ARRAY_BUFFER, unitVertexBuffer);
+    glVertexAttribPointer(shader.unit, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glLoadIdentity();
+    glTranslatef(400.f, 200.f, 0.9f);
+    glUniform1f(eye.radius, 64);
+    glUniform4f(eye.color, 1.f, 1.f, 1.f, 1.f);
+    glUniform4f(eye.irisColor, 0.f, 1.f, 0.f, 1.f);
+    glUniform1f(eye.irisRadiusSq, 0.33f*0.33f);
+
+    vec2_t offsetToMouse = InputSystem::MousePosition() - Vec2(400, 200);
+    offsetToMouse = 0.4f * offsetToMouse.Normalized();
+
+    glUniform2f(eye.irisPosition, offsetToMouse.x, offsetToMouse.y);
+
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 64);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableVertexAttribArray(shader.unit);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glUseProgram(0);
+
 }
 
 void CircleSystem::Create(ID node, ID mid) {
     ASSERT(NodeSystem::NodeValid(node));
     ASSERT(MaterialSystem::MaterialValid(mid));
     NodeSystem::AddComponent(node, kComponentCircle);
-    mSlots.Alloc(node);
-    mSlots[node].material = mid;
+    circles.Alloc(node);
+    circles[node].material = mid;
 }
 
 Material& GetMaterial(ID node) {
-    return MaterialSystem::GetMaterial(mSlots[node].material);
+    return MaterialSystem::GetMaterial(circles[node].material);
 }
 
 void CircleSystem::OnNodeDestroyed(ID node) {
-    mSlots.Free(node);
+    circles.Free(node);
 }
 
 void CircleSystem::Destroy(ID node) { 
