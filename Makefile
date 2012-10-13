@@ -43,6 +43,9 @@ endif
 GENERATED_HEADERS = \
 	src/Shaders.h
 
+GENERATED_SOURCE = \
+	src/ScriptSystem_Bind.cpp 
+
 LUA_OBJS = \
 	src/lua/lapi.o \
 	src/lua/lauxlib.o \
@@ -151,4 +154,4 @@ cleanroot:
 	rm -rf $(OBJS) $(BIN)
 
 clean:
-	rm -f $(OBJS) $(LUA_OBJS) $(GLFW_OBJS) $(BIN) $(TOOLS) src/ScriptSystem_Bind.cpp $(GENERATED_HEADERS)
+	rm -f $(OBJS) $(LUA_OBJS) $(GLFW_OBJS) $(BIN) $(TOOLS) $(GENERATED_SOURCE) $(GENERATED_HEADERS)
