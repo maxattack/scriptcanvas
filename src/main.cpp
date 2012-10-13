@@ -16,7 +16,7 @@
 
 #include "ScriptSystem.h"
 
-void game(void* ctxt);
+void script(void* ctxt);
 
 int main(int argc, char* argv[]) {
     // init systems
@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
     static CommandBuffer buf1;
     CommandSystem::SubmitToNodeSystem(&buf0);
     CommandSystem::SubmitToNodeSystem(&buf1);
-    GLFWthread hThread = glfwCreateThread(game, 0);
+    GLFWthread hThread = glfwCreateThread(script, 0);
 
     // render loop
     do {
@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-void game(void* ctxt) {
+void script(void* ctxt) {
     auto virtualMachine = luaL_newstate();          // TODO: hook memory allocator
     luaL_openlibs(virtualMachine);                  // TODO: limit libs
     ScriptSystem::Bind(virtualMachine);
