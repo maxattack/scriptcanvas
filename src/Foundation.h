@@ -22,7 +22,7 @@
 #include <ctime>
 #include <cmath>
 #include <cassert>
-#include <GL/glfw.h>
+#include "glfw/glfw.h"
 
 #define kMaxNodes 					1024
 

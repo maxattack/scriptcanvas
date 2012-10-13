@@ -101,14 +101,17 @@ void CircleSystem::Render(CommandBuffer *vbuf) {
 
     glLoadIdentity();
     glTranslatef(400.f, 200.f, 0.9f);
-    glUniform1f(eye.radius, 64);
+    float radius = 64;
+    glUniform1f(eye.radius, radius);
     glUniform4f(eye.color, 1.f, 1.f, 1.f, 1.f);
     glUniform4f(eye.irisColor, 0.f, 1.f, 0.f, 1.f);
     glUniform1f(eye.irisRadiusSq, 0.33f*0.33f);
 
-    vec2_t offsetToMouse = InputSystem::MousePosition() - Vec2(400, 200);
-    offsetToMouse = 0.4f * offsetToMouse.Normalized();
-
+    vec2_t offsetToMouse = (InputSystem::MousePosition() - Vec2(400, 200)) / radius;
+    if (offsetToMouse.Norm() > 1.f) {
+        offsetToMouse = offsetToMouse.Normalized();
+    }
+    offsetToMouse *= 0.6f;
     glUniform2f(eye.irisPosition, offsetToMouse.x, offsetToMouse.y);
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, 64);

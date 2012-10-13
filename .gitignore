@@ -1,6 +1,7 @@
 src/*.o
 src/lua/*.o
-src/math/*.o
+src/glfw/*.o
+src/glfw/cocoa/*.o
 src/ScriptSystem_Bind.cpp
 src/Shaders.h
 tools/lua

@@ -15,7 +15,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "InputSystem.h"
-#include <GL/glfw.h>
 
 // TODO - Add an atomic "dirty bit" and copy
 

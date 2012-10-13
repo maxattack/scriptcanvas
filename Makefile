@@ -19,13 +19,16 @@
 BIN = bubble
 CC = clang
 CXXC = clang++
-CFLAGS = -fno-common -I/usr/local/include -Wall -Werror -Wno-unused-variable $(OFLAG)
+CFLAGS = -fno-common -Wall -Werror -Wno-unused-variable $(OFLAG)
 CXXFLAGS = -fno-exceptions -fno-rtti -std=c++11 -stdlib=libc++
-LFLAGS = -L/usr/local/lib  -stdlib=libc++ -framework OpenGL -framework Cocoa -lglfw $(OFLAG)
+LFLAGS = -L/usr/local/lib  -stdlib=libc++ -framework OpenGL -framework Cocoa -framework IOKit $(OFLAG)
 
 CFLAGS += -DLUA_USE_POSIX
 #CFLAGS += -DNO_DAG_SORT
 #CFLAGS += -DNO_SIMD
+
+# for glfw :P
+CFLAGS += -Wno-deprecated-declarations -Wno-implicit-function-declaration -Isrc/glfw -Isrc/glfw/cocoa
 
 ifeq ($(PRODUCTION),1)
 CFLAGS += -O4
@@ -75,6 +78,28 @@ LUA_OBJS = \
 	src/lua/lvm.o \
 	src/lua/lzio.o
 
+GLFW_OBJS = \
+	src/glfw/enable.o \
+	src/glfw/fullscreen.o \
+	src/glfw/glext.o \
+	src/glfw/image.o \
+	src/glfw/init.o \
+	src/glfw/input.o \
+	src/glfw/joystick.o \
+	src/glfw/stream.o \
+	src/glfw/tga.o \
+	src/glfw/thread.o \
+	src/glfw/time.o \
+	src/glfw/window.o \
+	src/glfw/cocoa/cocoa_enable.o \
+	src/glfw/cocoa/cocoa_fullscreen.o \
+	src/glfw/cocoa/cocoa_glext.o \
+	src/glfw/cocoa/cocoa_init.o \
+	src/glfw/cocoa/cocoa_joystick.o \
+	src/glfw/cocoa/cocoa_thread.o \
+	src/glfw/cocoa/cocoa_time.o \
+	src/glfw/cocoa/cocoa_window.o
+
 OBJS = \
 	src/CircleSystem.o \
 	src/CommandSystem.o \
@@ -93,8 +118,8 @@ TOOLS = \
 	tools/lua \
 	tools/luac
 
-$(BIN): $(OBJS) $(LUA_OBJS)
-	$(CXXC) $(OBJS) $(LUA_OBJS) -o $(BIN) $(LFLAGS)
+$(BIN): $(OBJS) $(LUA_OBJS) $(GLFW_OBJS)
+	$(CXXC) $(OBJS) $(LUA_OBJS) $(GLFW_OBJS) -o $(BIN) $(LFLAGS)
 
 tools: $(TOOLS)
 
@@ -116,8 +141,14 @@ src/Shaders.h: tools/write_glsl_bindings.py src/*.glsl
 %.o : %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+%.o : %.m
+	$(CC) $(CFLAGS) -c $< -o $@	
+
 run: $(BIN)
 	./bubble main.lua
 
+cleanroot:
+	rm -rf $(OBJS) $(BIN)
+
 clean:
-	rm -f $(OBJS) $(LUA_OBJS) $(BIN) $(TOOLS) src/ScriptSystem_Bind.cpp $(GENERATED_HEADERS)
+	rm -f $(OBJS) $(LUA_OBJS) $(GLFW_OBJS) $(BIN) $(TOOLS) src/ScriptSystem_Bind.cpp $(GENERATED_HEADERS)
