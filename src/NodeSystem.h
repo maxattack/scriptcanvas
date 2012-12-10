@@ -18,6 +18,9 @@
 #include "Math.h"
 #include "RenderSystem.h"
 
+typedef ID NodeID;
+typedef ID CompID;
+
 namespace NodeSystem {
 
 //------------------------------------------------------------------------------
@@ -43,94 +46,94 @@ void Initialize();
 void Destroy();
 
 // Is this ID defined for the current scene?
-bool NodeValid(ID id);
+bool NodeValid(NodeID id);
 
 // How many nodes are currently active in the scene?
 int NodeCount();
 
 // Create a new node, potentially rooted to another node and
 // retrieve it's handle.
-ID CreateNode(ID parent=0, vec2_t position=Vec2(0,0), vec2_t attitude=Vec2(1,0), float depth=0.f);
+ID CreateNode(NodeID parent=0, vec2_t position=Vec2(0,0), vec2_t attitude=Vec2(1,0), float depth=0.f);
 
 // Attach a node as a child of another node
-void AttachNode(ID parent, ID child);
+void AttachNode(NodeID parent, NodeID child);
 
 // Detach a node from it's parent
-void DetachNode(ID child);
+void DetachNode(NodeID child);
 
 // Lookup a node's parent
-ID Parent(ID node);
+NodeID Parent(NodeID node);
 
 // Iterate over a node's children
 struct ChildIterator {
-	ID current;
-	ChildIterator(ID node);
-	bool Next(ID *outNode);
+	NodeID current;
+	ChildIterator(NodeID node);
+	bool Next(NodeID *outNode);
 };
 
 // Lookup a node's local-to-parent transform_t
-transform_t& LocalToParent(ID node);
+transform_t& LocalToParent(NodeID node);
 
-uint16_t Index(ID node);
+uint16_t Index(NodeID node);
 
 // For mid-frame one-shots -- the RenderQueue will get this batched.
-transform_t LocalToWorld(ID node);
+transform_t LocalToWorld(NodeID node);
 
 // write render state to vbuf
 void Update(CommandBuffer *buf);
 
 // Add a component to a node.  Each node can have multiple components,
 // but only one component of a given type.
-void AddComponent(ID node, ID componentType);
+void AddComponent(NodeID node, CompID componentType);
 
 // Check whether this node has a component of that type
-bool HasComponent(ID node, ID componentType);
+bool HasComponent(NodeID node, CompID componentType);
 
 // Remove a component from a node.  Components cannot be reparented like
 // nodes, only destroyed
-void RemoveComponent(ID node, ID componentType);
+void RemoveComponent(NodeID node, CompID componentType);
 
 // Iterate over the components attached to a given node
 struct ComponentIterator {
 	uint32_t mask;
-	ComponentIterator(ID node);
-	bool Next(ID *outComponentType);
+	ComponentIterator(NodeID node);
+	bool Next(CompID *outComponentType);
 };
 
 // Recursively destroy a node's children, then the node's
 // components, and then the node itself.
-void DestroyNode(ID node);
+void DestroyNode(NodeID node);
 
 // Helper Methods
-inline vec2_t Position(ID node) { 
+inline vec2_t Position(NodeID node) { 
 	return LocalToParent(node).translation; 
 }
 
-inline float Rotation(ID node) { 
+inline float Rotation(NodeID node) { 
 	return LocalToParent(node).attitude.Radians(); 
 }
 
-inline float Depth(ID node) {
+inline float Depth(NodeID node) {
 	return LocalToParent(node).depth;
 }
 
-inline vec2_t Direction(ID node) { 
+inline vec2_t Direction(NodeID node) { 
 	return LocalToParent(node).attitude; 
 }
 
-inline void SetPosition(ID node, vec2_t p) { 
+inline void SetPosition(NodeID node, vec2_t p) { 
 	LocalToParent(node).translation = p; 
 }
 
-inline void SetRotation(ID node, float angle) { 
+inline void SetRotation(NodeID node, float angle) { 
 	LocalToParent(node).attitude = Polar(1.f, angle); 
 }
 
-inline void SetDirection(ID node, vec2_t d) { 
+inline void SetDirection(NodeID node, vec2_t d) { 
 	LocalToParent(node).attitude = d; 
 }
 
-inline void SetDepth(ID node, float d) {
+inline void SetDepth(NodeID node, float d) {
 	LocalToParent(node).depth = d;
 }
 

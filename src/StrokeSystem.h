@@ -23,6 +23,8 @@ struct Stroke {
 	float end;
 };
 
+typedef ID StrokeID;
+
 namespace StrokeSystem {
 
 void Initialize();
@@ -30,22 +32,22 @@ void Destroy();
 
 void Update(CommandBuffer *vbuf);
 
-ID CreateStroke(float start, float end, float eccen=0.f);
-bool StrokeValid(ID sid);
-Stroke& GetStroke(ID strokeId);
-uint16_t Index(ID strokeId);
-void DestroyStroke(ID strokeId);
+StrokeID CreateStroke(float start, float end, float eccen=0.f);
+bool StrokeValid(StrokeID sid);
+Stroke& GetStroke(StrokeID strokeId);
+uint16_t Index(StrokeID strokeId);
+void DestroyStroke(StrokeID strokeId);
 
 
-inline ID CreateUniformStroke(float uniform) { return CreateStroke(uniform, uniform); }
-inline ID CreateEccentricStroke(float uniform, float eccen) { return CreateStroke(uniform, uniform, eccen); }
+inline StrokeID CreateUniformStroke(float uniform) { return CreateStroke(uniform, uniform); }
+inline StrokeID CreateEccentricStroke(float uniform, float eccen) { return CreateStroke(uniform, uniform, eccen); }
 
-inline float Start(ID strokeId) { return GetStroke(strokeId).start; }
-inline float End(ID strokeId) { return GetStroke(strokeId).end; }
-inline float Eccentricity(ID strokeId) { return GetStroke(strokeId).eccentricity; }
-inline void SetStart(ID strokeId, float s) { GetStroke(strokeId).start = s; }
-inline void SetEnd(ID strokeId, float e) { GetStroke(strokeId).end = e; }
-inline void SetEccentricity(ID strokeId, float e) { GetStroke(strokeId).eccentricity = e; }
+inline float Start(StrokeID strokeId) { return GetStroke(strokeId).start; }
+inline float End(StrokeID strokeId) { return GetStroke(strokeId).end; }
+inline float Eccentricity(StrokeID strokeId) { return GetStroke(strokeId).eccentricity; }
+inline void SetStart(StrokeID strokeId, float s) { GetStroke(strokeId).start = s; }
+inline void SetEnd(StrokeID strokeId, float e) { GetStroke(strokeId).end = e; }
+inline void SetEccentricity(StrokeID strokeId, float e) { GetStroke(strokeId).eccentricity = e; }
 
 
 

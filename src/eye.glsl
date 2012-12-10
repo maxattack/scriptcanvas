@@ -35,10 +35,10 @@ uniform float irisRadiusSq;
 uniform vec2 irisPosition;
 
 void main() {
-	vec2 offset = irisPosition - uv;
+	vec2 irisOffset = irisPosition - uv;
 	gl_FragColor = mix(
 		irisColor, color, 
-		step(irisRadiusSq, dot(offset, offset))
+		step(irisRadiusSq, dot(irisOffset, irisOffset))
 	);
 }
 

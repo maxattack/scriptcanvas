@@ -43,15 +43,6 @@ enum StatusCode {
 	// TODO: all failure codes
 };
 
-template<typename T = ID>
-struct Handle {
-	T id;
-	inline Handle(T aId) : id(aId) {}
-	inline operator T() const { return id; }
-	inline bool operator==(Handle<T> t) const { return id == t.id; }
-	inline bool operator!=(Handle<T> t) const { return id != t.id; }
-};
-
 #define STATIC_ASSERT(_x)  ((void)sizeof(char[1 - 2*!(_x)]))
 
 #ifndef arraysize

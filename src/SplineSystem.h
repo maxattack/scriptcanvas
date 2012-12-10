@@ -27,12 +27,14 @@ struct SegmentCommand {
 };
 
 struct Segment {
-	ID start;
-	ID end;
-	ID material;
-	ID stroke;
+	NodeID start;
+	NodeID end;
+	MatID material;
+	StrokeID stroke;
 	float eccentricity;
 };
+
+typedef ID SegmentID;
 
 namespace SplineSystem {
 
@@ -48,16 +50,16 @@ ID CreateSegment(ID start, ID end, ID mat, ID stroke=0, float eccentricity=INFIN
 Segment& GetSegment(ID sid);
 void DestroySegment(ID sid);
 
-inline ID Start(ID sid) { return GetSegment(sid).start; }
-inline ID End(ID sid) { return GetSegment(sid).end; }
-inline ID GetStrokeID(ID sid) { return GetSegment(sid).stroke; }
-inline Stroke& GetStroke(ID sid) { return StrokeSystem::GetStroke(GetSegment(sid).stroke); }
-inline ID GetMaterialID(ID sid) { return GetSegment(sid).material; }
-inline Material& GetMaterial(ID sid) { return MaterialSystem::GetMaterial(GetSegment(sid).material); }
-inline void SetMaterial(ID sid, ID mid) { ASSERT(MaterialSystem::MaterialValid(mid)); GetSegment(sid).material = mid; }
-inline void SetStroke(ID sid, ID stroke) { ASSERT(StrokeSystem::StrokeValid(stroke)); GetSegment(sid).stroke = stroke; }
-inline float Eccentricity(ID sid) { return GetSegment(sid).eccentricity; }
-inline void SetEccentricity(ID sid, float e) { GetSegment(sid).eccentricity = e; }
-inline void ClearEccentricity(ID sid) { GetSegment(sid).eccentricity = INFINITY; }
+inline NodeID Start(SegmentID sid) { return GetSegment(sid).start; }
+inline NodeID End(SegmentID sid) { return GetSegment(sid).end; }
+inline StrokeID GetStrokeID(SegmentID sid) { return GetSegment(sid).stroke; }
+inline Stroke& GetStroke(SegmentID sid) { return StrokeSystem::GetStroke(GetSegment(sid).stroke); }
+inline MatID GetMaterialID(SegmentID sid) { return GetSegment(sid).material; }
+inline Material& GetMaterial(SegmentID sid) { return MaterialSystem::GetMaterial(GetSegment(sid).material); }
+inline void SetMaterial(SegmentID sid, MatID mid) { ASSERT(MaterialSystem::MaterialValid(mid)); GetSegment(sid).material = mid; }
+inline void SetStroke(SegmentID sid, StrokeID stroke) { ASSERT(StrokeSystem::StrokeValid(stroke)); GetSegment(sid).stroke = stroke; }
+inline float Eccentricity(SegmentID sid) { return GetSegment(sid).eccentricity; }
+inline void SetEccentricity(SegmentID sid, float e) { GetSegment(sid).eccentricity = e; }
+inline void ClearEccentricity(SegmentID sid) { GetSegment(sid).eccentricity = INFINITY; }
 
 }

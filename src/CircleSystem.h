@@ -25,7 +25,7 @@ struct CircleCommand {
 };
 
 struct Circle {
-    ID material;
+    MatID material;
 };
 
 namespace CircleSystem {
@@ -33,24 +33,24 @@ namespace CircleSystem {
 void Initialize();
 void Destroy();
 
-void Create(ID node, ID mid);
-void Destroy(ID node);
+void Create(NodeID node, MatID mid);
+void Destroy(NodeID node);
 
-void OnNodeDestroyed(ID node);
+void OnNodeDestroyed(NodeID node);
 
 void Update(CommandBuffer* buf);
 void Render(CommandBuffer *buf);
 
-Circle& GetCircle(ID node);
+Circle& GetCircle(NodeID node);
 
 // Helper Functions
 
-inline ID GetMaterialID(ID node) { return GetCircle(node).material; }
-inline Material& GetMaterial(ID node) { return MaterialSystem::GetMaterial(GetCircle(node).material); }
+inline MatID GetMaterialID(NodeID node) { return GetCircle(node).material; }
+inline Material& GetMaterial(NodeID node) { return MaterialSystem::GetMaterial(GetCircle(node).material); }
 
-inline color_t Fill(ID node) { return GetMaterial(node).color; }
-inline float Radius(ID node) { return GetMaterial(node).weight; }
-inline void SetFill(ID node, color_t fill) { GetMaterial(node).color = fill; }
-inline void SetRadius(ID node, float r) { GetMaterial(node).weight = r; }
+inline color_t Fill(NodeID node) { return GetMaterial(node).color; }
+inline float Radius(NodeID node) { return GetMaterial(node).weight; }
+inline void SetFill(NodeID node, color_t fill) { GetMaterial(node).color = fill; }
+inline void SetRadius(NodeID node, float r) { GetMaterial(node).weight = r; }
 
 }
